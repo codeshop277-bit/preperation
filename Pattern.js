@@ -283,29 +283,64 @@ let b = 4;
 //         process.stdout.write("*")
 //     }
 //     console.log()
-// }
-let n = 5; 
-for(let i=1; i<=2*n-1; i++){
-    let starCount = n - i + 1; 
-    let spaceCount = 2*i - 2;
+// // }
+// let n = 5; 
+// for(let i=1; i<=2*n-1; i++){
+//     let starCount = n - i + 1; 
+//     let spaceCount = 2*i - 2;
 
-    //adjust for second half
-    if(i > n){
-        starCount = i - n + 1;
-        spaceCount = 4*n - 2*i - 2;
-    }
+//     //adjust for second half
+//     if(i > n){
+//         starCount = i - n + 1;
+//         spaceCount = 4*n - 2*i - 2;
+//     }
     
-    //left stars
-    for(let j=1; j<=starCount; j++){
-        process.stdout.write("*")
-    }
-    //spaces
-    for(let j=1; j<=spaceCount; j++){
-        process.stdout.write(" ")
-    }
-    //right stars
-    for(let j=1; j<=starCount; j++){
-        process.stdout.write("*")
-    }
-    console.log()
-}
+//     //left stars
+//     for(let j=1; j<=starCount; j++){
+//         process.stdout.write("*")
+//     }
+//     //spaces
+//     for(let j=1; j<=spaceCount; j++){
+//         process.stdout.write(" ")
+//     }
+//     //right stars
+//     for(let j=1; j<=starCount; j++){
+//         process.stdout.write("*")
+//     }
+//     console.log()
+// }
+
+// *****
+// *   *
+// *   *
+// *   *
+// *****
+// for(let i=0; i<=b; i++){
+//     for(let j=0; j<=b; j++){
+//         if(i==0 || j==0 || i==a-1 || j==a-1){
+//             process.stdout.write("*")
+//         }else{
+//             process.stdout.write(" ")
+//         }
+//     }
+//     console.log()
+// }
+
+
+// 4444444
+// 4333334
+// 4322234
+// 4321234
+// 4322234
+// 4333334
+// 4444444
+// for(let i=0; i<(2*b-1); i++){
+//     for(let j=0; j<(2*b-1); j++){
+//       let top = i;
+//       let left = j;
+//       let bottom = 2*b-2-i;
+//       let right = 2*b-2-j;
+//       process.stdout.write(`${b- Math.min(Math.min(top, bottom), Math.min(left, right))}`)
+//     }
+//     console.log()
+// }
