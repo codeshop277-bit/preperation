@@ -51,3 +51,26 @@ for(const ch of str){
     charMap.set(ch, (charMap.get(ch) || 0)+1)
 }
 console.log(charMap)
+
+
+// Given an array nums of n integers, find the most frequent element in it i.e., the element that occurs the maximum number of times. If there are multiple elements that appear a maximum number of times, find the smallest of them.
+
+class Solution {
+    mostFrequentElement(nums) {
+        let freq = new Map();
+
+        for(let num of nums){
+            freq.set(num, (freq.get(num) ||0) +1)
+        }
+        let maxFreq = 0;
+        let result = Infinity;
+        for (const [sum, count] of freq){
+            if(count > maxFreq || (count === maxFreq && num < result)){
+                maxFreq = count;
+                result = num;
+            }
+
+        }
+        return result;
+    }
+}
