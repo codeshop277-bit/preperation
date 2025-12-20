@@ -16,6 +16,35 @@ function SelectionSort(arr) {
     }
     return arr;
 }
+function RecursiveSelectionSort(arr, i) {
+    let n = arr.length
+    if (i> n-1) return arr
+        let min = i;
+        for (let j = i; j < n; j++) {
+            if (arr[j] < arr[min]) min = j
+        }
+        let temp = arr[min];
+        arr[min] = arr[i];
+        arr[i] = temp;
+    return RecursiveSelectionSort(arr, i+1);
+}
+
+function RecursiveBubbleSort(arr, i) {
+    let n = arr.length
+    //In bubble max will be checked and pushed to last, we can assume i as n-1
+    if(i<1) return arr;
+        let didSwap = 0;
+        for (let j = 0; j <=i; j++) { //j runs for n-1  since we are doing j+1 if taken till n it will throw run time error because it will access an undefined index
+            if (arr[j] > arr[j + 1]) {
+                let temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                didSwap++;
+            }
+        }
+        
+    return RecursiveBubbleSort(arr, i-1);
+}
 
 function BubbleSort(arr) {
     let n = arr.length
@@ -82,4 +111,4 @@ function MergeSort(arr){
     return merge(MergeSort(left), MergeSort(right))
 }
 
-console.log(MergeSort([15, 12, 48, 9, 3, 25, 1]))
+console.log(RecursiveBubbleSort([15, 12, 48, 9, 3, 25, 1], [15, 12, 48, 9, 3, 25, 1].length-1))
