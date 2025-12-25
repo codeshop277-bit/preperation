@@ -217,4 +217,110 @@ function IntersectionArray(nums1, nums2) {
     return intersection
 
 }
-console.log(IntersectionArray([1, 2, 3, 4, 5], [2,3,4,6]))
+//console.log(IntersectionArray([1, 2, 3, 4, 5], [2,3,4,6]))
+
+function MissingNo(nums){
+    let n = nums.length
+    let sumOfN = n*(n+1)/2;
+    let sum = 0;
+    for(let i=0; i<n; i++){
+        sum += nums[i]
+    }
+    return sumOfN - sum;
+}
+//console.log(MissingNo([0,1,2,3,4,5]))
+
+function MissingNoHash(nums){
+let missingSet = new Set(nums)
+for(let i=0; i<nums.length; i++){
+    if(!missingSet.has(i)){
+        return i;
+    }
+}
+}
+//console.log(MissingNoHash([0,1,2, 3,4,5]))
+
+function MaxConsecutiveOne(nums){
+    let max = 0;
+    let cons = 0;
+    for(let i=0; i<nums.length; i++){
+        if(nums[i] == 1){
+            cons++;
+        }else{
+            cons = 0;
+        }
+        if(cons> max){
+            max = cons;
+        }
+    }
+    return max;
+
+}
+//console.log(MaxConsecutiveOne([1, 1, 0, 0, 1, 1, 1, 0, 1,1,1,1,1,3]))
+
+function FindSingleNo(nums){
+ let map = new Map();
+ for(let i=0; i<nums.length; i++){
+    map.set(nums[i], (map.get(nums[i]) || 0) +1)
+ }
+ for(let [key, value] of map){
+    if (value == 1){
+        return key
+    }
+ }
+}
+//console.log(FindSingleNo([1, 2, 2, 4, 3,3, 5, 1, 4]))
+
+function FindSingleNoXOR(nums){
+ let result = 0;
+ for(let i=0; i<nums.length; i++){
+    result = result ^ nums[i]
+ }
+ return result
+}
+//console.log(FindSingleNoXOR([1, 2, 2, 4, 3,3, 5, 1, 4]))
+
+function LongestSubArray(nums, k){
+   let map = new Map();
+   let sum = 0;
+   let maxLen = 0;
+   for(let i=0; i<nums.length; i++){
+    sum+=nums[i];
+
+    if(sum == k){
+        maxLen = Math.max(maxLen, i+1)
+    }
+
+    if(map.has(sum-k)){
+        maxLen = Math.max(maxLen, i-(map.get(sum-k)))
+    }
+    if(!map.has(sum)){
+        map.set(sum, i)
+    }
+   }
+   return maxLen
+}
+console.log(LongestSubArray([10, 5, 2, 7, 1, 9], 15))
+
+
+function ShortestSubArray(nums, k){
+   let map = new Map();
+   let sum = 0;
+   let minLen = Infinity;
+   for(let i=0; i<nums.length; i++){
+    sum+=nums[i];
+
+    if(sum == k){
+        minLen = Math.min(minLen, i+1)
+    }
+
+    if(map.has(sum-k)){
+        minLen = Math.min(minLen, i-(map.get(sum-k)))
+    }
+    if(!map.has(sum)){
+        map.set(sum, i)
+    }
+   }
+   return minLen
+}
+console.log(ShortestSubArray([10, 5, 2, 7, 1, 9], 15))
