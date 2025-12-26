@@ -300,7 +300,7 @@ function LongestSubArray(nums, k){
    }
    return maxLen
 }
-console.log(LongestSubArray([10, 5, 2, 7, 1, 9], 15))
+//console.log(LongestSubArray([10, 5, 2, 7, 1, 9], 15))
 
 
 function ShortestSubArray(nums, k){
@@ -323,4 +323,92 @@ function ShortestSubArray(nums, k){
    }
    return minLen
 }
-console.log(ShortestSubArray([10, 5, 2, 7, 1, 9], 15))
+//console.log(ShortestSubArray([10, 5, 2, 7, 1, 9], 15))
+
+function TwoSum(nums, target){
+    //if map cannot be used try sorting the array and use two pointer
+    let map = new Map();
+    for(let i=0; i<nums.length; i++){
+        if(map.has(target - nums[i])){
+            return [map.get(target-nums[i]), i]
+        }
+        map.set(nums[i], i)
+
+    }
+}
+//console.log(TwoSum([1, 3, 5, -7, 6, -3], 0))
+
+function SortOS1S2S(nums){
+    //Dutch national flag algorithm
+    //Brute force - keep a counter for 0,1 and 2. Iteerate the array and get each count. Build new array with counts
+    let low = 0; let mid =0; let high = nums.length -1;
+
+    while(mid<= high){
+        if(nums[mid] == 0){
+            [nums[low], nums[mid]] = [nums[mid], nums[low]]
+            low++;
+            mid++;
+        }else if(nums[mid] == 1){
+            mid++;
+        }else{
+            [nums[mid], nums[high]] = [nums[high], nums[mid]]
+            high--;
+        }
+    }
+    return nums;
+}
+//console.log(SortOS1S2S([1, 0, 2, 1, 0]))
+
+function MajorityElement(nums) {
+    let map = new Map();
+
+    for (let i = 0; i < nums.length; i++) {
+        map.set(nums[i], (map.get(nums[i]) || 0) + 1)
+    }
+    for ([key, value] of map) {
+        if (value > nums.length / 2) {
+            return key
+        }
+    }
+    return -1;
+}
+//console.log(MajorityElement([1, 0, 2, 1, 0, 0, 0]))
+
+function MajorityElementMooresAlgo(nums) {
+    let el;
+    let count = 0;
+    for(let i=0; i<nums.length; i++){
+        if(count ==0){
+            el = nums[i]
+            count = 1;
+        }else if(el == nums[i]){
+            count++;
+        }else{
+            count--;
+        }
+    }
+    return el > nums.lenght/2 ? el : -1;
+}
+//console.log(MajorityElementMooresAlgo([1, 0, 2, 1, 0, 0]))
+
+function MaxSubarraySum(nums) {
+    //Kadane's algorithm
+    let sum =0;
+    let max = -Infinity;
+    let startIndex=0;
+    let endIndex = 0;
+
+    for(let i=0; i<nums.length; i++){
+        sum+=nums[i]
+        if(sum>max){
+            max=sum;
+            endIndex = i
+        }
+        if(sum<0){
+            sum=0
+            startIndex = i+1;
+        }
+    }
+    return nums.slice(startIndex, endIndex+1);
+}
+console.log(MaxSubarraySum([-2,-3,4,-1,-2,1,5,-3]))
