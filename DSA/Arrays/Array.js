@@ -203,12 +203,12 @@ function IntersectionArray(nums1, nums2) {
     let a = nums1.length;
     let b = nums2.length;
     let intersection = [];
-    while(i<a && j<b){
-        if(nums1[i]< nums2[j]){
+    while (i < a && j < b) {
+        if (nums1[i] < nums2[j]) {
             i++
-        }else if (nums2[j]< nums1[i]){
+        } else if (nums2[j] < nums1[i]) {
             j++
-        }else{
+        } else {
             intersection.push(nums1[i])
             i++;
             j++
@@ -219,37 +219,37 @@ function IntersectionArray(nums1, nums2) {
 }
 //console.log(IntersectionArray([1, 2, 3, 4, 5], [2,3,4,6]))
 
-function MissingNo(nums){
+function MissingNo(nums) {
     let n = nums.length
-    let sumOfN = n*(n+1)/2;
+    let sumOfN = n * (n + 1) / 2;
     let sum = 0;
-    for(let i=0; i<n; i++){
+    for (let i = 0; i < n; i++) {
         sum += nums[i]
     }
     return sumOfN - sum;
 }
 //console.log(MissingNo([0,1,2,3,4,5]))
 
-function MissingNoHash(nums){
-let missingSet = new Set(nums)
-for(let i=0; i<nums.length; i++){
-    if(!missingSet.has(i)){
-        return i;
+function MissingNoHash(nums) {
+    let missingSet = new Set(nums)
+    for (let i = 0; i < nums.length; i++) {
+        if (!missingSet.has(i)) {
+            return i;
+        }
     }
-}
 }
 //console.log(MissingNoHash([0,1,2, 3,4,5]))
 
-function MaxConsecutiveOne(nums){
+function MaxConsecutiveOne(nums) {
     let max = 0;
     let cons = 0;
-    for(let i=0; i<nums.length; i++){
-        if(nums[i] == 1){
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] == 1) {
             cons++;
-        }else{
+        } else {
             cons = 0;
         }
-        if(cons> max){
+        if (cons > max) {
             max = cons;
         }
     }
@@ -258,79 +258,79 @@ function MaxConsecutiveOne(nums){
 }
 //console.log(MaxConsecutiveOne([1, 1, 0, 0, 1, 1, 1, 0, 1,1,1,1,1,3]))
 
-function FindSingleNo(nums){
- let map = new Map();
- for(let i=0; i<nums.length; i++){
-    map.set(nums[i], (map.get(nums[i]) || 0) +1)
- }
- for(let [key, value] of map){
-    if (value == 1){
-        return key
+function FindSingleNo(nums) {
+    let map = new Map();
+    for (let i = 0; i < nums.length; i++) {
+        map.set(nums[i], (map.get(nums[i]) || 0) + 1)
     }
- }
+    for (let [key, value] of map) {
+        if (value == 1) {
+            return key
+        }
+    }
 }
 //console.log(FindSingleNo([1, 2, 2, 4, 3,3, 5, 1, 4]))
 
-function FindSingleNoXOR(nums){
- let result = 0;
- for(let i=0; i<nums.length; i++){
-    result = result ^ nums[i]
- }
- return result
+function FindSingleNoXOR(nums) {
+    let result = 0;
+    for (let i = 0; i < nums.length; i++) {
+        result = result ^ nums[i]
+    }
+    return result
 }
 //console.log(FindSingleNoXOR([1, 2, 2, 4, 3,3, 5, 1, 4]))
 
-function LongestSubArray(nums, k){
-   let map = new Map();
-   let sum = 0;
-   let maxLen = 0;
-   for(let i=0; i<nums.length; i++){
-    sum+=nums[i];
+function LongestSubArray(nums, k) {
+    let map = new Map();
+    let sum = 0;
+    let maxLen = 0;
+    for (let i = 0; i < nums.length; i++) {
+        sum += nums[i];
 
-    if(sum == k){
-        maxLen = Math.max(maxLen, i+1)
-    }
+        if (sum == k) {
+            maxLen = Math.max(maxLen, i + 1)
+        }
 
-    if(map.has(sum-k)){
-        maxLen = Math.max(maxLen, i-(map.get(sum-k)))
+        if (map.has(sum - k)) {
+            maxLen = Math.max(maxLen, i - (map.get(sum - k)))
+        }
+        if (!map.has(sum)) {
+            map.set(sum, i)
+        }
     }
-    if(!map.has(sum)){
-        map.set(sum, i)
-    }
-   }
-   return maxLen
+    return maxLen
 }
 //console.log(LongestSubArray([10, 5, 2, 7, 1, 9], 15))
 
 
-function ShortestSubArray(nums, k){
-   let map = new Map();
-   let sum = 0;
-   let minLen = Infinity;
-   for(let i=0; i<nums.length; i++){
-    sum+=nums[i];
+function ShortestSubArray(nums, k) {
+    let map = new Map();
+    let sum = 0;
+    let minLen = Infinity;
+    for (let i = 0; i < nums.length; i++) {
+        sum += nums[i];
 
-    if(sum == k){
-        minLen = Math.min(minLen, i+1)
-    }
+        if (sum == k) {
+            minLen = Math.min(minLen, i + 1)
+        }
 
-    if(map.has(sum-k)){
-        minLen = Math.min(minLen, i-(map.get(sum-k)))
+        if (map.has(sum - k)) {
+            minLen = Math.min(minLen, i - (map.get(sum - k)))
+        }
+        if (!map.has(sum)) {
+            map.set(sum, i)
+        }
     }
-    if(!map.has(sum)){
-        map.set(sum, i)
-    }
-   }
-   return minLen
+    return minLen
 }
 //console.log(ShortestSubArray([10, 5, 2, 7, 1, 9], 15))
 
-function TwoSum(nums, target){
+function TwoSum(nums, target) {
     //if map cannot be used try sorting the array and use two pointer
     let map = new Map();
-    for(let i=0; i<nums.length; i++){
-        if(map.has(target - nums[i])){
-            return [map.get(target-nums[i]), i]
+    for (let i = 0; i < nums.length; i++) {
+        if (map.has(target - nums[i])) {
+            return [map.get(target - nums[i]), i]
         }
         map.set(nums[i], i)
 
@@ -338,19 +338,19 @@ function TwoSum(nums, target){
 }
 //console.log(TwoSum([1, 3, 5, -7, 6, -3], 0))
 
-function SortOS1S2S(nums){
+function SortOS1S2S(nums) {
     //Dutch national flag algorithm
     //Brute force - keep a counter for 0,1 and 2. Iteerate the array and get each count. Build new array with counts
-    let low = 0; let mid =0; let high = nums.length -1;
+    let low = 0; let mid = 0; let high = nums.length - 1;
 
-    while(mid<= high){
-        if(nums[mid] == 0){
+    while (mid <= high) {
+        if (nums[mid] == 0) {
             [nums[low], nums[mid]] = [nums[mid], nums[low]]
             low++;
             mid++;
-        }else if(nums[mid] == 1){
+        } else if (nums[mid] == 1) {
             mid++;
-        }else{
+        } else {
             [nums[mid], nums[high]] = [nums[high], nums[mid]]
             high--;
         }
@@ -377,38 +377,164 @@ function MajorityElement(nums) {
 function MajorityElementMooresAlgo(nums) {
     let el;
     let count = 0;
-    for(let i=0; i<nums.length; i++){
-        if(count ==0){
+    for (let i = 0; i < nums.length; i++) {
+        if (count == 0) {
             el = nums[i]
             count = 1;
-        }else if(el == nums[i]){
+        } else if (el == nums[i]) {
             count++;
-        }else{
+        } else {
             count--;
         }
     }
-    return el > nums.lenght/2 ? el : -1;
+    return el > nums.lenght / 2 ? el : -1;
 }
 //console.log(MajorityElementMooresAlgo([1, 0, 2, 1, 0, 0]))
 
 function MaxSubarraySum(nums) {
     //Kadane's algorithm
-    let sum =0;
+    let sum = 0;
     let max = -Infinity;
-    let startIndex=0;
+    let startIndex = 0;
     let endIndex = 0;
 
-    for(let i=0; i<nums.length; i++){
-        sum+=nums[i]
-        if(sum>max){
-            max=sum;
+    for (let i = 0; i < nums.length; i++) {
+        sum += nums[i]
+        if (sum > max) {
+            max = sum;
             endIndex = i
         }
-        if(sum<0){
-            sum=0
-            startIndex = i+1;
+        if (sum < 0) {
+            sum = 0
+            startIndex = i + 1;
         }
     }
-    return nums.slice(startIndex, endIndex+1);
+    return nums.slice(startIndex, endIndex + 1);
 }
-console.log(MaxSubarraySum([-2,-3,4,-1,-2,1,5,-3]))
+//console.log(MaxSubarraySum([-2,-3,4,-1,-2,1,5,-3]))
+function RearrangeElementsOfN(nums) {
+        //only if pos == neg
+let posIndex = 0;
+let final = []
+let negIndex = 1;
+     for (let i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) {
+                final[posIndex] = nums[i];
+                posIndex+=2
+            } else {
+                 final[negIndex] = nums[i];
+                negIndex+=2
+            }
+        }
+   
+    return final
+}
+//console.log(RearrangeElementsOfN([3, 1, -2, -5, 2, -4]))
+function RearrangeElements(nums) {
+    let pos = [];
+    let neg = [];
+     for (let i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) {
+                pos.push(nums[i])
+            } else {
+                neg.push(nums[i])
+            }
+        }
+    //if pos>neg
+    if (pos.length == neg.length) {
+       
+        for (let i = 0; i < (nums.length) / 2; i++) {
+            nums[2 * i] = pos[i]
+            nums[2 * i + 1] = neg[i]
+        }
+    } else if (pos.length > neg.length) {
+        for (let i = 0; i < neg.length; i++) {
+            nums[2 * i] = pos[i]
+            nums[2 * i + 1] = neg[i]
+        }
+        let index = neg.length * 2;
+        for (let i = neg.length; i < pos.length; i++) {
+            nums[index] = pos[i];
+            index++;
+        }
+    } else {
+        for (let i = 0; i < pos.length; i++) {
+            nums[2 * i] = pos[i]
+            nums[2 * i + 1] = neg[i]
+        }
+        let index = pos.length * 2;
+        for (let i = pos.length; i < neg.length; i++) {
+            nums[index] = neg[i];
+            index++;
+        }
+    }
+
+    return nums
+}
+//console.log(RearrangeElements([3, 1, -2, -5, 2, -4, 1, 5]))
+
+function NextPermutation(nums) {
+    //refer book for steps
+    let index = -1;
+    let n = nums.length
+    for (let i = n - 2; i >=0; i--) {
+        if (nums[i] < nums[i + 1]) {
+            index = i;
+            break;
+        }
+    }
+    if(index == -1){
+        return nums.reverse()
+    }
+    for (let i = n - 1; i > index; i--) {
+        if (nums[i] > nums[index]) {
+            [nums[i], nums[index]] = [nums[index], nums[i]]
+        }
+    }
+    function reverseRange(arr, start, end) {
+        return [
+            ...arr.slice(0, start),
+            ...arr.slice(start, end + 1).reverse(),
+            ...arr.slice(end + 1)
+        ];
+    }
+
+    let result = reverseRange(nums, index+1, n-1);
+    return result
+}
+//console.log(NextPermutation([2, 1, 5, 4, 3, 0, 0]))
+
+function LeaderArray(nums){
+    let max = -Infinity;
+    let ans = []
+    for(let i=nums.length -1; i>=0; i--){
+        if(nums[i] > max){
+            ans.push(nums[i])
+            max = Math.max(max, nums[i])
+        }
+    }
+    return ans
+}
+//console.log(LeaderArray([10,22,12,3,0,6]))
+
+function LongestConsecutive(nums){
+    let set = new Set();
+    let maxCons = 1;
+    for(let i=0; i<nums.length; i++){
+        set.add(nums[i])
+    }
+    for(let i of set){
+        if(!set.has(i-1)){
+            let count = 1;
+            let x = i;
+
+            while(set.has(x+1)){
+                count++;
+                x++;
+            }
+            maxCons = Math.max(maxCons, count)
+        }
+    }
+    return maxCons
+}
+console.log(LongestConsecutive([1,1, 2,0,4, 5,6,7,3]))
