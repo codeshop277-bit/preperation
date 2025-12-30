@@ -413,36 +413,36 @@ function MaxSubarraySum(nums) {
 }
 //console.log(MaxSubarraySum([-2,-3,4,-1,-2,1,5,-3]))
 function RearrangeElementsOfN(nums) {
-        //only if pos == neg
-let posIndex = 0;
-let final = []
-let negIndex = 1;
-     for (let i = 0; i < nums.length; i++) {
-            if (nums[i] > 0) {
-                final[posIndex] = nums[i];
-                posIndex+=2
-            } else {
-                 final[negIndex] = nums[i];
-                negIndex+=2
-            }
+    //only if pos == neg
+    let posIndex = 0;
+    let final = []
+    let negIndex = 1;
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] > 0) {
+            final[posIndex] = nums[i];
+            posIndex += 2
+        } else {
+            final[negIndex] = nums[i];
+            negIndex += 2
         }
-   
+    }
+
     return final
 }
 //console.log(RearrangeElementsOfN([3, 1, -2, -5, 2, -4]))
 function RearrangeElements(nums) {
     let pos = [];
     let neg = [];
-     for (let i = 0; i < nums.length; i++) {
-            if (nums[i] > 0) {
-                pos.push(nums[i])
-            } else {
-                neg.push(nums[i])
-            }
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] > 0) {
+            pos.push(nums[i])
+        } else {
+            neg.push(nums[i])
         }
+    }
     //if pos>neg
     if (pos.length == neg.length) {
-       
+
         for (let i = 0; i < (nums.length) / 2; i++) {
             nums[2 * i] = pos[i]
             nums[2 * i + 1] = neg[i]
@@ -477,13 +477,13 @@ function NextPermutation(nums) {
     //refer book for steps
     let index = -1;
     let n = nums.length
-    for (let i = n - 2; i >=0; i--) {
+    for (let i = n - 2; i >= 0; i--) {
         if (nums[i] < nums[i + 1]) {
             index = i;
             break;
         }
     }
-    if(index == -1){
+    if (index == -1) {
         return nums.reverse()
     }
     for (let i = n - 1; i > index; i--) {
@@ -499,16 +499,16 @@ function NextPermutation(nums) {
         ];
     }
 
-    let result = reverseRange(nums, index+1, n-1);
+    let result = reverseRange(nums, index + 1, n - 1);
     return result
 }
 //console.log(NextPermutation([2, 1, 5, 4, 3, 0, 0]))
 
-function LeaderArray(nums){
+function LeaderArray(nums) {
     let max = -Infinity;
     let ans = []
-    for(let i=nums.length -1; i>=0; i--){
-        if(nums[i] > max){
+    for (let i = nums.length - 1; i >= 0; i--) {
+        if (nums[i] > max) {
             ans.push(nums[i])
             max = Math.max(max, nums[i])
         }
@@ -517,18 +517,18 @@ function LeaderArray(nums){
 }
 //console.log(LeaderArray([10,22,12,3,0,6]))
 
-function LongestConsecutive(nums){
+function LongestConsecutive(nums) {
     let set = new Set();
     let maxCons = 1;
-    for(let i=0; i<nums.length; i++){
+    for (let i = 0; i < nums.length; i++) {
         set.add(nums[i])
     }
-    for(let i of set){
-        if(!set.has(i-1)){
+    for (let i of set) {
+        if (!set.has(i - 1)) {
             let count = 1;
             let x = i;
 
-            while(set.has(x+1)){
+            while (set.has(x + 1)) {
                 count++;
                 x++;
             }
@@ -537,4 +537,76 @@ function LongestConsecutive(nums){
     }
     return maxCons
 }
-console.log(LongestConsecutive([1,1, 2,0,4, 5,6,7,3]))
+// console.log(LongestConsecutive([1,1, 2,0,4, 5,6,7,3]))
+function SetMatrixZeroes(matrix) {
+    let m = matrix.length; // number of rows
+    let n = matrix[0].length; // number of columns
+    let zeroRows = new Set();
+    let zeroCols = new Set();
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (matrix[i][j] == 0) {
+                zeroRows.add(i);
+                zeroCols.add(j);
+            }
+        }
+    }
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            if (zeroRows.has(i) || zeroCols.has(j)) {
+                matrix[i][j] = 0;
+            }
+        }           
+    }
+    return matrix;
+
+}
+console.log(SetMatrixZeroes([[0,1,2,0], [3,4,5,2], [1,3,1,5]]))
+function SetMatrixZeroesOptimal(matrix) {
+    let m = matrix.length; // number of rows
+    let n = matrix[0].length; // number of columns
+
+    let firstRowHasZero = false;
+    let firstColHasZero = false;
+
+    for (let i = 0; i < m; i++) {
+        if (matrix[i][0] == 0) {
+            firstColHasZero = true;
+            break;
+        }
+    }
+    for (let j = 0; j < n; j++) {
+        if (matrix[0][j] == 0) {
+            firstRowHasZero = true;
+            break;
+        }
+    }
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (matrix[i][j] == 0) {
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
+            }
+        }
+    }
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                matrix[i][j] = 0
+            }
+        }
+    }
+    if (firstRowHasZero) {
+        for (let j = 0; j < n; j++) {
+            matrix[0][j] = 0;
+        }
+    }
+    if (firstColHasZero) {
+        for (let i = 0; i < m; i++) {
+            matrix[i][0] = 0;
+        }
+    }
+    return matrix;
+}
+console.log(SetMatrixZeroesOptimal([[0,1,2,0], [3,4,5,2], [1,3,1,5]]))
