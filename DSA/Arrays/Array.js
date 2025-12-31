@@ -661,13 +661,69 @@ function CountSubArraysWithGivenSum(nums, k) {
     let map = new Map();
     let count = 0, prefixSum = 0;
     map.set(0, 1)
-    for(let i=0; i<nums.length; i++){
+    for (let i = 0; i < nums.length; i++) {
         prefixSum += nums[i];
 
-        let remove = prefixSum-k;
-        count +=map.get(remove) || 0;
-        map.set(prefixSum, map.get(prefixSum)+1 || 1)
+        let remove = prefixSum - k;
+        count += map.get(remove) || 0;
+        map.set(prefixSum, map.get(prefixSum) + 1 || 1)
     }
     return count
 }
 // console.log(CountSubArraysWithGivenSum([3, 1, 2, 4, 6], 6))
+
+function MajorityElement(nums) {
+    let n = nums.length;
+    let ans = [];
+    let map = new Map();
+    for (let i = 0; i < n; i++) {
+        map.set(nums[i], (map.get(nums[i]) || 0) + 1)
+    };
+
+    for (let [key, value] of map) {
+        if (value > Math.floor(n / 3)) {
+            ans.push(key)
+        }
+    }
+    return ans;
+}
+console.log(MajorityElement([3, 2, 3, 1, 2, 3, 3, 2]))
+
+function MajorityElementMoore(nums) {
+    // in an array of size n, there can be atmost 2 elements with freq > n/3
+    let el1 = -Infinity, el2 = -Infinity;
+    let count1 = 0, count2 = 0;
+    let n = nums.length;
+    let ans = [];
+    for (let i = 0; i < n; i++) {
+        if (count1 == 0 && nums[i] != el2) {
+            el1 = nums[i]
+            count1 = 1;
+        } else if (count2 == 0 && nums[i] != el1) {
+            count2 = 1;
+            el2 = nums[i]
+        } else if (nums[i] == el1) {
+            count1++;
+        } else if (nums[i] == el2) {
+            count2++
+        } else {
+            count1--;
+            count2--;
+        }
+
+    }
+
+    let cnt1 = 0; let cnt2 = 0;
+    for (let i = 0; i < n; i++) {
+        if (nums[i] == el1) cnt1++;
+         if (nums[i] == el2) cnt2++;
+    }
+    if (cnt1 >=Math.floor((n / 3) + 1)) {
+        ans.push(el1)
+    }
+    if (cnt2 >=Math.floor((n / 3) + 1)) {
+        ans.push(el2)
+    }
+    return ans;
+}
+console.log(MajorityElementMoore([3, 2, 3, 1, 2, 3, 3, 2]))
