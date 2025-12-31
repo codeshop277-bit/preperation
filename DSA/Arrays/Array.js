@@ -557,12 +557,12 @@ function SetMatrixZeroes(matrix) {
             if (zeroRows.has(i) || zeroCols.has(j)) {
                 matrix[i][j] = 0;
             }
-        }           
+        }
     }
     return matrix;
 
 }
-console.log(SetMatrixZeroes([[0,1,2,0], [3,4,5,2], [1,3,1,5]]))
+// console.log(SetMatrixZeroes([[0,1,2,0], [3,4,5,2], [1,3,1,5]]))
 function SetMatrixZeroesOptimal(matrix) {
     let m = matrix.length; // number of rows
     let n = matrix[0].length; // number of columns
@@ -609,4 +609,65 @@ function SetMatrixZeroesOptimal(matrix) {
     }
     return matrix;
 }
-console.log(SetMatrixZeroesOptimal([[0,1,2,0], [3,4,5,2], [1,3,1,5]]))
+// console.log(SetMatrixZeroesOptimal([[0,1,2,0], [3,4,5,2], [1,3,1,5]]))
+
+function RotateMatrixBy90Degrees(matrix) {
+    let m = matrix.length;
+
+    for (let i = 0; i < m - 1; i++) {
+        for (let j = i + 1; j < m; j++) {
+            [matrix[i][j], matrix[j][i]] = [matrix[j][i], matrix[i][j]]
+        }
+    }
+    return matrix.map(row => row.reverse());
+}
+// console.log(RotateMatrixBy90Degrees([[1,2,3,4], [5,6,7,8], [9,10,11,12], [13,14,15,16]]))
+
+function SpiralTraversalOfMatrix(matrix) {
+    let m = matrix.length;
+    let n = matrix[0].length;
+    let ans = [];
+    let top = 0, bottom = m - 1;
+    let left = 0; right = n - 1;
+
+    while (top <= bottom && left <= right) {
+
+        for (let i = left; i <= right; i++) {
+            ans.push(matrix[top][i])
+        };
+        top++;
+        for (let i = top; i <= bottom; i++) {
+            ans.push(matrix[i][right])
+        };
+        right--;
+        if (top <= bottom) {
+            for (let i = right; i >= left; i--) {
+                ans.push(matrix[bottom][i])
+            }
+            bottom--;
+        }
+        if (left <= right) {
+            for (i = bottom; i >= top; i--) {
+                ans.push(matrix[i][left])
+            }
+            left++;
+        }
+    }
+    return ans
+}
+// console.log(SpiralTraversalOfMatrix([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]))
+
+function CountSubArraysWithGivenSum(nums, k) {
+    let map = new Map();
+    let count = 0, prefixSum = 0;
+    map.set(0, 1)
+    for(let i=0; i<nums.length; i++){
+        prefixSum += nums[i];
+
+        let remove = prefixSum-k;
+        count +=map.get(remove) || 0;
+        map.set(prefixSum, map.get(prefixSum)+1 || 1)
+    }
+    return count
+}
+// console.log(CountSubArraysWithGivenSum([3, 1, 2, 4, 6], 6))
