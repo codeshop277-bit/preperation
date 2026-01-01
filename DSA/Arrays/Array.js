@@ -716,12 +716,12 @@ function MajorityElementMoore(nums) {
     let cnt1 = 0; let cnt2 = 0;
     for (let i = 0; i < n; i++) {
         if (nums[i] == el1) cnt1++;
-         if (nums[i] == el2) cnt2++;
+        if (nums[i] == el2) cnt2++;
     }
-    if (cnt1 >=Math.floor((n / 3) + 1)) {
+    if (cnt1 >= Math.floor((n / 3) + 1)) {
         ans.push(el1)
     }
-    if (cnt2 >=Math.floor((n / 3) + 1)) {
+    if (cnt2 >= Math.floor((n / 3) + 1)) {
         ans.push(el2)
     }
     return ans;
@@ -733,17 +733,17 @@ function ThreeSum(nums) {
     let set = new Set();
     let ans = [];
 
-    for(let i=0; i<n; i++){
-        for(let j=i+1; j<n; j++){
-            for(let k=j+1; k<n; k++){
-                if(nums[i] + nums[k] + nums[j] == 0){
+    for (let i = 0; i < n; i++) {
+        for (let j = i + 1; j < n; j++) {
+            for (let k = j + 1; k < n; k++) {
+                if (nums[i] + nums[k] + nums[j] == 0) {
                     let triplet = [nums[i], nums[j], nums[k]];
                     set.add(triplet.sort())
                 }
             }
         }
     }
-    for (let st of set){
+    for (let st of set) {
         ans.push(st)
     }
     return ans
@@ -756,21 +756,21 @@ function ThreeSumBetter(nums) {
     let set = new Set();
     let ans = [];
 
-    for(let i=0; i<n; i++){
-    let map = new Map();
-        for(let j=i+1; j<n; j++){
+    for (let i = 0; i < n; i++) {
+        let map = new Map();
+        for (let j = i + 1; j < n; j++) {
             let third = -(nums[i] + nums[j]);
-            if(map.has(third)){
-                if(nums[i] + nums[j] + third == 0){
+            if (map.has(third)) {
+                if (nums[i] + nums[j] + third == 0) {
                     let triplet = [nums[i], nums[j], third];
                     set.add(triplet.sort())
                 }
             }
             map.set(nums[j], j)
-                
+
         }
     }
-    for (let st of set){
+    for (let st of set) {
         ans.push(st)
     }
     return ans
@@ -781,27 +781,27 @@ function ThreeSumOptimal(nums) {
     let n = nums.length;
     let ans = [];
     //using two pinter approach, sort the array first then fix one element and use two pointer for other two elements for example if we fix i, then left = i+1 and right = n-1 and move accordingly
-    nums.sort((a,b)=>a-b) //T>c - o(nlogn)
+    nums.sort((a, b) => a - b) //T>c - o(nlogn)
     //Also if nums[i] == nums[i-1] continue to avoid duplicates similarly for left and right pointers
-    for(let i=0; i<n; i++){
-        let j = i+1; let k = n-1;
-        if(i> 0 && nums[i] == nums[i-1]) continue;
-        while(j<k){
+    for (let i = 0; i < n; i++) {
+        let j = i + 1; let k = n - 1;
+        if (i > 0 && nums[i] == nums[i - 1]) continue;
+        while (j < k) {
             let sum = nums[i] + nums[j] + nums[k];
-            if(sum <0){
+            if (sum < 0) {
                 j++;
-            }else if (sum > 0){
+            } else if (sum > 0) {
                 k--;
-            }else {
+            } else {
                 ans.push([nums[i], nums[j], nums[k]]);
-                    j++;
-                    k--;
-                    while(j<k && nums[j] == nums[j-1]) j++;
-                    while(j<k && nums[k] == nums[k+1]) k--;
+                j++;
+                k--;
+                while (j < k && nums[j] == nums[j - 1]) j++;
+                while (j < k && nums[k] == nums[k + 1]) k--;
             }
         }
     }
-   
+
     return ans
 }
 // console.log(ThreeSumBetter([-1, 0, 1, 2, -1, -4]))
@@ -809,30 +809,87 @@ function ThreeSumOptimal(nums) {
 function FourSum(nums, target) {
     let n = nums.length;
     let ans = [];
-    nums.sort((a,b) => a-b)
+    nums.sort((a, b) => a - b)
 
-    for(let i =0; i<n; i++){
-        if(i>0 && nums[i] == nums[i-1]) continue;
-        for(let j=i+1; j<n; j++){
-            let k = j+1;
-            let l = n-1;
-            if(j> i+1 && nums[j] == nums[j-1]) continue
-            while(k<l){
+    for (let i = 0; i < n; i++) {
+        if (i > 0 && nums[i] == nums[i - 1]) continue;
+        for (let j = i + 1; j < n; j++) {
+            let k = j + 1;
+            let l = n - 1;
+            if (j > i + 1 && nums[j] == nums[j - 1]) continue
+            while (k < l) {
                 let sum = nums[i] + nums[j] + nums[k] + nums[l];
-                if(sum<target){
+                if (sum < target) {
                     k++
-                }else if (sum>target){
+                } else if (sum > target) {
                     l--;
-                }else{
+                } else {
                     ans.push([nums[i], nums[j], nums[k], nums[l]]);
                     k++
                     l--;
-                    while(k<l && nums[k] == nums[k-1]) k++;
-                    while(k<l && nums[l] == nums[l+1]) l--;
+                    while (k < l && nums[k] == nums[k - 1]) k++;
+                    while (k < l && nums[l] == nums[l + 1]) l--;
                 }
             }
         }
     }
     return ans
 }
-console.log(FourSum([1, -2, 3, 5, 7, 9], 7))
+// console.log(FourSum([1, -2, 3, 5, 7, 9], 7))
+
+function LargestSubArrayWith0Sum(nums) {
+    let n = nums.length;
+    let map = new Map();
+    let max = -Infinity;;
+    let sum = 0;
+    for (let i = 0; i < n; i++) {
+        sum += nums[i]
+        if (map.get(sum) != undefined) {
+            max = Math.max(max, i - (map.get(sum)))
+            // Here i - map.get(sum) gives length of subarray with 0 sum, for ex - if sum repeats at index 2 and 5, then subarray from 3 to 5 has 0 sum, length = 5-2 =3
+        } else {
+            map.set(sum, i)
+        }
+    }
+    return max;
+}
+// console.log(LargestSubArrayWith0Sum([15, -2, 2, -8, 1, 7, 10, 23]))
+
+function CountSubArraysWithGivenSum(nums, k) {
+    let n = nums.length;
+    let map = new Map();
+    let xor = 0;
+
+    let count = 0;
+    map.set(0, 1)
+    for (let i = 0; i < n; i++) {
+        xor = xor ^ nums[i];
+
+        let remove = xor ^ k;
+        if (map.get(remove)) {
+            count += map.get(remove)
+        }
+        map.set(xor, (map.get(xor) || 0) + 1)
+    }
+    return count;
+}
+
+// console.log(CountSubArraysWithGivenSum([4,2,2,6,4], 6))
+
+function MergeOverlappingIntervals(intervals) {
+    let n = intervals.length
+    intervals.sort((a, b) => a[0] - b[0]);
+    let ans = [];
+
+    for(let i=0; i<n; i++){
+        let start  = intervals[i][0];
+        let end = intervals[i][1];
+        if(ans.length == 0 || ans[ans.length - 1][1] < start){
+            ans.push(start, end)
+        }else{
+            ans[ans.length -1][1] = Math.max(ans[ans.length - 1][1], end)
+        }
+    }
+    return ans;
+}
+// console.log(MergeOverlappingIntervals([[1, 3], [2, 4], [5, 7], [6, 8]]))
