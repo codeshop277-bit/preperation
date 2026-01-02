@@ -881,15 +881,117 @@ function MergeOverlappingIntervals(intervals) {
     intervals.sort((a, b) => a[0] - b[0]);
     let ans = [];
 
-    for(let i=0; i<n; i++){
-        let start  = intervals[i][0];
+    for (let i = 0; i < n; i++) {
+        let start = intervals[i][0];
         let end = intervals[i][1];
-        if(ans.length == 0 || ans[ans.length - 1][1] < start){
+        if (ans.length == 0 || ans[ans.length - 1][1] < start) {
             ans.push(start, end)
-        }else{
-            ans[ans.length -1][1] = Math.max(ans[ans.length - 1][1], end)
+        } else {
+            ans[ans.length - 1][1] = Math.max(ans[ans.length - 1][1], end)
         }
     }
     return ans;
 }
 // console.log(MergeOverlappingIntervals([[1, 3], [2, 4], [5, 7], [6, 8]]))
+
+function MergeSortedArray(nums1, m, nums2, n) {
+    let ans = [];
+    let left = 0; let right = 0;
+
+    while (left < m && right < n) {
+        if (nums1[left] <= nums2[right]) {
+            ans.push(nums1[left])
+            left++;
+        } else {
+            ans.push(nums2[right])
+            right++;
+        }
+    }
+    while (left < m) {
+        ans.push(nums1[left])
+        left++;
+    }
+    while (right < n) {
+        ans.push(nums2[right])
+        right++;
+    }
+    return ans
+
+}
+
+// console.log(MergeSortedArray([5, -2, 4, 5], 4, [-3, 1, 8], 3))
+
+function MergeSortedArrayInPlace(nums1, m, nums2, n) {
+    let left = m - 1;  // Start at last element of nums1
+    let right = 0;
+
+    // Swap elements to get smaller ones in nums1
+    while (left >= 0 && right < n) {
+        if (nums1[left] > nums2[right]) {
+            [nums1[left], nums2[right]] = [nums2[right], nums1[left]];
+            left--;
+            right++;
+        } else {
+            break;
+        }
+    }
+    
+    // Sort both arrays
+    nums1.sort((a, b) => a - b);
+    nums2.sort((a, b) => a - b);
+    
+    return {nums1, nums2};
+}
+
+// console.log(MergeSortedArrayInPlace([5, -2, 4, 5], 4, [-3, 1, 8], 3));
+function countInversions(nums) {
+    return mergeSortAndCount(nums, 0, nums.length - 1);
+}
+
+function mergeSortAndCount(arr, left, right) {
+    let count = 0;
+    
+    if (left < right) {
+        const mid = Math.floor((left + right) / 2);
+        
+        // Count inversions in left and right halves
+        count += mergeSortAndCount(arr, left, mid);
+        count += mergeSortAndCount(arr, mid + 1, right);
+        
+        // Count inversions during merge
+        count += mergeAndCount(arr, left, mid, right);
+    }
+    
+    return count;
+}
+
+function mergeAndCount(arr, left, mid, right) {
+    const leftArr = arr.slice(left, mid + 1);
+    const rightArr = arr.slice(mid + 1, right + 1);
+    
+    let i = 0, j = 0, k = left;
+    let count = 0;
+    
+    while (i < leftArr.length && j < rightArr.length) {
+        if (leftArr[i] <= rightArr[j]) {
+            arr[k++] = leftArr[i++];
+        } else {
+            // All remaining elements in leftArr are greater than rightArr[j]
+            arr[k++] = rightArr[j++];
+            count += (leftArr.length - i);
+        }
+    }
+    
+    // Copy remaining elements
+    while (i < leftArr.length) {
+        arr[k++] = leftArr[i++];
+    }
+    
+    while (j < rightArr.length) {
+        arr[k++] = rightArr[j++];
+    }
+    
+    return count;
+}
+
+console.log(countInversions([2, 3, 7, 1, 3, 5])); // Output: 5
