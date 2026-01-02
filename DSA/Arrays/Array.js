@@ -988,4 +988,133 @@ function countInversions(nums) {
 }
 
 // Test cases
-console.log(countInversions([2, 3, 7, 1, 3, 5])); // Output: 5
+// console.log(countInversions([2, 3, 7, 1, 3, 5])); // Output: 5
+
+function findMissingAndRepeating(nums) {
+    let n = nums.length;
+
+    let map = new Map();
+    for(let i=1; i<=n; i++){
+        map.set(i, 0)
+    }
+    let missing = -1;
+    let repeating = -1;
+
+    for(let i=0; i< n; i++){
+        map.set(nums[i], map.get(nums[i]) +1)
+    }
+
+    for(let [key, value]  of map){
+        if(value ==0){
+            missing = key;
+        }
+        if(value ==2){
+            repeating = key;
+        }
+    }
+    return {missing, repeating};
+}
+// console.log(findMissingAndRepeating([3, 1, 3, 5, 4])) // {missing:2, repeating:3}
+
+function findMissingAndRepeatingOptimal(nums) {
+    let n = nums.length
+    
+    let sumOfN = n* (n+1)/2;
+    let sumOfNSquare = (n* (n+1) * (2*n+1))/6;
+    let sum = 0;
+    let sumSquare =0;
+    for(let i=0; i< n; i++){
+        sum+=nums[i];
+        sumSquare += (nums[i] * nums[i])
+    }
+
+    let val1 = sum - sumOfN; // repeating - missing
+    let val2 = sumSquare - sumOfNSquare; // repeating^2 - missing^2
+
+    val2 = val2/val1;
+    let x = (val1 + val2)/2
+    let y = x - val1;
+    return {missing: y, repeating: x};
+}
+// console.log(findMissingAndRepeatingOptimal([3, 1, 3, 5, 4])) // {missing:2, repeating:3}
+
+function MaximumProductSubarray(nums) {
+    let n = nums.length
+    let max = -Infinity;
+    let prefix = 1; suffix = 1;
+
+    for(let i=0; i<n; i++){
+        if(prefix == 0) prefix =1;
+        if(suffix ==0) suffix =1;
+         prefix = prefix * nums[i];
+         suffix = suffix * nums[n-i-1]
+
+         max = Math.max(max, Math.max(prefix, suffix))
+    }
+    return max;
+}
+// console.log(MaximumProductSubarray([2,3,-2,4])) //6
+function reversePairs(nums) {
+    return mergeSortAndCount(nums, 0, nums.length - 1);
+}
+
+function mergeSortAndCount(arr, left, right) {
+    if (left >= right) return 0;
+    
+    const mid = Math.floor((left + right) / 2);
+    let count = 0;
+    
+    // Count in left and right halves
+    count += mergeSortAndCount(arr, left, mid);
+    count += mergeSortAndCount(arr, mid + 1, right);
+    
+    // Count reverse pairs across the two halves
+    count += countReversePairs(arr, left, mid, right);
+    
+    // Merge the two halves
+    merge(arr, left, mid, right);
+    
+    return count;
+}
+
+function countReversePairs(arr, left, mid, right) {
+    let count = 0;
+    let j = mid + 1;
+    
+    // For each element in left half, count elements in right half
+    // that satisfy the condition
+    for (let i = left; i <= mid; i++) {
+        while (j <= right && arr[i] > 2 * arr[j]) {
+            j++;
+        }
+        count += (j - (mid + 1));
+    }
+    
+    return count;
+}
+
+function merge(arr, left, mid, right) {
+    const leftArr = arr.slice(left, mid + 1);
+    const rightArr = arr.slice(mid + 1, right + 1);
+    
+    let i = 0, j = 0, k = left;
+    
+    while (i < leftArr.length && j < rightArr.length) {
+        if (leftArr[i] <= rightArr[j]) {
+            arr[k++] = leftArr[i++];
+        } else {
+            arr[k++] = rightArr[j++];
+        }
+    }
+    
+    while (i < leftArr.length) {
+        arr[k++] = leftArr[i++];
+    }
+    
+    while (j < rightArr.length) {
+        arr[k++] = rightArr[j++];
+    }
+}
+
+// Test cases
+console.log(reversePairs([6, 4, 1, 2, 7])); // Output: 3
