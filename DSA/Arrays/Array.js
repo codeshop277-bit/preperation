@@ -944,54 +944,48 @@ function MergeSortedArrayInPlace(nums1, m, nums2, n) {
 }
 
 // console.log(MergeSortedArrayInPlace([5, -2, 4, 5], 4, [-3, 1, 8], 3));
-function countInversions(nums) {
-    return mergeSortAndCount(nums, 0, nums.length - 1);
-}
-
-function mergeSortAndCount(arr, left, right) {
-    let count = 0;
+function merge(left, right){
+    let result = [];
+    let i = 0;
+    let j = 0;
+    let inversions = 0;
     
-    if (left < right) {
-        const mid = Math.floor((left + right) / 2);
-        
-        // Count inversions in left and right halves
-        count += mergeSortAndCount(arr, left, mid);
-        count += mergeSortAndCount(arr, mid + 1, right);
-        
-        // Count inversions during merge
-        count += mergeAndCount(arr, left, mid, right);
-    }
-    
-    return count;
-}
-
-function mergeAndCount(arr, left, mid, right) {
-    const leftArr = arr.slice(left, mid + 1);
-    const rightArr = arr.slice(mid + 1, right + 1);
-    
-    let i = 0, j = 0, k = left;
-    let count = 0;
-    
-    while (i < leftArr.length && j < rightArr.length) {
-        if (leftArr[i] <= rightArr[j]) {
-            arr[k++] = leftArr[i++];
+    while(i < left.length && j < right.length){
+        if(left[i] <= right[j]){
+            result.push(left[i]);
+            i++;
         } else {
-            // All remaining elements in leftArr are greater than rightArr[j]
-            arr[k++] = rightArr[j++];
-            count += (leftArr.length - i);
+            result.push(right[j]);
+            j++;
+            // When we pick from right array, all remaining elements in left are inversions
+            inversions += (left.length - i);
         }
     }
     
-    // Copy remaining elements
-    while (i < leftArr.length) {
-        arr[k++] = leftArr[i++];
-    }
-    
-    while (j < rightArr.length) {
-        arr[k++] = rightArr[j++];
-    }
-    
-    return count;
+    const merged = result.concat(left.slice(i)).concat(right.slice(j));
+    return { merged, inversions };
 }
 
+function MergeSort(arr){
+    if(arr.length <= 1) return { sorted: arr, inversions: 0 };
+    
+    let mid = Math.floor(arr.length / 2);
+    const left = arr.slice(0, mid);
+    const right = arr.slice(mid);
+
+    const leftResult = MergeSort(left);
+    const rightResult = MergeSort(right);
+    const mergeResult = merge(leftResult.sorted, rightResult.sorted);
+    
+    return {
+        sorted: mergeResult.merged,
+        inversions: leftResult.inversions + rightResult.inversions + mergeResult.inversions
+    };
+}
+
+function countInversions(nums) {
+    return MergeSort(nums).inversions;
+}
+
+// Test cases
 console.log(countInversions([2, 3, 7, 1, 3, 5])); // Output: 5
