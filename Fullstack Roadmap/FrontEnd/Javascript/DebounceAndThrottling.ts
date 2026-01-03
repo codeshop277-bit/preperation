@@ -7,10 +7,10 @@ import React from 'react';
 // tf user runs the query r and re next and has a delay of 500 ms
 //Only after 500ms the search will trigger, r -> re  timer resets to 0 and query is updated to re
 
-function debounce<T extends(...args: any[])=> void>(fn: T, delay: number): (...args: Parameters<T>) => void{
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): (...args: Parameters<T>) => void {
     let timerId: ReturnType<typeof setTimeout>;
 
-    return function(this: ThisParameterType<T>, ...args: Parameters<T>){
+    return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
         let context = this;
         clearTimeout(timerId);
 
@@ -34,3 +34,23 @@ const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 // (...args: Parameters<T>)
 // Preserves the exact argument types of fn
+
+
+//Throttling ensures a function is only called once in a specified time period,
+// regardless of how many times it is triggered. This is useful for limiting the rate of events like window resizing or scrolling.
+
+function throttle<T extends (...args:any[]) => void>(fn: T, delay: number): (...args:Parameters<T>) => void {
+    let lastCallTime: number = 0;
+
+    return function (...args: Parameters<T>) {
+        const now = Date.now()
+        if (now - lastCallTime >= delay) {
+            lastCallTime = now
+            fn(...args)
+        }
+    }
+}
+
+const handleScroll = throttle(() => {
+    ///throttle lgong
+}, 500)
