@@ -54,3 +54,5 @@ function throttle<T extends (...args:any[]) => void>(fn: T, delay: number): (...
 const handleScroll = throttle(() => {
     ///throttle lgong
 }, 500)
+
+//Key difference: Debounce waits for a pause in activity, while throttling executes at regular intervals during continuous activity.
