@@ -315,5 +315,6 @@ Typical use cases:
 
 ## Practical Recommendation
 
-* Choose **getStaticProps** whenever possible for performance and scalability.
-* Use **getServerSideProps** only when you truly need request-specific or real-time data.
+* Choose **getStaticProps** whenever possible for performance and scalability. --SSG(getStaticProps)
+* Use **getServerSideProps** only when you truly need request-specific or real-time data. --SSR(getServerSideProps)
+getInitialProps - RUns on both client and server
