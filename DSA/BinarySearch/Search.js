@@ -198,7 +198,7 @@ function SearchInRotatedSortedArray(nums, target){
 }
     return -1;
 }
-console.log(SearchInRotatedSortedArray([4,5,6,7,0,1,2], 0));
+// console.log(SearchInRotatedSortedArray([4,5,6,7,0,1,2], 0));
 
 function SearchInSortedArrayWIthDuplicates(nums, k){
     let n = nums.length;
@@ -231,4 +231,97 @@ function SearchInSortedArrayWIthDuplicates(nums, k){
 
     return false;
 }
-console.log(SearchInSortedArrayWIthDuplicates([2,5,6,0,0,1,2], 0));
+// console.log(SearchInSortedArrayWIthDuplicates([2,5,6,0,0,1,2], 0));
+
+function MinimunInSortedRotatedArray(nums){
+    let n=nums.length;
+    let low = 0;
+    let high = n-1;
+    let min = Infinity;
+
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        if(nums[low] <= nums[high]){ //If the subarray is already sorted
+            min = Math.min(min, nums[low]); 
+            break;
+        }
+        if(nums[low] <= nums[mid]){//left part is sorted
+            min = Math.min(min, nums[low]); //Update min with the first element of the sorted part, since it is the smallest in that part
+            low = mid+1
+        }else{
+            min = Math.min(min, nums[mid]); //upadate min with mid element since right part is unsorted and mid could be the smallest
+            high = mid -1
+        }
+    }
+    return min;
+}
+
+// console.log(MinimunInSortedRotatedArray([3,4,5,0,1,2]));
+
+
+function MinimunInSortedRotatedArrayDuplicates(nums){
+    let n=nums.length;
+    let low = 0;
+    let high = n-1;
+    let min = Infinity;
+
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        if(nums[low] == nums[mid] && nums[mid] == nums[high]){
+            min = Math.min(min, nums[low]);
+            low = low+1;
+            high = high -1;
+            continue;
+        }
+        if(nums[low] <= nums[high]){ //If the subarray is already sorted
+            min = Math.min(min, nums[low]); 
+            break;
+        }
+        if(nums[low] <= nums[mid]){//left part is sorted
+            min = Math.min(min, nums[low]); //Update min with the first element of the sorted part, since it is the smallest in that part
+            low = mid+1
+        }else{
+            min = Math.min(min, nums[mid]); //upadate min with mid element since right part is unsorted and mid could be the smallest
+            high = mid -1
+        }
+    }
+    return min;
+}
+
+// console.log(MinimunInSortedRotatedArrayDuplocates([3,4,5,0, 0,1,2]));
+
+function TimesArrayIsRotated(nums){
+     let n=nums.length;
+    let low = 0;
+    let high = n-1;
+    let min = Infinity;
+    let index = -1;
+
+      while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        if(nums[low] <= nums[high]){ //If the subarray is already sorted
+            if(nums[low] < min){
+                min = nums[low];
+                index = low
+            }
+            break;
+        }
+        if(nums[low] <= nums[mid]){//left part is sorted
+            if(nums[low]< min){
+                min = nums[low];
+                index = low;
+            }
+           //Update min with the first element of the sorted part, since it is the smallest in that part
+            low = mid+1
+        }else{
+            if(nums[mid]< min){
+                min = nums[mid];
+                index = mid;
+            }
+            //upadate min with mid element since right part is unsorted and mid could be the smallest
+            high = mid -1
+        }
+    }
+    return index;
+}
+console.log(TimesArrayIsRotated([3,4,5,1,2]));
