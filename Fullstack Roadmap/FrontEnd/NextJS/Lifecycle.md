@@ -196,3 +196,30 @@ Effects always run after paint.
 
 Next.js does not replace React lifecycle. It wraps React with additional server, build-time, and routing lifecycles.
 
+# Server Components
+These components are not part of browser bundles(JS) sent to the nrowser
+# Browser Bundle
+Gets downloaded and executed the user's browser 
+Handles UI interaction
+
+| Aspect                         | Server-only code | Browser bundle     |
+| ------------------------------ | ---------------- | ------------------ |
+| Runs on                        | Server           | User’s browser     |
+| Access to secrets              | ✅ Yes            | ❌ No               |
+| Access to DOM                  | ❌ No             | ✅ Yes              |
+| Included in JS sent to browser | ❌ No             | ✅ Yes              |
+| Performance cost               | Server CPU       | Network + JS parse |
+| Security risk                  | Low              | High (exposed)     |
+Smaller JS → faster load
+Less hydration work
+Better Core Web Vitals
+Secrets never exposed
+DB logic protected
+
+
+# Tree shaking:
+It is a build optimization technique used to remove code that is imported but never used.
+Imagine a tree and shaking it removes the unused branches
+
+Browser parses and executes JS. Unused JS still costs time.
+Tree shaking--> Reduce bunle size, reduce execution time and improves performance
