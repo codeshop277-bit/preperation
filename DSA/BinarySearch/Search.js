@@ -324,4 +324,49 @@ function TimesArrayIsRotated(nums){
     }
     return index;
 }
-console.log(TimesArrayIsRotated([3,4,5,1,2]));
+// console.log(TimesArrayIsRotated([3,4,5,1,2]));
+
+function SingleElementInSortedArray(nums){
+    let n = nums.length;
+    if(nums[0] != nums[1]) return nums[0];
+    if(nums[n-1] != nums[n-2]) return nums[n-1];
+
+    let low =1;
+    let high = n-2;
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        if(nums[mid] != nums[mid-1] && nums[mid] != nums [mid+1]){
+            return nums[mid];
+        };
+        if((mid % 2 == 1 && nums[mid] == nums[mid-1]) || (mid % 2==0 && nums[mid] == nums[mid+1])){//We are on the left part of array
+            low = mid + 1;
+        }else{
+            high = mid -1
+        }
+    }
+    return -1
+}
+// console.log(SingleElementInSortedArray([1,1,2,2,3,3,4,5,5]));
+
+function PeakElement(nums){
+    let n = nums.length;
+    if(nums[0] > nums[1]) return nums[0];
+    if(nums[n-1] > nums[n-2]) return nums[n-2];
+
+    let low = 1;
+    let high = n-2;
+
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        if(nums[mid] > nums[mid-1] && nums[mid] > nums[mid+1]){
+            return nums[mid]
+        };
+        if(nums[mid] > nums[mid-1]){
+            low = mid +1;
+        }else{
+            high = mid-1
+        }
+    }
+    return -1;
+}
+console.log(PeakElement([1,10,13,7,6,5,4,3,2,1,0]))
