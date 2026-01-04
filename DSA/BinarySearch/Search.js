@@ -167,3 +167,68 @@ function CountOcccurance(nums, target){
     return last-first +1; //Since it is a sorted array, all occurances will be in between first and last index, so the last - first +1 will give the count of occurances
 }
 // console.log(CountOcccurance([1,2,2,2,3,4,5], 2));
+
+function SearchInRotatedSortedArray(nums, target){
+
+    //Key is to indentify which part is sorted
+    let n = nums.length;
+    let low =0;
+    let high = n-1;
+
+    while(low<=high){
+    let mid = Math.floor((low+high)/2);
+    if(nums[mid] == target) return mid;
+    //If left part is sorted, then check if target lies in left part else search in right part and also target should be in between low and mid
+    //In first  dry run, for the given input [4,5,6,7,0,1,2], mid = 3, nums[mid] = 7, nums[low] = 4 and target = 0, so left part is sorted but target is not in between low and mid
+    //So we will search in right part by updating low = mid +1
+    //In
+    if(nums[low] <= nums[mid]){ //This ensures left part is sorted
+        if(nums[low] <= target && target <= nums[mid]){
+            high = mid -1; //Search in left part
+        }else{
+            low = mid +1; //Search in right part
+        }
+    }else{
+        if(nums[mid] <= target && target <= nums[high]){
+            low = mid +1; //Search in right part
+        }else{
+            high = mid -1; //Search in left part
+        }
+    }
+}
+    return -1;
+}
+console.log(SearchInRotatedSortedArray([4,5,6,7,0,1,2], 0));
+
+function SearchInSortedArrayWIthDuplicates(nums, k){
+    let n = nums.length;
+    let low =0;
+    let high = n-1;
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        if(nums[mid] == k) return true;
+        //If we have duplicates, we can not determine which part is sorted, so we will just move the low and high pointers
+        if(nums[low] == nums[mid] && nums[mid] == nums[high]){
+            low = low +1;
+            high = high -1;
+            continue;
+        }
+        if(nums[low] <= nums[mid]){
+            if(nums[low] <= k && k <= nums[mid]){
+                high = mid -1;
+            }else{
+                low = mid +1;
+            }
+        }else{
+            if(nums[mid] <= k && k<= nums[high]){
+                low = mid +1;
+            }else{
+                high = mid -1;
+            }
+        }
+
+    }
+
+    return false;
+}
+console.log(SearchInSortedArrayWIthDuplicates([2,5,6,0,0,1,2], 0));
