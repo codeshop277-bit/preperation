@@ -192,3 +192,12 @@ Revalidate path:
 revalidatePath('/users');
 
 # React does not have in built caching features like above. So it relies on npm like Redux toolkit query
+
+# Waterfall
+A water fall happens when each requests run sequentially where each requests wait for the previous request to finish before starting
+
+To avoid if requests are not dependant on each other, run in parallel sing, Promise.all([])
+Fetch data in oarent and pass as props to child
+
+Where it is unavoidable use Suspense so slow section loads without blocking everything
+and caching wherever dependencies exist
