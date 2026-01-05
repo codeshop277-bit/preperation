@@ -125,6 +125,7 @@ Steps:
     Nextjs makes an internal HTTP request to routes which matches the url
     Then executes the routes.ts call and returns the response to server which then generates the HTML and caches it 
 
+For multiple get calls
 ```js
 /api/users?type=active
 /api/users?role=admin
@@ -147,3 +148,47 @@ export async function GET(req: Request) {
 }
 
 ```
+
+# Server Actions
+It allows react client compoenents to directly invoke  server logic without defining endpoints and still securely running on server.
+It needs to be triggered manually. like formsubmit, button click. It can be used only when we own the db layer as well.
+
+```js
+// app/actions/createUser.ts
+'use server';
+
+export async function createUser(formData: FormData) {
+  const name = formData.get('name');
+  await saveUserToDB(name);
+}
+```
+Client → request → Next.js Server → Executes server action → Returns result
+
+| Server Actions    | Route Handlers (`route.ts`) |
+| ----------------- | --------------------------- |
+| Function-based    | HTTP-based                  |
+| No public URL     | Public API endpoint         |
+| Called from React | Called via fetch            |
+| Ideal for forms   | Ideal for APIs              |
+| Tight UI coupling | Loose coupling              |
+| No CORS           | CORS applies                |
+
+# Cache Invalidation 
+Cache invalidation strategies define when cached data becomes stale. In Next.js, this can be handled using time-based revalidation, event-based invalidation with tags, path-based invalidation, or disabling cache entirely, depending on consistency and performance needs.
+It is when cached data is no longer correct and must be refreshed
+1, WHat is cached?
+2, When is it no longer valid?
+
+In netxjs 
+| Strategy    | Next.js mechanism        |
+| ----------- | ------------------------ |
+| Time-based  | `revalidate`             |
+| Event-based | `tags` + `revalidateTag` |
+| Path-based  | `revalidatePath`         |
+| No cache    | `cache: 'no-store'`      |
+| SWR         | Built-in ISR             |
+
+Revalidate path: 
+revalidatePath('/users');
+
+# React does not have in built caching features like above. So it relies on npm like Redux toolkit query
