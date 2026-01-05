@@ -390,59 +390,133 @@ function FindSquareRoot(n) {
 }
 // console.log(FindSquareRoot(82))
 
-function FindNthRootOfM(n,m){
+function FindNthRootOfM(n, m) {
     let low = 0;
     let high = m;
 
-    while(low<=high){
-       let mid = Math.floor((low + high) / 2);
-       let value = Math.pow(mid, n)
-       if((m/value) == 1){
-        return mid;
-       }
-       if(value < m){
-        low = mid+1
-       }else{
-        high = mid -1;
-       }
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
+        let value = Math.pow(mid, n)
+        if ((m / value) == 1) {
+            return mid;
+        }
+        if (value < m) {
+            low = mid + 1
+        } else {
+            high = mid - 1;
+        }
     }
     return -1
 }
 // console.log(FindNthRootOfM(3, 28))
 
-function MaxiMumElement(nums){
+function MaxiMumElement(nums) {
     let max = -Infinity
-    for(let i =0; i<nums.length; i++){
-        if(nums[i] > max){
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] > max) {
             max = nums[i]
         }
     }
-    console.log('max', max)
     return max;
 }
-function HourleyRate(nums, time){
+function HourleyRate(nums, time) {
     let avgTime = 0;
-    for(let i=0; i<nums.length; i++){
-        avgTime += Math.ceil(nums[i]/time)
+    for (let i = 0; i < nums.length; i++) {
+        avgTime += Math.ceil(nums[i] / time)
     }
     console.log('avgTime', avgTime)
     return avgTime;
 }
-function KokoEatingBananas(nums, h){
-    let low = 0; 
+function KokoEatingBananas(nums, h) {
+    let low = 0;
     let high = MaxiMumElement(nums);
     let ans = 0;
 
-    while(low<=high){
+    while (low <= high) {
         let mid = Math.floor((low + high) / 2);
         let rate = HourleyRate(nums, mid);
-        if(rate <=h){
+        if (rate <= h) {
             ans = mid;
-            high = mid -1;
-        }else{
-            low = mid +1;
+            high = mid - 1;
+        } else {
+            low = mid + 1;
         }
     }
     return ans;
 }
 // console.log(KokoEatingBananas([25, 12, 8, 14, 19], 5))
+
+function MinAndMax(nums) {
+    let max = -Infinity;
+    let min = Infinity;
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] > max) {
+            max = nums[i]
+        }
+        if (nums[i] < min) {
+            min = nums[i]
+        }
+    }
+    return { max, min };
+}
+function CheckIfPossible(nums, k, days) {
+    let count = 0;
+    let noOfBouq = 0;
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] <= days) {
+            count++;
+        } else {
+            noOfBouq += Math.floor((count / k));
+            count = 0
+        }
+    }
+    noOfBouq += Math.floor((count / k));
+    return noOfBouq
+}
+function FindMinNoDaysToMakeBouquets(n, nums, k, m) {
+    //n arr length;
+    //k adjacent flowers
+    //m no of bouqets
+    const range = MinAndMax(nums);
+    let low = range.min;
+    let high = range.max;
+    let ans = -1;
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
+        const noOfBouq = CheckIfPossible(nums, k, mid);
+        if (noOfBouq == m) {
+            ans = mid;
+            high = mid - 1
+        }else {
+            low = mid + 1
+        } 
+    }
+    return ans;
+}
+// console.log(FindMinNoDaysToMakeBouquets(8, [7, 7, 7, 7, 13, 11, 12, 7], 2, 3))
+
+function FindSum(nums, divisor){
+    let sum = 0;
+    for(let i=0; i<nums.length; i++){
+        sum+= Math.ceil(nums[i]/divisor)
+    }
+    return sum;
+}
+function SmallestDivisorForTThreshold(nums, limit){
+    let low = 1;
+    let high = MaxiMumElement(nums);
+    let ans = -1;
+
+    while(low<=high){
+        let mid = Math.floor((low + high) / 2);
+        const sum = FindSum(nums, mid);
+        if(sum<=limit){
+            ans = mid;
+            high = mid-1
+        }else{
+            low = mid+1
+        }
+    }
+    return ans;
+}
+console.log(SmallestDivisorForTThreshold([8,4,2,3], 10))
