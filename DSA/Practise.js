@@ -1,42 +1,42 @@
-function SelectionSOrt(nums){
-    let n = nums.length
+
+
+function Kadene(nums,k){
+    let n = nums.length;
+    let sum = 0;
+    let max = 0;
+    let start = 0;
+    let end = -1;
     for(let i=0; i<n; i++){
-        let min = i;
-        for(let j=i+1; j<n; j++){
-            if(nums[j] < nums[min]){
-                min = j
-            }
-            [nums[i], nums[min]] = [nums[min], nums[i]]
+        sum+=nums[i];
+        if(sum >max){
+            max = sum
+            end = i
+        }
+        if(sum < 0){
+            sum = 0;
+            start = i+1
         }
     }
-    return nums;
+    return nums.slice(start, end+1)
 }
-console.log(SelectionSOrt([13, 46, 24, 20, 9]))
+console.log(Kadene([2,3,1,-5,1,1,2,1]))
 
-function RecursiveBubbleSort(nums, i){
-    let n = nums.length
-    let min = i
-    if(i> n-1) return nums
-    for(let j = i+1; j<n; j++){
-        if(nums[j] < nums[min]){
-            min=j
+function MajorityElement(nums){
+    let n = nums.length;
+    let el;
+    let count =0;
+    let map = new Map()
+
+
+    for(let i=0; i<n; i++){
+        map.set(nums[i], (map.get(nums[i]) || 0)+1)
+        if(count ==0){
+            el = nums[i]
+            count = 1
+        }else{
+            count--
         }
     }
- [nums[i], nums[min]] = [nums[min], nums[i]]
- return RecursiveBubbleSort(nums, i+1)
+    return map.get(el) > n/2 ? el : -1;
 }
-console.log(RecursiveBubbleSort([13, 46, 24, 20, 9], 0))
-
-function BubbleSort(nums){
-     let n = nums.length
-     for(let i=0; i<n-1; i++){
-
-        for(let j=0; j<n-1; j++){
-            if(nums[j] > nums[j+1]){
-                [nums[j], nums[j+1]] = [nums[j+1], nums[j]]
-            }
-        }
-     }
-     return nums
-}
-console.log(BubbleSort([7, 46, 24, 20, 9]))
+console.log(MajorityElement([7, 0, 0, 1, 7, 7, 2, 7, 7]))
