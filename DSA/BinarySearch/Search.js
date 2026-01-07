@@ -519,4 +519,74 @@ function SmallestDivisorForTThreshold(nums, limit){
     }
     return ans;
 }
-console.log(SmallestDivisorForTThreshold([8,4,2,3], 10))
+// console.log(SmallestDivisorForTThreshold([8,4,2,3], 10))
+
+function findSum(nums){
+    let sum = 0;
+    for(let i=0; i<nums.length; i++){
+        sum+=nums[i]
+    }
+    return sum;
+};
+
+function CheckIfCapIsPossible(weights, maxDays, cap){
+    let days = 1; 
+    let sumOfWeightsPerDay = 0;
+    for(let i=0; i<weights.length; i++){
+        if((sumOfWeightsPerDay + weights[i]) > cap){
+            sumOfWeightsPerDay = weights[i];
+            days = days+1;
+        }else{
+            sumOfWeightsPerDay +=weights[i]
+        }
+    }
+    if(days<=maxDays){
+        return true
+    }
+
+    return false;
+}
+function LeastCapacityToShipPackagesWithinDdays(weights, days){
+    let low = MaxiMumElement(weights);
+    let high = findSum(weights);
+    let ans = 0;
+
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        const isPossible = CheckIfCapIsPossible(weights, days, mid)
+        if(isPossible){
+            high = mid-1;
+            ans = mid;
+        }else{
+            low = mid+1
+        }
+    }
+    return low;
+}
+
+// console.log(LeastCapacityToShipPackagesWithinDdays([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5))
+
+function FindMissingKthNumber(arr, k){
+
+    //Bruet
+    // for(let i=0; i<arr.length; i++){
+    //     if(arr[i] < k){
+    //         k++
+    //     }
+    // }
+    // return k
+    let low = 0;
+    let high = arr.length -1 ;
+
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        let missing = arr[mid] - (mid +1);
+        if(missing <k){
+            low = mid+1
+        }else{
+            high = mid-1
+        }
+    }
+    return low+k
+}
+console.log(FindMissingKthNumber([3, 5, 7, 10], 6))
