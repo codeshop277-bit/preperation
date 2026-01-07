@@ -102,6 +102,15 @@ Browser executes JS for interactivity
     ↓ Database query
 [Database - PostgreSQL/MongoDB/etc]
 
+export const dynamic = "force-dynamic";
+ If an SSR page send props to a CSR child then the child is not fully CSR
+ "use client";
+
+export default function Page({ users }) {
+  return <UserTable users={users} />;
+}
+SSG / SSR + hydration
+
 # SSG (Static Site Generation)
 What happens:
 
@@ -159,6 +168,9 @@ Instant, complete page with all content
 But data is from build time (stale if users changed)
 
 Problem with your example: If a new user signs up, they won't appear in the table until you rebuild and redeploy!
+export const dynamic = "force-static";
+export const revalidate = false;
+
 ```
 
 # ISR (Incremental Static Regeneration)

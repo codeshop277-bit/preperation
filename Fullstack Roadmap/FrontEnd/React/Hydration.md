@@ -208,3 +208,9 @@ Default in Next.js
 Mismatch causes runtime errors
 
 Partial hydration improves performance
+
+Server → server calls:
+No CORS
+No TLS handshake from browser
+Lower latency
+Private network access
