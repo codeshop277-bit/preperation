@@ -487,78 +487,78 @@ function FindMinNoDaysToMakeBouquets(n, nums, k, m) {
         if (noOfBouq == m) {
             ans = mid;
             high = mid - 1
-        }else {
+        } else {
             low = mid + 1
-        } 
+        }
     }
     return ans;
 }
 // console.log(FindMinNoDaysToMakeBouquets(8, [7, 7, 7, 7, 13, 11, 12, 7], 2, 3))
 
-function FindSum(nums, divisor){
+function FindSum(nums, divisor) {
     let sum = 0;
-    for(let i=0; i<nums.length; i++){
-        sum+= Math.ceil(nums[i]/divisor)
+    for (let i = 0; i < nums.length; i++) {
+        sum += Math.ceil(nums[i] / divisor)
     }
     return sum;
 }
-function SmallestDivisorForTThreshold(nums, limit){
+function SmallestDivisorForTThreshold(nums, limit) {
     let low = 1;
     let high = MaxiMumElement(nums);
     let ans = -1;
 
-    while(low<=high){
+    while (low <= high) {
         let mid = Math.floor((low + high) / 2);
         const sum = FindSum(nums, mid);
-        if(sum<=limit){
+        if (sum <= limit) {
             ans = mid;
-            high = mid-1
-        }else{
-            low = mid+1
+            high = mid - 1
+        } else {
+            low = mid + 1
         }
     }
     return ans;
 }
 // console.log(SmallestDivisorForTThreshold([8,4,2,3], 10))
 
-function findSum(nums){
+function findSum(nums) {
     let sum = 0;
-    for(let i=0; i<nums.length; i++){
-        sum+=nums[i]
+    for (let i = 0; i < nums.length; i++) {
+        sum += nums[i]
     }
     return sum;
 };
 
-function CheckIfCapIsPossible(weights, maxDays, cap){
-    let days = 1; 
+function CheckIfCapIsPossible(weights, maxDays, cap) {
+    let days = 1;
     let sumOfWeightsPerDay = 0;
-    for(let i=0; i<weights.length; i++){
-        if((sumOfWeightsPerDay + weights[i]) > cap){
+    for (let i = 0; i < weights.length; i++) {
+        if ((sumOfWeightsPerDay + weights[i]) > cap) {
             sumOfWeightsPerDay = weights[i];
-            days = days+1;
-        }else{
-            sumOfWeightsPerDay +=weights[i]
+            days = days + 1;
+        } else {
+            sumOfWeightsPerDay += weights[i]
         }
     }
-    if(days<=maxDays){
+    if (days <= maxDays) {
         return true
     }
 
     return false;
 }
-function LeastCapacityToShipPackagesWithinDdays(weights, days){
+function LeastCapacityToShipPackagesWithinDdays(weights, days) {
     let low = MaxiMumElement(weights);
     let high = findSum(weights);
     let ans = 0;
 
-    while(low<=high){
-        let mid = Math.floor((low+high)/2);
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
         const isPossible = CheckIfCapIsPossible(weights, days, mid)
-        if(isPossible){
-            high = mid-1;
+        if (isPossible) {
+            high = mid - 1;
             ans = mid;
-        }else{
-            low = mid+1
+        } else {
+            low = mid + 1
         }
     }
     return low;
@@ -566,7 +566,7 @@ function LeastCapacityToShipPackagesWithinDdays(weights, days){
 
 // console.log(LeastCapacityToShipPackagesWithinDdays([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5))
 
-function FindMissingKthNumber(arr, k){
+function FindMissingKthNumber(arr, k) {
 
     //Bruet
     // for(let i=0; i<arr.length; i++){
@@ -576,50 +576,83 @@ function FindMissingKthNumber(arr, k){
     // }
     // return k
     let low = 0;
-    let high = arr.length -1 ;
+    let high = arr.length - 1;
 
-    while(low<=high){
-        let mid = Math.floor((low+high)/2);
-        let missing = arr[mid] - (mid +1);
-        if(missing <k){
-            low = mid+1
-        }else{
-            high = mid-1
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
+        let missing = arr[mid] - (mid + 1);
+        if (missing < k) {
+            low = mid + 1
+        } else {
+            high = mid - 1
         }
     }
-    return low+k
+    return low + k
 }
 // console.log(FindMissingKthNumber([3, 5, 7, 10], 6))
 
-function CanWePlaceCows(nums, noOfCows, distance){
-    let cowsPlaced = 1; 
+function CanWePlaceCows(nums, noOfCows, distance) {
+    let cowsPlaced = 1;
     let lastPlacedIndex = nums[0];
-    for(let i=0; i<nums.length; i++){
-        if((nums[i] - lastPlacedIndex) >= distance){
-            cowsPlaced+=1;
+    for (let i = 0; i < nums.length; i++) {
+        if ((nums[i] - lastPlacedIndex) >= distance) {
+            cowsPlaced += 1;
             lastPlacedIndex = nums[i]
         }
     }
-    if(cowsPlaced >=noOfCows){
+    if (cowsPlaced >= noOfCows) {
         return true;
     }
     return false;
 }
-function AggressiveCows(nums, k){
-    let sorted = nums.sort((a, b) => a-b)
-    let low =  0;
-    let high = sorted[sorted.length -1] - sorted[0];
+function AggressiveCows(nums, k) {
+    let sorted = nums.sort((a, b) => a - b)
+    let low = 0;
+    let high = sorted[sorted.length - 1] - sorted[0];
     let ans = 0;
-    while(low<=high){
-        let mid = Math.floor((low+high)/2);
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
         const checkPossible = CanWePlaceCows(sorted, k, mid);
-        if(checkPossible){
-            low = mid+1
+        if (checkPossible) {
+            low = mid + 1
             ans = mid
-        }else{
-            high = mid-1
+        } else {
+            high = mid - 1
         }
     }
     return ans
 }
-console.log(AggressiveCows([0, 3, 7, 10, 9], 4))
+// console.log(AggressiveCows([0, 3, 7, 10, 9], 4))
+
+function findAllocationPossible(nums, minCapacity){
+    let countOfStu = 1;
+    let totalPages = 0
+
+    for(let i=0; i<nums.length; i++){
+        if((totalPages + nums[i]) <= minCapacity){
+            totalPages += nums[i]
+        }else{
+            countOfStu++;
+            totalPages = nums[i]
+        }
+    }
+    return countOfStu
+}
+function BookAllocation(nums, m) {
+    let low = MaxiMumElement(nums);
+    let high = findSum(nums);
+    let ans = 0;
+
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
+        const count = findAllocationPossible(nums, mid, m);
+        if (count > m) {
+            low = mid + 1
+        } else {
+            ans = mid
+            high = mid - 1
+        }
+    }
+    return {ans, low, high}
+}
+console.log(BookAllocation([25, 46, 28, 49, 24],4))
