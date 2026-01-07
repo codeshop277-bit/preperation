@@ -589,4 +589,37 @@ function FindMissingKthNumber(arr, k){
     }
     return low+k
 }
-console.log(FindMissingKthNumber([3, 5, 7, 10], 6))
+// console.log(FindMissingKthNumber([3, 5, 7, 10], 6))
+
+function CanWePlaceCows(nums, noOfCows, distance){
+    let cowsPlaced = 1; 
+    let lastPlacedIndex = nums[0];
+    for(let i=0; i<nums.length; i++){
+        if((nums[i] - lastPlacedIndex) >= distance){
+            cowsPlaced+=1;
+            lastPlacedIndex = nums[i]
+        }
+    }
+    if(cowsPlaced >=noOfCows){
+        return true;
+    }
+    return false;
+}
+function AggressiveCows(nums, k){
+    let sorted = nums.sort((a, b) => a-b)
+    let low =  0;
+    let high = sorted[sorted.length -1] - sorted[0];
+    let ans = 0;
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        const checkPossible = CanWePlaceCows(sorted, k, mid);
+        if(checkPossible){
+            low = mid+1
+            ans = mid
+        }else{
+            high = mid-1
+        }
+    }
+    return ans
+}
+console.log(AggressiveCows([0, 3, 7, 10, 9], 4))
