@@ -771,3 +771,43 @@ function rowsWithMax1(mat){
 }
 console.log(rowsWithMax1([[1, 1, 0], [0, 0, 1], [0, 0, 0], [1, 1, 1]]));
 // Output: 3 ✓
+
+function searchMatrix(mat, target) {
+    let row = mat.length
+    let col = mat[0].length
+    let total = row * col;
+
+    let low = 0;
+    let high = total -1;
+    while(low<=high){
+        let mid = Math.floor((low + high)/2)
+        let rowIndex = Math.floor(mid/col);
+        let colIndex = mid%col;
+        if(mat[rowIndex][colIndex] ==target){
+            return true
+        }else if(mat[rowIndex][colIndex] < target){
+            low = mid+1
+        }else{
+            high = mid-1
+        }
+    }
+return false
+}
+// console.log(searchMatrix([ [1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12] ], 18))
+
+function Search2DMatrix(matrix, target){
+    let row = 0;
+    let col = matrix[0].length -1;
+
+    while(row < matrix.length && col >=0){
+        if(matrix[row][col] == target){
+            return true
+        }else if(matrix[row][col] <target){
+            row++;
+        }else{
+            col--;
+        }
+    }
+    return false
+}
+console.log(Search2DMatrix( [ [1, 4, 7, 11, 15], [2, 5, 8, 12, 19], [3, 6, 9, 16, 22], [10, 13, 14, 17, 24], [18, 21, 23, 26, 30] ], 5))
