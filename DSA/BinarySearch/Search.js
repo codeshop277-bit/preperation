@@ -32,15 +32,15 @@ function LowerBoundBinarySearch(nums, target) {
     let n = nums.length;
     let low = 0;
     let high = n - 1;
-    let reuslt = n;
+    let result = n;
     while (low <= high) {
         let mid = Math.floor((low + high) / 2);
         if (nums[mid] >= target) {
-            ans = mid
+            result = mid
             high = mid - 1
         } else low = mid + 1
     }
-    return reuslt;
+    return result;
 }
 // console.log(LowerBoundBinarySearch([1, 2, 2, 2, 3, 4, 5], 2));
 
@@ -624,14 +624,14 @@ function AggressiveCows(nums, k) {
 }
 // console.log(AggressiveCows([0, 3, 7, 10, 9], 4))
 
-function findAllocationPossible(nums, minCapacity){
+function findAllocationPossible(nums, minCapacity) {
     let countOfStu = 1;
     let totalPages = 0
 
-    for(let i=0; i<nums.length; i++){
-        if((totalPages + nums[i]) <= minCapacity){
+    for (let i = 0; i < nums.length; i++) {
+        if ((totalPages + nums[i]) <= minCapacity) {
             totalPages += nums[i]
-        }else{
+        } else {
             countOfStu++;
             totalPages = nums[i]
         }
@@ -653,6 +653,121 @@ function BookAllocation(nums, m) {
             high = mid - 1
         }
     }
-    return {ans, low, high}
+    return { ans, low, high }
 }
-console.log(BookAllocation([25, 46, 28, 49, 24],4))
+// console.log(BookAllocation([25, 46, 28, 49, 24],4))
+
+function MedianOfTwoSortedArrays(arr1, arr2) {
+    let n1 = arr1.length;
+    let n2 = arr2.length;
+    let i = 0;
+    let j = 0;
+    let el1 = -1;
+    let el2 = -1;
+    let index2 = Math.floor((n1 + n2) / 2);
+    let index1 = index2 - 1;
+    let count = 0;
+
+    while (i < n1 && j < n2) {
+        if (arr1[i] < arr2[j]) {
+            if (count == index1) el1 = arr1[i];
+            if (count == index2) el2 = arr1[i]
+            count++;
+            i++;
+        } else {
+            if (count == index1) el1 = arr2[j];
+            if (count == index2) el2 = arr2[j]
+            count++;
+            j++;
+        }
+    }
+    while (i < n1) {
+        if (count == index1) el1 = arr1[i];
+        if (count == index2) el2 = arr1[i]
+        count++;
+        i++;
+    }
+    while (j < n2) {
+        if (count == index1) el1 = arr2[j];
+        if (count == index2) el2 = arr2[j]
+        count++;
+        j++;
+    }
+    if ((n1 + n2) % 2 == 0) {
+        return (el1 + el2) / 2
+    } else {
+        return el2;
+    }
+}
+// console.log(MedianOfTwoSortedArrays([2,4,6], [1,3]))
+
+function KthElement(a, b, k) {
+    let n1 = a.length;
+    let n2 = b.length;
+    let i = 0;
+    let j = 0;
+    let el1 = -1;
+    let count = 1;
+
+    while (i < n1 && j < n2) {
+        if (a[i] < b[j]) {
+            if (count == k) el1 = a[i];
+            count++;
+            i++;
+        } else {
+            if (count == k) el1 = b[j];
+            count++;
+            j++;
+        }
+    }
+    while (i < n1) {
+        if (count == k) el1 = a[i];
+        count++;
+        i++;
+    }
+    while (j < n2) {
+        if (count == k) el1 = b[j];
+        count++;
+        j++;
+    }
+    return el1
+}
+// console.log(KthElement([100, 112, 256, 349, 770], [72, 86, 113, 119, 265, 445, 892], 7))
+function UpperBound(nums, target) {
+    // Find first position where element > target
+    let n = nums.length;
+    let low = 0;
+    let high = n - 1;
+    let result = 0; // Changed to 0
+    
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
+        if (nums[mid] > target) {
+            result = mid;
+            high = mid - 1;
+        } else {
+            low = mid + 1;
+        }
+    }
+    return result;
+}
+
+function rowsWithMax1(mat){
+    let row = mat.length;
+    let col = mat[0].length;
+    let maxCount = 0;
+    let index = -1;
+
+    for(let i = 0; i < row; i++){
+        // For rows like [1,1,0], UpperBound(1) gives index where values > 1
+        // So count of 1s = UpperBound position
+        let count = UpperBound(mat[i], 1);
+        if(count > maxCount){
+            maxCount = count;
+            index = i;
+        }
+    }
+    return index;
+}
+console.log(rowsWithMax1([[1, 1, 0], [0, 0, 1], [0, 0, 0], [1, 1, 1]]));
+// Output: 3 ✓
