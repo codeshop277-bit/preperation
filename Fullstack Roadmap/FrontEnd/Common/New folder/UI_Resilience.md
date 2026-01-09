@@ -84,3 +84,63 @@ Client JS disabled → SSR content still readable
 | Runtime crash   | error.tsx     |
 | Missing data    | not-found.tsx |
 | JS fails        | SSR HTML      |
+
+# Error Logs - Sentry, datadog, new relic, bug snag
+User action →
+  Error occurs →
+    SDK captures error →
+      Context attached →
+        Event sent to Sentry →
+          Stored + grouped →
+            Alert triggered →
+              Developer fixes
+
+export async function getOrders() {
+  try {
+    const res = await fetch('https://api.example.com/orders');
+    if (!res.ok) throw new Error('Orders API failed');
+    return res.json();
+  } catch (error) {
+    Sentry.captureException(error);
+    throw error; // Let error.tsx handle UI
+  }
+}
+
+ou can configure alerts like:
+Error rate spike
+New error in production
+Error affecting > X users
+
+Alert → Slack → Developer → Fix → Deploy
+
+What Sentry stores for this project
+All error events
+Stack traces
+Breadcrumbs
+User context
+Release versions
+Environment separation (prod / staging)
+
+# Breadcrumbs
+What are breadcrumbs? Breadcrumbs = “Where am I?”
+Breadcrumbs are a secondary navigation aid that show users:
+Where they are in a site’s hierarchy
+How they got there
+How to go back to higher-level pages
+
+✅ Recommendation (practical)
+If you are:
+Frontend / React / Next.js heavy → Sentry
+Enterprise / microservices → Datadog
+Mobile or release-driven → Bugsnag
+UX debugging pain → LogRocket (add-on)
+
+| Tool        | Best for              | Replace Sentry?   |
+| ----------- | --------------------- | ----------------- |
+| Sentry      | Error-first debugging | ✅                 |
+| Datadog     | Full observability    | ⚠️ (bigger scope) |
+| New Relic   | Performance-first     | ⚠️                |
+| Bugsnag     | Release stability     | ✅                 |
+| Rollbar     | Simple tracking       | ✅                 |
+| LogRocket   | UX/session replay     | ❌ (complement)    |
+| Elastic APM | Self-hosted           | ⚠️                |
