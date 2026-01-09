@@ -419,6 +419,15 @@ function MaxiMumElement(nums) {
     }
     return max;
 }
+function MiniMumELement(nums) {
+    let max = Infinity
+    for (let i = 0; i < nums.length; i++) {
+        if (nums[i] < max) {
+            max = nums[i]
+        }
+    }
+    return max;
+}
 function HourleyRate(nums, time) {
     let avgTime = 0;
     for (let i = 0; i < nums.length; i++) {
@@ -810,4 +819,72 @@ function Search2DMatrix(matrix, target){
     }
     return false
 }
-console.log(Search2DMatrix( [ [1, 4, 7, 11, 15], [2, 5, 8, 12, 19], [3, 6, 9, 16, 22], [10, 13, 14, 17, 24], [18, 21, 23, 26, 30] ], 5))
+// console.log(Search2DMatrix( [ [1, 4, 7, 11, 15], [2, 5, 8, 12, 19], [3, 6, 9, 16, 22], [10, 13, 14, 17, 24], [18, 21, 23, 26, 30] ], 5))
+
+function findPeakRow(mat, rows, currentCol){
+    let index = -1;
+    let max = -1;
+    for(let i=0; i<rows; i++){
+        if(mat[i][currentCol] > max){
+            max = mat[i][currentCol]
+            index = i
+        }
+    }
+    return index
+}
+function PeakELementIn2D(mat){
+    let rows = mat.length;
+    let col = mat[0].length;
+
+    let low = 0;
+    let high = col-1;
+
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+
+        let peakRow = findPeakRow(mat, rows, mid);
+        let left = mid -1 >= 0 ? mat[peakRow][mid-1]: -1;
+        let right = mid + 1< col ?  mat[peakRow][mid+1] : -1
+        if((mat[peakRow][mid] >  left)&& (mat[peakRow][mid] > right)) {
+            return [peakRow, mid]
+        } 
+        else if(mat[peakRow][mid] < left){
+            high = mid-1
+        }else{
+            low = mid+1
+        }
+    }
+    return [-1]
+}
+// console.log(PeakELementIn2D([[10, 20, 15], [21, 30, 14], [7, 16, 32]]))
+
+function findNoSmallerThanMedian(mat, row, target){
+    let count = 0;
+    for(let i=0; i<row; i++){
+        count+=UpperBound(mat[i], target)
+    }
+    return count
+}
+function MedianInSortedMatrix(matrix){
+    let row = matrix.length
+    let col = matrix[0].length
+    let low = matrix[0][0]
+    let high = matrix[0][col-1]
+    let median = Math.floor((row*col)/2)
+    for(i=0; i< row; i++){
+        low = Math.min(low, matrix[i][0])
+        high = Math.max(high, matrix[i][col-1])
+    }
+
+    while(low<=high){
+        let mid = Math.floor((low+high)/2);
+        let smallestEqual = findNoSmallerThanMedian(matrix, row, mid)
+        if(smallestEqual<= median){
+            low = mid+1
+        }else{
+            high = mid-1
+        }
+    }
+    return low;
+}
+console.log(MedianInSortedMatrix([ [1, 4, 9], [2, 5, 6], [3, 7, 8] ] ))
