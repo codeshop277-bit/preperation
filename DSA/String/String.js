@@ -53,4 +53,51 @@ function LargestOddNoInString(s) {
     }
     return s.substring(j, endIndex + 1)
 }
-console.log(LargestOddNoInString('02013638'))
+// console.log(LargestOddNoInString('02013638'))
+
+function CommonPrefix(str){
+    str.sort()// When sorted any non unique will be either in firdt or last
+    let first = str[0];
+    let last = str[str.length - 1];
+    let common = ""
+    for(let i=0; i<Math.min(first.length, last.length); i++){
+        if(first[i] != last[i]){
+            return common
+        }   
+
+        common += first[i]
+    }
+    return common
+}
+// console.log(CommonPrefix( ["flowers" , "flow" , "aa", "flight" ]))
+
+function IsomorphicStrings(s,t){
+    const mapS = new Map()
+    const mapT = new Map()
+    for (let i=0; i<s.length; i++ ){
+        if(mapS.has(s[i])){
+            if(mapS.get(s[i]) !== t[i]){
+                return false
+            }
+        }else{
+            if(mapT.has(t[i])){
+                return false
+            }
+            mapS.set(s[i], t[i])
+            mapT.set(t[i])
+        }
+    }
+    return true
+}
+//  console.log(IsomorphicStrings("apple", "bbnbm"))
+
+function RotateStringTOMatchGoal(s, goal){
+    for(let i=0; i<s.length; i++){
+        let rotate = s.substring(i) + s.substring(0,i);
+        if(rotate == goal) return true
+    }
+    return false
+    let double = s+s
+    return double.includes(goal)
+}
+console.log(RotateStringTOMatchGoal("abcde", "bcdea"))
