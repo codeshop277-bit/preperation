@@ -100,4 +100,41 @@ function RotateStringTOMatchGoal(s, goal){
     let double = s+s
     return double.includes(goal)
 }
-console.log(RotateStringTOMatchGoal("abcde", "bcdea"))
+// console.log(RotateStringTOMatchGoal("abcde", "bcdea"))
+
+function CheckAnangram(s, t){
+    if(s.length != t.length) return false
+    let map = new Map();
+
+    for(let i=0; i<s.length; i++){
+        map.set(s[i], (map.get(s[i]) || 0) + 1);
+        map.set(t[i], (map.get(t[i]) || 0) -1)
+    }
+    for(let [key, value] of map){
+        if(value !=0){
+            return false
+        }
+    }
+    return true
+}
+console.log(CheckAnangram("ANAGRAM", "NAGARAM"))
+
+function frequencySort(s){
+    let map = new Map();
+    let ans = []
+
+    for(let i=0; i<s.length; i++){
+        map.set(s[i], (map.get(s[i]) || 0) +1)
+    }
+    let sorted = new Map([...map.entries()].sort((a,b) => {
+        if(b[1] != a[1]){
+           return b[1] -a[1]
+        }
+       return a[0].localeCompare(b[0])
+    }))
+    for(let [key, value] of sorted){
+        if(value > 0) ans.push(key)
+    }
+return ans
+}
+console.log(frequencySort("tree"))
