@@ -117,7 +117,7 @@ function CheckAnangram(s, t){
     }
     return true
 }
-console.log(CheckAnangram("ANAGRAM", "NAGARAM"))
+// console.log(CheckAnangram("ANAGRAM", "NAGARAM"))
 
 function frequencySort(s){
     let map = new Map();
@@ -137,4 +137,58 @@ function frequencySort(s){
     }
 return ans
 }
-console.log(frequencySort("tree"))
+// console.log(frequencySort("tree"))
+
+function MaxDepthParanthesis(s){
+    let level = 0;
+    let maxCount = 0;
+
+    for(let i=0; i<s.length; i++){
+        if(s[i] == "("){
+            level++;
+            maxCount = Math.max(maxCount, level)
+        }else if(s[i] == ")"){
+            level--
+        }
+    }
+    return maxCount
+}
+// console.log(MaxDepthParanthesis("(1+(2*3)+((8)/4))+1"))
+
+function RomanToInt(s){
+    let ans = 0;
+     const roman = {
+            'I': 1, 'V': 5, 'X': 10,
+            'L': 50, 'C': 100, 'D': 500, 'M': 1000
+        };
+    for(let i=0; i<s.length-1; i++){
+        if(roman[s[i]] < roman[s[i+1]]){
+            ans -= roman[s[i]] 
+        }else{
+            ans += roman[s[i]]
+        }
+    }
+    return ans+roman[s[s.length-1]];
+}
+// console.log(RomanToInt("MCMXCIV"))
+
+function atoi(s){
+    let sign = 1;
+    let i=0;
+    let res = 0;
+    while(i<s.length && s[i] == " ") i++
+    if(s[i] == "-"){
+        sign = -1;
+        i++
+    }else if(s[i] == "+"){
+        i++
+    }
+    while(i<=s.length && s[i] >="0" && s[i] <="9"){
+        res = res * 10 + (s[i].charCodeAt(0) - "0".charCodeAt(0));
+        if(sign * res > 2147483647) return 2147483647
+        if(sign * res < -2147483647) return -2147483647
+        i++
+    }
+    return sign*res
+}
+console.log(atoi("4193 with words"))
