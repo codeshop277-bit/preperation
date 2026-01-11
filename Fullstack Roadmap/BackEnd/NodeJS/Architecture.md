@@ -401,3 +401,7 @@ Promise microtasks
 ↓
 Next phase
 Browser event loop is optimized for UI rendering, while Node.js event loop is optimized for high-throughput asynchronous I/O using libuv phases.
+
+# Concurrency
+Managing many tasks at once
+Concurrency is the ability to manage multiple tasks at once, and Node.js achieves it using a single-threaded, event-driven, non-blocking I/O model powered by libuv.
