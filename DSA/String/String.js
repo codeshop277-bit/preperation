@@ -55,15 +55,15 @@ function LargestOddNoInString(s) {
 }
 // console.log(LargestOddNoInString('02013638'))
 
-function CommonPrefix(str){
+function CommonPrefix(str) {
     str.sort()// When sorted any non unique will be either in firdt or last
     let first = str[0];
     let last = str[str.length - 1];
     let common = ""
-    for(let i=0; i<Math.min(first.length, last.length); i++){
-        if(first[i] != last[i]){
+    for (let i = 0; i < Math.min(first.length, last.length); i++) {
+        if (first[i] != last[i]) {
             return common
-        }   
+        }
 
         common += first[i]
     }
@@ -71,16 +71,16 @@ function CommonPrefix(str){
 }
 // console.log(CommonPrefix( ["flowers" , "flow" , "aa", "flight" ]))
 
-function IsomorphicStrings(s,t){
+function IsomorphicStrings(s, t) {
     const mapS = new Map()
     const mapT = new Map()
-    for (let i=0; i<s.length; i++ ){
-        if(mapS.has(s[i])){
-            if(mapS.get(s[i]) !== t[i]){
+    for (let i = 0; i < s.length; i++) {
+        if (mapS.has(s[i])) {
+            if (mapS.get(s[i]) !== t[i]) {
                 return false
             }
-        }else{
-            if(mapT.has(t[i])){
+        } else {
+            if (mapT.has(t[i])) {
                 return false
             }
             mapS.set(s[i], t[i])
@@ -91,27 +91,27 @@ function IsomorphicStrings(s,t){
 }
 //  console.log(IsomorphicStrings("apple", "bbnbm"))
 
-function RotateStringTOMatchGoal(s, goal){
-    for(let i=0; i<s.length; i++){
-        let rotate = s.substring(i) + s.substring(0,i);
-        if(rotate == goal) return true
+function RotateStringTOMatchGoal(s, goal) {
+    for (let i = 0; i < s.length; i++) {
+        let rotate = s.substring(i) + s.substring(0, i);
+        if (rotate == goal) return true
     }
     return false
-    let double = s+s
+    let double = s + s
     return double.includes(goal)
 }
 // console.log(RotateStringTOMatchGoal("abcde", "bcdea"))
 
-function CheckAnangram(s, t){
-    if(s.length != t.length) return false
+function CheckAnangram(s, t) {
+    if (s.length != t.length) return false
     let map = new Map();
 
-    for(let i=0; i<s.length; i++){
+    for (let i = 0; i < s.length; i++) {
         map.set(s[i], (map.get(s[i]) || 0) + 1);
-        map.set(t[i], (map.get(t[i]) || 0) -1)
+        map.set(t[i], (map.get(t[i]) || 0) - 1)
     }
-    for(let [key, value] of map){
-        if(value !=0){
+    for (let [key, value] of map) {
+        if (value != 0) {
             return false
         }
     }
@@ -119,35 +119,35 @@ function CheckAnangram(s, t){
 }
 // console.log(CheckAnangram("ANAGRAM", "NAGARAM"))
 
-function frequencySort(s){
+function frequencySort(s) {
     let map = new Map();
     let ans = []
 
-    for(let i=0; i<s.length; i++){
-        map.set(s[i], (map.get(s[i]) || 0) +1)
+    for (let i = 0; i < s.length; i++) {
+        map.set(s[i], (map.get(s[i]) || 0) + 1)
     }
-    let sorted = new Map([...map.entries()].sort((a,b) => {
-        if(b[1] != a[1]){
-           return b[1] -a[1]
+    let sorted = new Map([...map.entries()].sort((a, b) => {
+        if (b[1] != a[1]) {
+            return b[1] - a[1]
         }
-       return a[0].localeCompare(b[0])
+        return a[0].localeCompare(b[0])
     }))
-    for(let [key, value] of sorted){
-        if(value > 0) ans.push(key)
+    for (let [key, value] of sorted) {
+        if (value > 0) ans.push(key)
     }
-return ans
+    return ans
 }
 // console.log(frequencySort("tree"))
 
-function MaxDepthParanthesis(s){
+function MaxDepthParanthesis(s) {
     let level = 0;
     let maxCount = 0;
 
-    for(let i=0; i<s.length; i++){
-        if(s[i] == "("){
+    for (let i = 0; i < s.length; i++) {
+        if (s[i] == "(") {
             level++;
             maxCount = Math.max(maxCount, level)
-        }else if(s[i] == ")"){
+        } else if (s[i] == ")") {
             level--
         }
     }
@@ -155,68 +155,87 @@ function MaxDepthParanthesis(s){
 }
 // console.log(MaxDepthParanthesis("(1+(2*3)+((8)/4))+1"))
 
-function RomanToInt(s){
+function RomanToInt(s) {
     let ans = 0;
-     const roman = {
-            'I': 1, 'V': 5, 'X': 10,
-            'L': 50, 'C': 100, 'D': 500, 'M': 1000
-        };
-    for(let i=0; i<s.length-1; i++){
-        if(roman[s[i]] < roman[s[i+1]]){
-            ans -= roman[s[i]] 
-        }else{
+    const roman = {
+        'I': 1, 'V': 5, 'X': 10,
+        'L': 50, 'C': 100, 'D': 500, 'M': 1000
+    };
+    for (let i = 0; i < s.length - 1; i++) {
+        if (roman[s[i]] < roman[s[i + 1]]) {
+            ans -= roman[s[i]]
+        } else {
             ans += roman[s[i]]
         }
     }
-    return ans+roman[s[s.length-1]];
+    return ans + roman[s[s.length - 1]];
 }
 // console.log(RomanToInt("MCMXCIV"))
 
-function atoi(s){
+function atoi(s) {
     let sign = 1;
-    let i=0;
+    let i = 0;
     let res = 0;
-    while(i<s.length && s[i] == " ") i++
-    if(s[i] == "-"){
+    while (i < s.length && s[i] == " ") i++
+    if (s[i] == "-") {
         sign = -1;
         i++
-    }else if(s[i] == "+"){
+    } else if (s[i] == "+") {
         i++
     }
-    while(i<=s.length && s[i] >="0" && s[i] <="9"){
+    while (i <= s.length && s[i] >= "0" && s[i] <= "9") {
         res = res * 10 + (s[i].charCodeAt(0) - "0".charCodeAt(0));
-        if(sign * res > 2147483647) return 2147483647
-        if(sign * res < -2147483647) return -2147483647
+        if (sign * res > 2147483647) return 2147483647
+        if (sign * res < -2147483647) return -2147483647
         i++
     }
-    return sign*res
+    return sign * res
 }
 // console.log(atoi("4193 with words"))
 
-function LongestPalindrome(s){
+function LongestPalindrome(s) {
     let start = 0;
     let maxLen = 0;
 
-    function expandAroundCenter(left, right){
-        while(left >=0 && right <=s.length && s[left] == s[right]){
+    function expandAroundCenter(left, right) {
+        while (left >= 0 && right <= s.length && s[left] == s[right]) {
             left--;
             right++
         }
-        return right -left -1
+        return right - left - 1
     }
 
-    for(let i=0; i<s.length; i++){
+    for (let i = 0; i < s.length; i++) {
         let len1 = expandAroundCenter(i, i);
-        let len2 = expandAroundCenter(i, i+1);
+        let len2 = expandAroundCenter(i, i + 1);
 
         let len = Math.max(len1, len2)
 
-        if(len > maxLen){
+        if (len > maxLen) {
             maxLen = len
-            start = i-Math.floor((len -1)/2)
+            start = i - Math.floor((len - 1) / 2)
         }
     }
-    return s.substring(start, start+maxLen)
+    return s.substring(start, start + maxLen)
 
 }
- console.log(LongestPalindrome("bababd"))
+//  console.log(LongestPalindrome("bababd"))
+
+function BeautyOfSting(s) {
+    let total = 0;
+    let n = s.length;
+
+    for (let i = 0; i < n; i++) {
+        const freq = {}
+        for (let j = i; j < n; j++) {
+            const ch = s[j]
+            freq[ch] = (freq[ch] || 0) + 1
+            const value = Object.values(freq)
+            const max = Math.max(...value)
+            const min = Math.min(...value)
+            total += (max - min)
+        }
+    }
+    return total
+}
+console.log(BeautyOfSting("aabcbaa"))
