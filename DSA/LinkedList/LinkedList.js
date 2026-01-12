@@ -26,8 +26,54 @@ function LengthOfLinkedList(head) {
     return count;
 
 }
-console.log(LengthOfLinkedList([1, 2, 3, 4, 5]))
+// console.log(LengthOfLinkedList([1, 2, 3, 4, 5]))
 
 function SearchInLinkedList(head, key) {
+    const linkedList = buildLinkedListFromArr(head);
+    let temp = linkedList;
 
+    while(temp != null){
+        if(temp.data == key) return true
+        temp = temp.next
+    }
+    return false
+}
+// console.log(SearchInLinkedList([1,2,3,4,5], 2))
+// ListNode {
+//   val: 7,
+//   next: ListNode { val: 8, next: ListNode { val: 9, next: [ListNode] } }
+// }
+
+function DeleteKthElement(head, k){
+    const linkedList = buildLinkedListFromArr(head);
+    let temp = linkedList
+    let count = 0; let prev = null
+
+    while(temp!= null){
+        count++;
+        if(count ==k){
+            if(prev == null){
+                return head.next
+            }
+            prev.next = temp.next;
+            break;
+        }
+        prev = temp;
+        temp = temp.next
+    }
+    return linkedList
+}
+console.log(DeleteKthElement([1,2,3,4,5], 2))
+function DeleteHead(head){
+    let temp = head;
+    if(temp.next == null) return null
+    return head.next;
+}
+function DeleteTail(head){
+    let temp = head;
+    while(temp.next.next != null){
+       temp = temp.next
+    }
+    temp.next = null
+    return head
 }
