@@ -63,7 +63,7 @@ function DeleteKthElement(head, k){
     }
     return linkedList
 }
-console.log(DeleteKthElement([1,2,3,4,5], 2))
+// console.log(DeleteKthElement([1,2,3,4,5], 2))
 function DeleteHead(head){
     let temp = head;
     if(temp.next == null) return null
@@ -77,3 +77,51 @@ function DeleteTail(head){
     temp.next = null
     return head
 }
+
+function InsertELementAtHead(head, x){
+    const linkedList = buildLinkedListFromArr(head);
+    let temp = linkedList;
+    let element = new Node(x);
+    element.next = temp;
+
+    return element
+}
+// console.log(InsertELementAtHead([2,3], 1))
+
+function InsertELementAtTail(head, x){
+    const linkedList = buildLinkedListFromArr(head);
+    let temp = linkedList;
+    let element = new Node(x);
+    if(linkedList== null) return element 
+    while(temp !=null){
+        if(temp.next == null){
+            temp.next = element
+            break;
+        }
+        temp = temp.next
+    }
+    return linkedList;
+}
+// console.log(InsertELementAtTail([2,3], 1))
+
+function InsertElementAtKth(head, k, x){
+    const linkedList = buildLinkedListFromArr(head);
+    let temp = linkedList;
+    const element = new Node(x);
+    let count = 1;
+    if(k==1){
+        element.next = temp
+        return linkedList;
+    }
+    while(temp!=null){
+        if(count == k-1){
+            element.next = temp.next
+            temp.next = element
+            break
+        }
+        count++;
+        temp = temp.next
+    }
+    return linkedList
+}
+console.log(InsertElementAtKth([1,2,3,4,5], 3, 10))
