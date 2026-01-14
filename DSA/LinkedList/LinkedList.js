@@ -277,4 +277,22 @@ function ReverseDoubleLL(arr){
     }
     return last.prev
 }
-console.log(ReverseDoubleLL([1,2,3,4,5]))
+// console.log(ReverseDoubleLL([1,2,3,4,5]))
+
+function FindMiddle(arr){
+    const linkedlist = buildDoubleLinkedList(arr)
+    //Tortoise and hare algrithm
+    //Hare moves 2 steps
+    //Tortoise moves 1 step
+    // While hare moves to end of ll, tortoise will be in middle
+    let head = linkedlist
+    let slow = head
+    let fast = head
+
+    while(slow && fast && fast.next ){
+        fast = fast.next.next
+        slow = slow.next
+    }
+    return slow.data
+}
+console.log([FindMiddle([1,2,3,4,5, 6])])
