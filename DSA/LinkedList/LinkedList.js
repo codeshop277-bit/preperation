@@ -260,4 +260,21 @@ function InsertDLLAtK(arr, k, x) {
     back.next = newNode
     return head
 }
-console.log(InsertDLLAtK([1,2,4], 3, 5))
+// console.log(InsertDLLAtK([1,2,4], 3, 5))
+
+function ReverseDoubleLL(arr){
+    const linkedlist = buildDoubleLinkedList(arr)
+    let head = linkedlist
+    let current = head;
+    let last = null;
+
+    while(current != null){
+        last = current.prev
+        current.prev = current.next
+        current.next = last
+
+        current = current.prev
+    }
+    return last.prev
+}
+console.log(ReverseDoubleLL([1,2,3,4,5]))
