@@ -32,8 +32,8 @@ function SearchInLinkedList(head, key) {
     const linkedList = buildLinkedListFromArr(head);
     let temp = linkedList;
 
-    while(temp != null){
-        if(temp.data == key) return true
+    while (temp != null) {
+        if (temp.data == key) return true
         temp = temp.next
     }
     return false
@@ -44,15 +44,15 @@ function SearchInLinkedList(head, key) {
 //   next: ListNode { val: 8, next: ListNode { val: 9, next: [ListNode] } }
 // }
 
-function DeleteKthElement(head, k){
+function DeleteKthElement(head, k) {
     const linkedList = buildLinkedListFromArr(head);
     let temp = linkedList
     let count = 0; let prev = null
 
-    while(temp!= null){
+    while (temp != null) {
         count++;
-        if(count ==k){
-            if(prev == null){
+        if (count == k) {
+            if (prev == null) {
                 return head.next
             }
             prev.next = temp.next;
@@ -64,21 +64,21 @@ function DeleteKthElement(head, k){
     return linkedList
 }
 // console.log(DeleteKthElement([1,2,3,4,5], 2))
-function DeleteHead(head){
+function DeleteHead(head) {
     let temp = head;
-    if(temp.next == null) return null
+    if (temp.next == null) return null
     return head.next;
 }
-function DeleteTail(head){
+function DeleteTail(head) {
     let temp = head;
-    while(temp.next.next != null){
-       temp = temp.next
+    while (temp.next.next != null) {
+        temp = temp.next
     }
     temp.next = null
     return head
 }
 
-function InsertELementAtHead(head, x){
+function InsertELementAtHead(head, x) {
     const linkedList = buildLinkedListFromArr(head);
     let temp = linkedList;
     let element = new Node(x);
@@ -88,13 +88,13 @@ function InsertELementAtHead(head, x){
 }
 // console.log(InsertELementAtHead([2,3], 1))
 
-function InsertELementAtTail(head, x){
+function InsertELementAtTail(head, x) {
     const linkedList = buildLinkedListFromArr(head);
     let temp = linkedList;
     let element = new Node(x);
-    if(linkedList== null) return element 
-    while(temp !=null){
-        if(temp.next == null){
+    if (linkedList == null) return element
+    while (temp != null) {
+        if (temp.next == null) {
             temp.next = element
             break;
         }
@@ -104,17 +104,17 @@ function InsertELementAtTail(head, x){
 }
 // console.log(InsertELementAtTail([2,3], 1))
 
-function InsertElementAtKth(head, k, x){
+function InsertElementAtKth(head, k, x) {
     const linkedList = buildLinkedListFromArr(head);
     let temp = linkedList;
     const element = new Node(x);
     let count = 1;
-    if(k==1){
+    if (k == 1) {
         element.next = temp
         return linkedList;
     }
-    while(temp!=null){
-        if(count == k-1){
+    while (temp != null) {
+        if (count == k - 1) {
             element.next = temp.next
             temp.next = element
             break
@@ -124,4 +124,140 @@ function InsertElementAtKth(head, k, x){
     }
     return linkedList
 }
-console.log(InsertElementAtKth([1,2,3,4,5], 3, 10))
+// console.log(InsertElementAtKth([1,2,3,4,5], 3, 10))
+// ``````````````````````````Double Linked li``````````````````
+
+class DoubleNode {
+    constructor(data, next = null, prev = null) {
+        this.data = data;
+        this.next = next;
+        this.prev = prev;
+    }
+}
+
+function buildDoubleLinkedList(arr) {
+    let head = new DoubleNode(arr[0]);
+    let current = head;
+    for (let i = 1; i < arr.length; i++) {
+        let newNode = new DoubleNode(arr[i]);
+        current.next = newNode
+        newNode.prev = current
+        current = newNode
+    }
+    return head;
+}
+
+// console.log(buildDoubleLinkedList([1,2,3]))
+
+function DeleteDLLHead(arr) {
+    const linkedlist = buildDoubleLinkedList(arr);
+    let head = linkedlist;
+    let prev = head;
+    if (head == null || head.next == null) return null
+    head = head.next;
+    head.prev = null
+    prev.next = null
+
+    return head
+}
+// console.log(DeleteDLLHead([1,2,3]));
+
+function DeleteDLLTail(arr) {
+    const linkedlist = buildDoubleLinkedList(arr);
+    let head = linkedlist;
+    let temp = head;
+    if (head == null || head.next == null) return null
+    while (temp.next.next != null) {
+        temp = temp.next
+    }
+    temp.next = null;
+
+    return head
+}
+// console.log(DeleteDLLTail([1,2,3]))
+
+function DeleteDLLTailAtk(arr, k) {
+    const linkedlist = buildDoubleLinkedList(arr);
+    let head = linkedlist;
+    let temp = head;
+    let count = 0;
+    if (head == null || head.next == null) return null
+    while (temp != null) {
+        count++;
+        if (count == k) break;
+        temp = temp.next
+    }
+    if (temp == null) return head; //Out of bound
+    let nextEl = temp.next;
+    let prevEl = temp.prev;
+    if (prevEl == null) {//Delete head
+        head = nextEl
+        if(nextEl != null) nextEl.prev = null
+    } else if (nextEl == null) {//Delete tail
+        prevEl.next = null
+    } else {
+        prevEl.next = nextEl;
+        nextEl.prev = prevEl;
+    }
+    temp.next = null
+    temp.prev = null
+    return head
+}
+// console.log(DeleteDLLTailAtk([1, 2, 3, 4, 5], 4))
+
+function InsertDLLHead(arr, x) {
+    const linkedlist = buildDoubleLinkedList(arr);
+    let headNode = new DoubleNode(x)
+    let head = linkedlist;
+    if (head == null) return headNode
+    head.prev = headNode
+    headNode.next = head;
+
+    return headNode
+}
+// console.log(InsertDLLHead([2,3], 1))
+
+function InsertDLLTail(arr, x) {
+    const linkedlist = buildDoubleLinkedList(arr);
+    let headNode = new DoubleNode(x)
+    let head = linkedlist;
+    let temp = head;
+    if (head == null) return headNode
+    while (temp.next != null) {
+        temp = temp.next
+    }
+    headNode.prev = temp;
+    temp.next = headNode
+
+    return linkedlist
+}
+// console.log(InsertDLLTail([2, 3], 1))
+
+
+function InsertDLLAtK(arr, k, x) {
+    //k place at which new node should be inserted
+    //x new node
+    const linkedlist = buildDoubleLinkedList(arr);
+    let newNode = new DoubleNode(x)
+    let head = linkedlist;
+    let temp = head;
+    let count = 0;
+    if (head == null) return newNode
+    while (temp != null) {
+        count++
+        if(count == k) break;
+        temp = temp.next
+    }
+    let back = temp.prev;
+    if(back == null) {
+        newNode.next = head
+        head.prev = newNode
+        return newNode
+    }
+    temp.prev = newNode
+    newNode.prev = back;
+    newNode.next = temp;
+    back.next = newNode
+    return head
+}
+console.log(InsertDLLAtK([1,2,4], 3, 5))
