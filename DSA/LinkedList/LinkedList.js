@@ -373,3 +373,25 @@ function StartingPointOfLoop(arr){
     }
     return null
 }
+function LengthOfLoop(arr){
+    let linkedlist = buildLinkedListFromArr(arr)
+    let head = linkedlist
+    let slow = head
+    let fast = head
+    let count = 0;
+    while(slow && fast&& fast.next!=null){
+        slow = slow.next
+        fast = fast.next.next
+        if(slow == fast){
+            slow = slow.next;
+            count++;
+            while(slow != fast){
+            slow = slow.next;
+            count++;
+            }
+            return count
+        }
+
+    }
+    return 0;
+}
