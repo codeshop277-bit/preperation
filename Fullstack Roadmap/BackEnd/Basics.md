@@ -109,3 +109,89 @@ app.use(express.urlencoded({ extended: true }));
 Parse incoming request bodies
 Populate req.body
 Must run before routes/controllers
+
+| Property      | Without `express.json()` / `urlencoded()` |
+| ------------- | ----------------------------------------- |
+| `req.body`    | ❌ **undefined**                           |
+| `req.params`  | ✅ **works**                               |
+| `req.query`   | ✅ **works**                               |
+| `req.headers` | ✅ **works**                               |
+
+# Avoid Middleware Pitfalls
+✔ Parsing first
+✔ Auth after public routes
+✔ Routes before 404
+✔ Error handler last
+✔ Always call next()
+✔ One parser only
+
+# Error validation
+Bad request
+  ↓
+Frontend validation → reject
+  ↓
+Gateway validation → reject
+  ↓
+Zod DTO → reject
+  ↓
+Service business rule → reject
+  ↓
+DB (LAST resort)
+
+# Validation at the Edge
+Validation done as close to the client as possible:
+Frontend (browser)
+Mobile app
+API Gateway / CDN (Cloudflare, Nginx, API Gateway)
+
+# Validation at the Server
+Validation done inside your backend:
+Express/Nest app
+Zod / DTO validation
+Service-level business rules
+
+# Validation at gateway - CDN/Cloudfare
+```js
+export default {
+  async fetch(request) {
+    // 1️⃣ Allow only POST
+    if (request.method !== 'POST') {
+      return new Response('Method Not Allowed', { status: 405 });
+    }
+
+    // 2️⃣ Enforce Content-Type
+    const contentType = request.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      return new Response('Unsupported Media Type', { status: 415 });
+    }
+
+    // 3️⃣ Body size limit (fail fast)
+    const contentLength = request.headers.get('content-length');
+    if (contentLength && Number(contentLength) > 1024) {
+      return new Response('Payload Too Large', { status: 413 });
+    }
+
+    // 4️⃣ Parse + validate JSON structure
+    const body = await request.json();
+
+    if (!body.email || !body.password) {
+      return new Response('Invalid payload', { status: 400 });
+    }
+
+    // 5️⃣ Forward ONLY valid requests to backend
+    return fetch('https://api.myapp.com/auth/login', {
+      method: 'POST',
+      headers: request.headers,
+      body: JSON.stringify(body)
+    });
+  }
+};
+```
+
+# Cloudflare WAF rules (no code):
+Example rules
+Block requests if:
+Body size > 1MB
+Missing Content-Type
+SQL injection patterns
+XSS payloads
