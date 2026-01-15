@@ -311,7 +311,7 @@ function ReverseSingleLL(arr){
     }
     return prev
 }
-console.log(ReverseSingleLL([1,2,3,4]))
+// console.log(ReverseSingleLL([1,2,3,4]))
 
 function RecursiveReverse(arr){
     const linkedlist = buildLinkedListFromArr(arr);
@@ -326,4 +326,50 @@ function RecursiveReverse(arr){
         return recursive(nextEl, current)
     }
     return recursive(current)
+}
+// console.log(RecursiveReverse([1,2,3,4]))
+
+function DetectLoop(arr){
+    const linkedlist = buildLinkedListFromArr(arr)
+    let head = linkedlist
+    let temp = head
+    let map = new Map()
+    while(temp != null){
+        if(map.has(temp)) return true
+        map.set(temp, 1)
+        temp = temp.next
+    }
+    return false
+}
+
+function DetectLoopOptimal(arr){
+    const linkedlist = buildLinkedListFromArr(arr)
+    let head = linkedlist
+    let slow = head
+    let fast = head
+    while(slow && fast && fast.next != null){
+       slow = slow.next
+       fast = fast.next.next
+       if(slow == fast ) return true
+    }
+    return false
+}
+function StartingPointOfLoop(arr){
+    const linkedlist = buildLinkedListFromArr(arr)
+    let head = linkedlist
+    let slow = head
+    let fast = head
+    while(slow && fast && fast.next != null){
+       slow = slow.next
+       fast = fast.next.next
+       if(slow == fast ) {
+        slow = head;
+        while(slow == fast){
+            slow = slow.next
+            fast = fast.next
+        }
+        return slow
+       }
+    }
+    return null
 }
