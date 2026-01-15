@@ -295,4 +295,35 @@ function FindMiddle(arr){
     }
     return slow.data
 }
-console.log([FindMiddle([1,2,3,4,5, 6])])
+// console.log([FindMiddle([1,2,3,4,5, 6])])
+
+function ReverseSingleLL(arr){
+    const linked = buildLinkedListFromArr(arr);
+    let head = linked;
+    let current = head;
+    let prev = null;
+
+    while(current != null){
+        let nextEl = current.next;
+        current.next = prev;
+        prev = current;
+        current = nextEl
+    }
+    return prev
+}
+console.log(ReverseSingleLL([1,2,3,4]))
+
+function RecursiveReverse(arr){
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist
+    let current = head
+
+    function recursive(current, prev=null){
+        if(current == null) return prev
+        let nextEl = current.next
+        current.next = prev
+
+        return recursive(nextEl, current)
+    }
+    return recursive(current)
+}
