@@ -192,7 +192,7 @@ function DeleteDLLTailAtk(arr, k) {
     let prevEl = temp.prev;
     if (prevEl == null) {//Delete head
         head = nextEl
-        if(nextEl != null) nextEl.prev = null
+        if (nextEl != null) nextEl.prev = null
     } else if (nextEl == null) {//Delete tail
         prevEl.next = null
     } else {
@@ -245,11 +245,11 @@ function InsertDLLAtK(arr, k, x) {
     if (head == null) return newNode
     while (temp != null) {
         count++
-        if(count == k) break;
+        if (count == k) break;
         temp = temp.next
     }
     let back = temp.prev;
-    if(back == null) {
+    if (back == null) {
         newNode.next = head
         head.prev = newNode
         return newNode
@@ -262,13 +262,13 @@ function InsertDLLAtK(arr, k, x) {
 }
 // console.log(InsertDLLAtK([1,2,4], 3, 5))
 
-function ReverseDoubleLL(arr){
+function ReverseDoubleLL(arr) {
     const linkedlist = buildDoubleLinkedList(arr)
     let head = linkedlist
     let current = head;
     let last = null;
 
-    while(current != null){
+    while (current != null) {
         last = current.prev
         current.prev = current.next
         current.next = last
@@ -279,7 +279,7 @@ function ReverseDoubleLL(arr){
 }
 // console.log(ReverseDoubleLL([1,2,3,4,5]))
 
-function FindMiddle(arr){
+function FindMiddle(arr) {
     const linkedlist = buildDoubleLinkedList(arr)
     //Tortoise and hare algrithm
     //Hare moves 2 steps
@@ -289,7 +289,7 @@ function FindMiddle(arr){
     let slow = head
     let fast = head
 
-    while(slow && fast && fast.next ){
+    while (slow && fast && fast.next) {
         fast = fast.next.next
         slow = slow.next
     }
@@ -297,13 +297,13 @@ function FindMiddle(arr){
 }
 // console.log([FindMiddle([1,2,3,4,5, 6])])
 
-function ReverseSingleLL(arr){
+function ReverseSingleLL(arr) {
     const linked = buildLinkedListFromArr(arr);
     let head = linked;
     let current = head;
     let prev = null;
 
-    while(current != null){
+    while (current != null) {
         let nextEl = current.next;
         current.next = prev;
         prev = current;
@@ -313,13 +313,13 @@ function ReverseSingleLL(arr){
 }
 // console.log(ReverseSingleLL([1,2,3,4]))
 
-function RecursiveReverse(arr){
+function RecursiveReverse(arr) {
     const linkedlist = buildLinkedListFromArr(arr);
     let head = linkedlist
     let current = head
 
-    function recursive(current, prev=null){
-        if(current == null) return prev
+    function recursive(current, prev = null) {
+        if (current == null) return prev
         let nextEl = current.next
         current.next = prev
 
@@ -329,65 +329,65 @@ function RecursiveReverse(arr){
 }
 // console.log(RecursiveReverse([1,2,3,4]))
 
-function DetectLoop(arr){
+function DetectLoop(arr) {
     const linkedlist = buildLinkedListFromArr(arr)
     let head = linkedlist
     let temp = head
     let map = new Map()
-    while(temp != null){
-        if(map.has(temp)) return true
+    while (temp != null) {
+        if (map.has(temp)) return true
         map.set(temp, 1)
         temp = temp.next
     }
     return false
 }
 
-function DetectLoopOptimal(arr){
+function DetectLoopOptimal(arr) {
     const linkedlist = buildLinkedListFromArr(arr)
     let head = linkedlist
     let slow = head
     let fast = head
-    while(slow && fast && fast.next != null){
-       slow = slow.next
-       fast = fast.next.next
-       if(slow == fast ) return true
+    while (slow && fast && fast.next != null) {
+        slow = slow.next
+        fast = fast.next.next
+        if (slow == fast) return true
     }
     return false
 }
-function StartingPointOfLoop(arr){
+function StartingPointOfLoop(arr) {
     const linkedlist = buildLinkedListFromArr(arr)
     let head = linkedlist
     let slow = head
     let fast = head
-    while(slow && fast && fast.next != null){
-       slow = slow.next
-       fast = fast.next.next
-       if(slow == fast ) {
-        slow = head;
-        while(slow == fast){
-            slow = slow.next
-            fast = fast.next
+    while (slow && fast && fast.next != null) {
+        slow = slow.next
+        fast = fast.next.next
+        if (slow == fast) {
+            slow = head;
+            while (slow == fast) {
+                slow = slow.next
+                fast = fast.next
+            }
+            return slow
         }
-        return slow
-       }
     }
     return null
 }
-function LengthOfLoop(arr){
+function LengthOfLoop(arr) {
     let linkedlist = buildLinkedListFromArr(arr)
     let head = linkedlist
     let slow = head
     let fast = head
     let count = 0;
-    while(slow && fast&& fast.next!=null){
+    while (slow && fast && fast.next != null) {
         slow = slow.next
         fast = fast.next.next
-        if(slow == fast){
+        if (slow == fast) {
             slow = slow.next;
             count++;
-            while(slow != fast){
-            slow = slow.next;
-            count++;
+            while (slow != fast) {
+                slow = slow.next;
+                count++;
             }
             return count
         }
@@ -396,21 +396,21 @@ function LengthOfLoop(arr){
     return 0;
 }
 
-function checkIFPalindrome(arr){
+function checkIFPalindrome(arr) {
     const linkedlist = buildLinkedListFromArr(arr);
     let head = linkedlist;
     let slow = head;
     let fast = head;
 
-    while(fast.next != null && fast.next.next != null){
+    while (fast.next != null && fast.next.next != null) {
         slow = slow.next;
         fast = fast.next.next;
     }
     let newHead = ReverseSingleLL(slow.next);
     let first = head; let second = newHead;
 
-    while(second != null){
-        if(first.data != second.data){
+    while (second != null) {
+        if (first.data != second.data) {
             ReverseSingleLL(newHead);
             return false;
         }
@@ -421,14 +421,14 @@ function checkIFPalindrome(arr){
     return true
 }
 
-function GroupOddEven(arr){
+function GroupOddEven(arr) {
     const linkedlist = buildLinkedListFromArr(arr);
     let head = linkedlist;
     let odd = head;
     let even = head.next;
     let evenHead = head.next;
 
-    while(even!=null && even.next !=null){
+    while (even != null && even.next != null) {
         odd.next = odd.next.next;
         odd = odd.next;
         even.next = even.next.next;
@@ -437,21 +437,94 @@ function GroupOddEven(arr){
     odd.next = evenHead
     return head;
 }
-function RemoveKthfromEnd(arr, k){
+function RemoveKthfromEnd(arr, k) {
     const linkedlist = buildLinkedListFromArr(arr);
     let head = linkedlist;
 
     let fast = head;
     let slow = head;
-    for(let i=0; i<k; i++){
+    for (let i = 0; i < k; i++) {
         fast = fast.next
     }
-    while(fast!= null && fast.next != null){
-        slow = slow.next 
+    while (fast != null && fast.next != null) {
+        slow = slow.next
         fast = fast.next
     }
-    if(fast == null) return head.next
+    if (fast == null) return head.next
     slow.next = slow.next.next;
 
     return head;
 }
+function DeleteMiddle(arr) {
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist
+    let slow = head
+    let fast = head
+    fast = fast.next.next //require middle.prev so we skip slow 1st time
+
+    while (fast != null && fast.next != null) {
+        slow = slow.next
+        fast = fast.next.next;
+    }
+    let deleteEl = slow.next
+    slow.next = slow.next.next
+    deleteEl.next = null
+
+    return head
+};
+
+function mergeSortLL(list1, list2) {
+    let temp = new Node(-1);
+    let current = temp; // Keep reference to build the list
+
+    while (list1 != null && list2 != null) {
+        if (list1.data <= list2.data) {
+            current.next = list1;
+            list1 = list1.next;
+        } else {
+            current.next = list2;
+            list2 = list2.next;
+        }
+        current = current.next;
+    }
+
+    if (list1 != null) {
+        current.next = list1;
+    } else {
+        current.next = list2;
+    }
+
+    return temp.next;
+}
+
+function findMiddle1st(head) {
+    let slow = head;
+    let fast = head.next;
+
+    while (fast != null && fast.next != null) {
+        slow = slow.next
+        fast = fast.next.next
+    }
+    return slow
+}
+function SortLinkedList(head) {
+    if (head == null || head.next == null) {
+        return head;
+    }
+    let middle = findMiddle1st(head);
+    let right = middle.next;
+    middle.next = null;
+    let left = head;
+    
+    let leftNode = SortLinkedList(left)
+    let rightNode = SortLinkedList(right)
+
+    return mergeSortLL(leftNode, rightNode)
+}
+
+function SORT(arr) {
+    const linkedlist = buildLinkedListFromArr(arr);
+    return SortLinkedList(linkedlist)
+
+}
+console.log(SORT([5, 1, 2, 4]))
