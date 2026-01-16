@@ -492,3 +492,72 @@ Safer isolation
 | Crash impact | Isolated     | Can affect process |
 | Startup cost | High         | Low                |
 | Best for     | Scaling apps | CPU tasks          |
+
+# Memory Leaks
+A memory leak happens when your Node.js app keeps references to objects that are no longer needed, so the V8 garbage collector cannot free them.
+1️⃣ Global variables & shared state
+2️⃣ Unbounded in-memory caches
+3️⃣ Event listeners not removed
+4️⃣ Closures holding large objects
+5️⃣ Timers & intervals not cleared
+6️⃣ Unhandled Promises & retained references
+
+ Detect Memory Leak -->
+ node --inspect index.js
+
+# Vertical Scaling
+Add more CPU / RAM to the same server
+Same process, same machine
+
+2 CPU, 4GB RAM → 8 CPU, 32GB RAM
+
+When to use:
+Early-stage applications
+Low traffic APIs
+Stateful systems (legacy apps)
+Databases (to a limit)
+
+# Horizontal Scaling
+Add more machines or processes
+Load is distributed
+1 server → 5 servers behind a load balancer
+
+✅ When to use horizontal scaling
+High traffic APIs
+Microservices
+Fault tolerance required
+Cloud-native systems
+
+# What is PM2?
+PM2 is a production process manager for Node.js that:
+Keeps apps alive
+Restarts on crash
+Runs apps in cluster mode
+Enables zero-downtime reloads
+
+# Graceful shutdown means:
+Stop accepting new requests,
+Finish ongoing requests,
+Clean up resources,
+Then exit.
+
+What should be cleaned up?
+✔ HTTP server
+✔ DB connections
+✔ Message queues
+✔ Background jobs
+✔ Worker threads
+
+PM2 + Graceful Shutdown Flow
+
+PM2 sends SIGTERM
+
+App stops accepting traffic
+
+In-flight requests complete
+
+Resources close
+
+Process exits
+
+PM2 starts new process
