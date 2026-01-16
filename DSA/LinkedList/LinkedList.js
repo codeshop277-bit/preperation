@@ -395,3 +395,63 @@ function LengthOfLoop(arr){
     }
     return 0;
 }
+
+function checkIFPalindrome(arr){
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist;
+    let slow = head;
+    let fast = head;
+
+    while(fast.next != null && fast.next.next != null){
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+    let newHead = ReverseSingleLL(slow.next);
+    let first = head; let second = newHead;
+
+    while(second != null){
+        if(first.data != second.data){
+            ReverseSingleLL(newHead);
+            return false;
+        }
+        first = first.next;
+        second = second.next;
+    }
+    ReverseSingleLL(newHead)
+    return true
+}
+
+function GroupOddEven(arr){
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist;
+    let odd = head;
+    let even = head.next;
+    let evenHead = head.next;
+
+    while(even!=null && even.next !=null){
+        odd.next = odd.next.next;
+        odd = odd.next;
+        even.next = even.next.next;
+        even = even.next;
+    }
+    odd.next = evenHead
+    return head;
+}
+function RemoveKthfromEnd(arr, k){
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist;
+
+    let fast = head;
+    let slow = head;
+    for(let i=0; i<k; i++){
+        fast = fast.next
+    }
+    while(fast!= null && fast.next != null){
+        slow = slow.next 
+        fast = fast.next
+    }
+    if(fast == null) return head.next
+    slow.next = slow.next.next;
+
+    return head;
+}
