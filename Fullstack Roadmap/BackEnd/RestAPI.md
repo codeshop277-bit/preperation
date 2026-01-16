@@ -91,3 +91,66 @@ paths:
 
 # Backward Compatible
 A system is backward compatible if old clients continue to work with newer API versions.
+
+# Operational Errors
+Errors that happen during normal operation.
+Examples
+Invalid user input
+Authentication failure
+Resource not found
+External API timeout
+DB constraint violation
+
+# Programmer Errors (Bugs)
+Errors caused by bugs in code.
+Examples
+undefined.property
+Incorrect assumptions
+Race conditions
+Memory leaks
+
+# Graceful Error Flow
+Request
+ ↓
+Validation
+ ↓
+Service Logic
+ ↓
+Operational Error? → Controlled response
+ ↓
+Programmer Error? → Generic response + alert
+ ↓
+Server continues running
+
+# Leaking Internal errors
+Avoid showing backend errors in client. Like cannot read property of undefined at userservice in client
+
+# HTTP Headers for Security
+Security headers protect your API from:
+XSS
+Clickjacking
+MIME sniffing
+Token leakage
+
+# Content Security Policy
+Prevents XSS attacks.
+Content-Security-Policy: default-src 'self'
+✔ Controls allowed scripts, styles, images
+
+# X-Content-Type-Options
+Stops MIME sniffing.
+X-Content-Type-Options: nosniff
+✔ Prevents browser guessing file types
+
+# X-Frame-Options
+Prevents clickjacking.
+X-Frame-Options: DENY
+
+# Strict-Transport-Security (HSTS)
+Forces HTTPS.
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+✔ Prevents SSL downgrade attacks
+
+# Referrer-Policy
+Controls referrer info leakage.
+Referrer-Policy: no-referrer
