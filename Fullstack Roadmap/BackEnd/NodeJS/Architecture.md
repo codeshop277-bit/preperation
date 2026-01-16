@@ -138,6 +138,22 @@ Event loop executes it later
 setImmediate runs in check phase
 setTimeout(0) waits for timers phase
 
+# EVent loop block
+If you run CPU-heavy or synchronous code, the event loop cannot process anything else.
+All incoming requests freeze until the blocking task finishes.
+
+```js
+app.get('/block', (req, res) => {
+  const start = Date.now();
+  while (Date.now() - start < 5000) {} // blocks for 5 sec
+  res.send('Done');
+});
+app.get('/non-block', async (req, res) => {
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  res.send('Done');
+});
+```
+
 | Type           | Purpose                                        |
 | -------------- | ---------------------------------------------- |
 | **Microtasks** | Run **immediately after current JS execution** |
@@ -223,6 +239,28 @@ Crypto (pbkdf2, scrypt)
 Compression (zlib)
 These are delegated to the libuv thread pool.
 
+# Worker Thread
+Node.js is single-threaded by default, but:
+Encryption
+Image processing
+Large calculations
+👉 These block the event loop
+Worker threads allow true parallel execution for CPU tasks.
+Basic idea
+Main thread → handles requests
+Worker thread → does heavy computation
+Communication via messages
+```js
+const { Worker } = require('worker_threads');
+
+const worker = new Worker('./worker.js', {
+  workerData: 10
+});
+
+worker.on('message', result => {
+  console.log('Result:', result);
+});
+```
 ```js
 const fs = require("fs");
 
@@ -405,3 +443,52 @@ Browser event loop is optimized for UI rendering, while Node.js event loop is op
 # Concurrency
 Managing many tasks at once
 Concurrency is the ability to manage multiple tasks at once, and Node.js achieves it using a single-threaded, event-driven, non-blocking I/O model powered by libuv.
+
+# CLuster
+Node.js uses one CPU core, even if your machine has 8 cores.
+Clustering:
+Creates multiple Node processes
+Each process runs on a separate CPU core
+All share the same port
+
+Benefits
+Uses all CPU cores
+One process crash ≠ full downtime
+Higher throughput
+Real-world note
+In production, clustering is often handled by:
+PM2
+Docker + Kubernetes
+```js
+const cluster = require('cluster');
+const os = require('os');
+const express = require('express');
+
+if (cluster.isPrimary) {
+  const cpuCount = os.cpus().length;
+  for (let i = 0; i < cpuCount; i++) {
+    cluster.fork();
+  }
+} else {
+  const app = express();
+  app.get('/', (req, res) => {
+    res.send(`Handled by PID ${process.pid}`);
+  });
+  app.listen(3000);
+}
+
+```
+
+# Process vs Thread
+Process
+Independent memory
+Own event loop
+Higher memory usage
+Safer isolation
+
+| Aspect       | Process      | Thread             |
+| ------------ | ------------ | ------------------ |
+| Memory       | Separate     | Shared             |
+| Crash impact | Isolated     | Can affect process |
+| Startup cost | High         | Low                |
+| Best for     | Scaling apps | CPU tasks          |
