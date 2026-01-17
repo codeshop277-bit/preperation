@@ -600,4 +600,56 @@ function Add1ToLL(arr){
     return head;
 }
 
-console.log(Add1ToLL([1,2,3]))
+// console.log(Add1ToLL([1,2,3]))
+
+function Add2LL(arr1, arr2){
+    const linkedlist1 = buildLinkedListFromArr(arr1);
+    const linkedlist2 = buildLinkedListFromArr(arr2);
+    let head1 = linkedlist1
+    let head2 = linkedlist2
+
+    let result = new Node(-1);
+    let current = result;
+    let carry = 0;
+
+    while(head1 != null || head2 != null){
+       let sum = carry
+       if(head1) sum+= head1.data
+       if(head2) sum+=head2.data
+
+       carry = Math.floor(sum/100);
+        let newNode = new Node(sum%10);
+        current.next = newNode;
+        current = current.next
+        if(head1) head1 = head1.next
+        if(head2) head2 = head2.next
+    }
+    if(carry!=0){
+        let newHead = new Node(carry)
+        current.next = newHead;
+    }
+    return result.next;
+}
+// console.log(Add2LL([1,2,3], [4,5,6]))
+function DeleteAllOccOfKeyInDLL(arr, target){
+    const linkedlist = buildDoubleLinkedList(arr);
+    let head = linkedlist;
+    let temp = head;
+
+    while(temp !=null){
+        if(temp.data == target){
+            if(temp == head) head = head.next
+            let prev = temp.prev;
+            let next = temp.next
+            if(prev) prev.next = next
+            if(next)next.prev = prev
+
+            temp = next
+        }else{
+        temp= temp.next
+        }
+
+    }
+    return head
+}
+console.log(DeleteAllOccOfKeyInDLL([10,2, 10, 1,10], 10))
