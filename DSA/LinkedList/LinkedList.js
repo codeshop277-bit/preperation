@@ -515,7 +515,7 @@ function SortLinkedList(head) {
     let right = middle.next;
     middle.next = null;
     let left = head;
-    
+
     let leftNode = SortLinkedList(left)
     let rightNode = SortLinkedList(right)
 
@@ -527,4 +527,77 @@ function SORT(arr) {
     return SortLinkedList(linkedlist)
 
 }
-console.log(SORT([5, 1, 2, 4]))
+// console.log(SORT([5, 1, 2, 4]))
+
+function Sort012(arr) {
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist;
+    let zeroNode = new Node(-1);
+    let oneNode = new Node(-1);
+    let twoNode = new Node(-1);
+    let one = oneNode;
+    let two = twoNode;
+    let zero = zeroNode;
+
+    let temp = head;
+
+    while (temp != null) {
+        if (temp.data == 0) {
+            zero.next = temp;
+            zero = zero.next;
+        } else if (temp.data == 1) {
+            one.next = temp;
+            one = one.next;
+        } else {
+            two.next = temp;
+            two = two.next;
+        }
+        temp = temp.next
+    }
+    zero.next = oneNode.next ? oneNode.next : twoNode.next;
+    one.next = twoNode.next;
+    two.next = null
+
+    return zeroNode.next
+}
+
+// console.log(Sort012([1,0,2,0,1]))
+
+function IntersectionPoint(arr1, arr2){
+    const headA = buildLinkedListFromArr(arr1);
+    const headB = buildLinkedListFromArr(arr2);
+    let temp1 = headA;
+    let temp2= headB
+
+    if(headA == null || headB == null) return null
+
+    while(temp1 != temp2){
+       temp1 = temp1 == null ? headB : temp1.next;
+    temp2 = temp2 == null ? headA : temp2.next;
+    }
+    return temp1
+}
+function RecursiveCarry(temp){
+    if(temp == null) return 1;
+
+    let carry = RecursiveCarry(temp.next);
+    temp.data+=carry
+    if(temp.data < 10) return 0;
+    temp.data = 0;
+    return 1;
+}
+function Add1ToLL(arr){
+    const linkedlist = buildLinkedListFromArr(arr)
+    let head = linkedlist;
+
+    let carry = RecursiveCarry(head);
+
+    if(carry == 1){
+        let newHead = new Node(1);
+        newHead.next = head
+        head = newHead
+    }
+    return head;
+}
+
+console.log(Add1ToLL([1,2,3]))
