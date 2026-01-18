@@ -652,4 +652,93 @@ function DeleteAllOccOfKeyInDLL(arr, target){
     }
     return head
 }
-console.log(DeleteAllOccOfKeyInDLL([10,2, 10, 1,10], 10))
+// console.log(DeleteAllOccOfKeyInDLL([10,2, 10, 1,10], 10))
+
+function findTail(head){
+    let temp = head;
+    while(temp.next != null){
+        temp = temp.next;
+    }
+    return temp;
+}
+function PairsOfGivenSum(arr, target){
+    const linkedlist = buildDoubleLinkedList(arr);
+    let head = linkedlist;
+    let temp = head;
+    let ans = [];
+    let left = head;
+    let right = findTail(head);
+    while(left.data <right.data){
+        if(left.data + right.data == target){
+            ans.push([left.data, right.data])
+            left = left.next
+            right = right.prev
+        }else if(left.data + right.data <target){
+            left = left.next
+        }else{
+            right = right.prev
+        }
+    }
+return ans
+}
+
+// console.log(PairsOfGivenSum([1,2,3,4,9], 5))
+
+function RemoveDUplicatesFromSortedDLL(arr){
+    const linkedList = buildDoubleLinkedList(arr);
+    let head = linkedList
+    let temp = head;
+
+    while(temp!= null && temp.next != null){
+        let nextNode = temp.next;
+        while(nextNode != null && nextNode.data == temp.data){
+            nextNode = nextNode.next;
+        }
+        temp.next = nextNode
+        if(nextNode) nextNode.prev = temp
+        temp = temp.next
+    }
+    return head
+}
+// console.log(RemoveDUplicatesFromSortedDLL([1,1,1,2,3,3,4]))
+
+function findKthNode( head, k){
+    k-=1
+    while(head!= null && k>0){
+        k--
+        head=head.next
+    }
+    return head
+}
+function ReverseNodesInKGroup(arr,k){
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist;
+    let temp = head;
+    let nextNode = null;
+    let prevNode = null;
+
+    while(temp != null){
+        let kthNode = findKthNode(temp, k);
+        if(kthNode == null){
+            if(prevNode) prevNode.next = temp
+            break;
+        }
+        nextNode = kthNode.next;
+        kthNode.next = null;
+        
+        // Reverse returns the new head (which is kthNode)
+        // temp is now the tail of the reversed segment
+        ReverseSingleLL(temp);
+        
+        if(temp == head){
+            head = kthNode; // kthNode is new head of entire list
+        } else {
+            prevNode.next = kthNode; // Connect previous segment to new head
+        }
+        
+        prevNode = temp; // temp is now the tail, correct!
+        temp = nextNode; // Move to 
+    }
+    return head
+}
+console.log(ReverseNodesInKGroup([1,2,3,4,5,6,7], 3))
