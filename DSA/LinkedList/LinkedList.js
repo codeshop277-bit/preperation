@@ -741,4 +741,66 @@ function ReverseNodesInKGroup(arr,k){
     }
     return head
 }
-console.log(ReverseNodesInKGroup([1,2,3,4,5,6,7], 3))
+// console.log(ReverseNodesInKGroup([1,2,3,4,5,6,7], 3))
+
+function ROtateLinkedList(arr, k){
+    const linkedList = buildLinkedListFromArr(arr);
+    let head = linkedList
+    let temp = head;
+    let tail = head;
+    let count = 1;
+    while(tail.next != null){
+        count++
+        tail = tail.next
+    }
+    tail.next = head;
+    k = k%count;
+    let diff = count - k;
+    diff-=1
+    while(temp!= null && diff>0){
+        diff--
+        temp = temp.next
+    }
+    head = temp.next
+    temp.next = null
+    return head
+
+}
+console.log(ROtateLinkedList([1,2,3,4,5], 2))
+
+function FlattenLL(arr){
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist
+    let temp = head;
+
+    function mergeLL(list1, list2){
+        let dummyNode = new Node(-1);
+        let res = dummyNode;
+        while(list1 != null && list2 != null){
+            if(list1.data <list2.data){
+                res.child = list1;
+                res = list1;
+                list1 = list1.child
+            }else{
+                res.child = list2;
+                res = list2;
+                list2 = list2.child
+            }
+            res.next = null;
+        }
+        if(list1) {
+            res.child = list1
+        }else{
+            res.child = list2
+        }
+        if(dummyNode.child) dummyNode.child.next = null
+        return dummyNode.child
+    }
+    function recursivehead(val){
+        if(val == null || val.next == null) return val
+        let mergedHead = recursivehead(val.next);
+        return mergeLL(val, mergedHead)
+    }
+
+    recursivehead(temp)
+}
