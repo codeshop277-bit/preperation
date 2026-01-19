@@ -804,3 +804,65 @@ function FlattenLL(arr){
 
     recursivehead(temp)
 }
+
+function CloneLLWIthDummyAndRandom(arr){
+    const linkedlist = buildLinkedListFromArr(arr);
+    let head = linkedlist
+    let temp = head
+
+    while(temp!= null){
+        let copy = new Node(temp.data);
+        copy.next = temp.next
+        temp.next = copy
+        temp = temp.next
+    }
+    temp = head
+    while(temp != null){
+        let copyNode = temp.next
+         if (temp.random) {
+            copyNode.random = temp.random.next;
+        } else {
+            copyNode.random = null;
+        }
+        temp = temp.next
+    }
+    let dummyNode = new Node(-1)
+    let res = dummyNode
+    temp = head
+    while(temp != null){
+        res.next = temp.next
+        temp.next = temp.next.next
+    }
+    return dummyNode.next
+}
+class Browser{
+    constructor(homepage){
+        this.currentPage = new DoubleNode(homepage)
+    };
+    visit(url){
+        const newNode = new DoubleNode(url);
+        newNode.back = this.currentPage;
+        this.currentPage.next = newNode;
+        this.currentPage = newNode;
+    };
+    back(steps){
+        while(steps > 0){
+            if(this.currentPage.back){
+                this.currentPage = this.currentPage.back;
+            }else{
+                break;
+            }
+            steps--;
+        }
+    };
+     forward(steps){
+        while(steps > 0){
+            if(this.currentPage.next){
+                this.currentPage = this.currentPage.next
+            }else{
+                break;
+            }
+            steps--;
+        }
+    }
+}
