@@ -105,3 +105,56 @@ function PowrSet(current, index, result, s){
     current.pop()
 }
 // console.log(PowrSet([], 0, [], "abc"))
+
+function CountSubSeq(index, arr, sum){
+    if (sum ==0) return 1;
+    if(sum < 0|| index == arr.length) return 0;
+
+    return CountSubSeq(index +1, arr, sum - arr[index] ) + CountSubSeq(index+1, arr, sum)
+}
+
+function CheckSubSequence(i, arr, k){
+    if(k===0) return true;
+    if(k<0) return false;
+    if(i=== arr.length) return k ===0;
+
+    return CheckSubSequence(i+1, arr, k-arr[i]) || CheckSubSequence(i+1, arr, k)
+}
+function RecurseCombSum(index, arr, k, current, ans){
+    if(index == arr.length){
+        if(k === 0){
+            ans.push([...current])
+        }
+        return
+    }
+    if(arr[index] <= k){
+        current.push(arr[index])
+        RecurseCombSum(index+1, arr,  k-arr[index], current, sum)
+        current.pop()
+    }
+     RecurseCombSum(index+1, arr , k, current, sum)
+}
+function CombinationSum(arr, k){
+    let ans = []
+    let current  = []
+    return RecurseCombSum(0, arr, k, current, ans)
+}
+function RecurseCombTwoSum(index, arr, k, current, ans){
+        if(k === 0){
+            ans.push([...current])
+            return
+        }
+        for(let i=index; i<arr.length; i++){
+            if(i> index && arr[i] === arr[i-1]) continue
+            if(arr[i] > k) break;
+            current.push(arr[i])
+             RecurseCombSum(i+1, arr,  k-arr[i], current, sum)
+             current.pop()
+        }
+}
+function CombinationTwoSum(arr, k){
+    arr.sort()
+    let ans = []
+    let current  = []
+    return RecurseCombTwoSum(0, arr, k, current, ans)
+}
