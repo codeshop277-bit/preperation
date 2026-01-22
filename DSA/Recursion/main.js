@@ -211,3 +211,18 @@ function SubsetTwoSum(arr) {
     RecursiveSubSet(0, arr, [], sum)
     return sum
 }
+const map = ["", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"];
+function RecursiveLetterToDigits(index, digits, current, sum){
+    if(index === digits.length){
+        sum.push(current)
+        return
+    }
+    let string = map[digits[index] - "0"];
+    for(let i=0; i< string.length; i++){
+        RecursiveLetterToDigits(index+1, digits, current+string[i], sum)
+    }
+
+}
+function LetterToDigits(digits){
+    RecursiveLetterToDigits(0, digits, "" , [])
+}
