@@ -226,3 +226,28 @@ function RecursiveLetterToDigits(index, digits, current, sum){
 function LetterToDigits(digits){
     RecursiveLetterToDigits(0, digits, "" , [])
 }
+
+function isPalindrome(s, left, right){
+    while(left<right){
+        if(s[left] != s[right]) return false
+        left++
+        right--
+    }
+    return true
+}
+function RecursiveReturnPalindrome(index, s, ans, path){
+    if(index === s.length){
+        ans.push([...path])
+        return
+    }; 
+    for(let i=index; i<s.length; i++){
+        if(isPalindrome(s, index, i)){
+            RecursiveReturnPalindrome(index+1, s, ans, path)
+            path.pop()
+        }
+    }
+}
+function ReturnPalindrome(s){
+    let ans = []
+    RecursiveReturnPalindrome(0, s, ans, [])
+}
