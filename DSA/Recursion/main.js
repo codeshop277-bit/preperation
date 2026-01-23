@@ -251,3 +251,54 @@ function ReturnPalindrome(s){
     let ans = []
     RecursiveReturnPalindrome(0, s, ans, [])
 }
+
+function wordSearch(grid, word){
+    const rows = grid.length;
+    const cols = grid[0].length;
+
+    const findWord = (i, j, idx) => {
+        if(idx == word.length) return true;
+        if(i< 0 || j <0 || i>= rows || j>=cols || grid[i][j] != word[idx] ) return false;
+        let temp = grid[i][j]
+        grid[i][j] = '#'
+        const found = findWord(i+1, j, idx+1) || findWord(i-1,j, idx+1 ) || findWord(i, j+1, idx+1) || findWord(i, j-1, idx+1);
+        grid[i][j] = temp;
+        return found
+    }
+
+    for(let i=0; i<rows; i++){
+        for(let j=0; j<cols; j++){
+            if(findWord(i, j, 0)) return true;
+        }
+    }
+    return false
+}
+function isSafe(x,y,n, maze, visited){
+    return (x>0 && x<n && y>0 && y<n && visited[x][y] == 0 && maze[x][y] == 1)
+}
+function solve(x,y,n,maze, visited, res, path){
+    if(x == n-1 && y == n-1){
+        res.pus(path)
+        return
+    }
+    visited[x][y] = 1
+    if(isSafe(x+1,y,n, maze, visited)){
+        solve(x+1, y, n, maze, visited, res, path+"D")
+    }
+     if(isSafe(x,y-1,n, maze, visited)){
+        solve(x, y-1, n, maze, visited, res, path+"L")
+    }
+     if(isSafe(x,y+1,n, maze, visited)){
+        solve(x, y_1, n, maze, visited, res, path+"R")
+    }
+     if(isSafe(x-1,y,n, maze, visited)){
+        solve(x-1, y, n, maze, visited, res, path+"U")
+    }
+    visited[x][y] = 0
+}
+function RatInMaze(maze, n){
+    const res = [];
+    const visited = Array.from({length: n}, () => Array.fill(0) )
+    solve(0,0, n, maze, visited, res, "")
+
+}
