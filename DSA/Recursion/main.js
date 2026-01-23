@@ -324,3 +324,27 @@ function wordSearch(string, wordDict){
     }
     return dp[n]
 }
+function isSafeColor(node, color, graph, N, i){
+    for(let k=0; k<N; k++){
+        if(k!== node && graph[k][node] ==1 && color[k] == i){
+            return false
+        }
+    }
+    return true
+}
+function solveGraph(node, graph,  m, N, color){
+    if(node === N) return true;
+
+    for(let i=0; i<m; i++){
+        if(isSafeColor(node, color, graph, N, i)){
+            color[node] = i;
+            if(solveGraph(node+1, graph, m, N, color)) return true
+            color[node] = 0
+        }
+    }
+}
+function colorGraph(graph, m, N){
+    const color = Array(N).fill(0)
+    if (solveGraph(0, graph, m, N, color)) return true
+    return false
+}
