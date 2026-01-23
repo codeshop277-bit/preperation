@@ -348,3 +348,30 @@ function colorGraph(graph, m, N){
     if (solveGraph(0, graph, m, N, color)) return true
     return false
 }
+function  RecurseStringOperation(nums, target, result, start, current_val, last_operand, expression){
+    if(start == nums.length ){
+        if(current_val == target){
+        result.push(expression)
+        }
+        return
+    }
+
+    for(let i=start; i<nums.length; i++){
+        if( i> start  && nums[start] == '0') return
+        let current_num = parseInt(nums.slice(start, i+1));
+        if(start === 0){
+             RecurseStringOperation(nums, target, result, i+1, current_val, last_operand, expression)
+        }else{
+             RecurseStringOperation(nums, target, result, i+1, current_val+current_num, current_num, expression+ "+" + current_num)
+             RecurseStringOperation(nums, target, result, i+1, current_val-current_num, -current_num, expression+ "-" + current_num)
+             RecurseStringOperation(nums, target, result, i+1, current_value - last_operand + last_operand * current_num_val, last_operand * current_num_val, expression + "*" + current_num)
+
+        }
+
+    }
+}
+
+function stringOperations(nums, target){
+    const result = []
+    RecurseStringOperation(nums, target, result, start, current_val, last_operand, expression)
+}
