@@ -302,3 +302,25 @@ function RatInMaze(maze, n){
     solve(0,0, n, maze, visited, res, "")
 
 }
+
+function wordSearch(string, wordDict){
+    const dict = new Set(wordDict);
+    const n = string.length
+    let dp = Array(n+1).fill(false)
+    dp[0] = true
+    let maxLen = 0;
+
+    for(let word of wordDict){
+        maxLen = Math.max(maxLen, word.length)
+    }
+
+    for(let i=1; i<n; i++){
+        for(let j= Math.max(0, i-maxLen); j<i; j++){
+            if(dp[j] && dict.has(string.slice(j,i))){
+                dp[i] = true
+                break
+            }
+        }
+    }
+    return dp[n]
+}
