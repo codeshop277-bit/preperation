@@ -258,7 +258,7 @@ function MinimumReversal(sting) {
     if ((opening + closing) % 2 != 0) return -1
     return Math.floor((opening + 1) / 2) + Math.floor((closing + 1) / 2)
 }
-console.log(MinimumReversal("()()(())"))
+// console.log(MinimumReversal("()()(())"))
 
 function countAndSay(n) {
     let result = "1";
@@ -280,4 +280,61 @@ function countAndSay(n) {
     }
     return result
 }
-console.log(countAndSay(4))
+// console.log(countAndSay(4))
+function rabinKarp(text, pattern) {
+  const result = [];
+  const n = text.length;
+  const m = pattern.length;
+  
+  if (m > n || m === 0) return result;
+  
+  const d = 256; // Number of characters in the input alphabet
+  const q = 101; // A prime number for modulo operation
+  
+  let patternHash = 0;
+  let textHash = 0;
+  let h = 1;
+  
+  // Calculate h = d^(m-1) % q
+  for (let i = 0; i < m - 1; i++) {
+    h = (h * d) % q;
+  }
+  
+  // Calculate initial hash values for pattern and first window of text
+  for (let i = 0; i < m; i++) {
+    patternHash = (d * patternHash + pattern.charCodeAt(i)) % q;
+    textHash = (d * textHash + text.charCodeAt(i)) % q;
+  }
+  
+  // Slide the pattern over text one by one
+  for (let i = 0; i <= n - m; i++) {
+    // Check if hash values match
+    if (patternHash === textHash) {
+      // Hash values match, verify character by character
+      let match = true;
+      for (let j = 0; j < m; j++) {
+        if (text[i + j] !== pattern[j]) {
+          match = false;
+          break;
+        }
+      }
+      if (match) {
+        result.push(i);
+      }
+    }
+    
+    // Calculate hash for next window
+    if (i < n - m) {
+      textHash = (d * (textHash - text.charCodeAt(i) * h) + text.charCodeAt(i + m)) % q;
+      
+      // Handle negative hash values
+      if (textHash < 0) {
+        textHash = textHash + q;
+      }
+    }
+  }
+  
+  return result;
+}
+
+rabinKarp('ABCABC', 'ABC');
