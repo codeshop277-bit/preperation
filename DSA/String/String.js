@@ -238,4 +238,46 @@ function BeautyOfSting(s) {
     }
     return total
 }
-console.log(BeautyOfSting("aabcbaa"))
+// console.log(BeautyOfSting("aabcbaa"))
+
+function MinimumReversal(sting) {
+    let opening = 0;
+    let closing = 0;
+
+    for (let ch of sting) {
+        if (ch === '(') {
+            opening++
+        } else {
+            if (opening > 0) {
+                opening--
+            } else {
+                closing++
+            }
+        }
+    }
+    if ((opening + closing) % 2 != 0) return -1
+    return Math.floor((opening + 1) / 2) + Math.floor((closing + 1) / 2)
+}
+console.log(MinimumReversal("()()(())"))
+
+function countAndSay(n) {
+    let result = "1";
+
+    for (let i = 1; i < n; i++) {
+        let count = 1
+        let current = ""
+
+        for (let j = 1; j < result.length; j++) {
+            if (result[j] == result[j - 1]) {
+                count++
+            } else {
+                current += count.toString() + result[j - 1]
+                count = 1
+            }
+        }
+        current += count.toString() + result[result.length - 1]
+        result = current
+    }
+    return result
+}
+console.log(countAndSay(4))
