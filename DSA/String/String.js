@@ -383,3 +383,11 @@ function KPSALGO(text, pattern){
     }
     return result
 }
+function shortestPalindrome(s){
+    const rev = s.split('').reverse().join();
+    const combined = s + "#" + rev;
+    const lps = computeLPS(combined);
+    const palindromeLength = lps[combined.length - 1]
+    const toAdd = s.substring(palindromeLength).split('').reverse().join();
+    return toAdd + s;
+};
