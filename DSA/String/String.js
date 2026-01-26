@@ -391,3 +391,20 @@ function shortestPalindrome(s){
     const toAdd = s.substring(palindromeLength).split('').reverse().join();
     return toAdd + s;
 };
+
+function LongestPrefix(s){
+    let len = 0;
+    let lps = Array(s.length).fill(0);
+
+    for(let i=1; i<s.length; i++){
+        if(s[i] == s[len]){
+            len++
+            lps[i] = len
+        }else if(len!=0){
+            len= lps[len-1]
+            i--
+        }
+    }
+    return s.substring(0, lps[s.length-1])
+}
+console.log(LongestPrefix("ababab"))
