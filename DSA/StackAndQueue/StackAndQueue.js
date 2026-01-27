@@ -194,3 +194,84 @@ class MinStack{
         return this.min;
     }
 }
+
+function priority(ch){
+    if(ch == '^'){
+        return 3;
+    }else if(ch == '*' || ch == '/'){
+        return 2;
+    }else if(ch == '+' || ch == '-'){
+        return 1;
+    }else{
+        return -1;
+    }
+};
+
+function InfixToPostfix(exp){
+    let i = 0;
+    let stack = new Stack();
+    let ans = '';
+
+    while(i<exp.length){
+        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
+        (exp[i] >= '0' && exp[i] <= '9')
+        ){
+            ans += exp[i]
+        }else if(exp[i] == '('){
+            stack.push(exp[i]);
+        }else if(exp[i] == ')'){
+            while(!stack.isEmpty() && stack.top() != '('){
+                ans = ans + stack.top()
+                stack.pop();
+            }
+        }else{
+            while(!stack.isEmpty() && priority(s[i]) <= priority(stack.top())){
+                ans = ans + stack.top();
+                stack.pop()
+            }
+         stack.push(stack[i])
+        }
+        i++
+    }
+    while(!stack.isEmpty()){
+        ans = ans + stack.top()
+        stack.pop()
+    }
+}
+function reverseAndSwapBrackets(string) {
+    let reversed = '';
+    
+    for (let i = string.length - 1; i >= 0; i--) {
+        let char = string[i];
+        
+        // Swap brackets
+        if (char == '(') {
+            reversed += ')';
+        } else if (char == ')') {
+            reversed += '(';
+        }else{
+            reversed += char
+        }
+    }
+    return reversed;
+}
+function InfixToPrefix(exp){
+    // step1: Reverse the string 
+    let reversed = reverseAndSwapBrackets(exp);
+    // Step 2: Only diff from InfixTOpostfilx is handling operand. Instead of 1 check we will have 2 checks
+    else if(s[i] == '^'){
+            while(!stack.isEmpty() && priority(s[i]) <= priority(stack.top())){
+                ans = ans + stack.top();
+                stack.pop()
+            }
+        }
+    else{
+            while(!stack.isEmpty() && priority(s[i]) < priority(stack.top())){
+                ans = ans + stack.top();
+                stack.pop()
+            }
+         stack.push(stack[i])
+        }
+
+//Step 3 reverse ans
+}
