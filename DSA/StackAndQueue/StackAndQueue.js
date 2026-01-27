@@ -275,3 +275,86 @@ function InfixToPrefix(exp){
 
 //Step 3 reverse ans
 }
+
+function PostfixToInfix(exp){
+    let i = 0;
+    let stack = new Stack();
+    while(i<exp.length){
+        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
+        (exp[i] >= '0' && exp[i] <= '9')
+        ){
+            stack.push(s[i])
+        }else{
+            let t1 = stack.top();
+            stack.pop();
+            let t2 = stack.top();
+            stack.pop();
+            let newStr = '(' + t2 + exp[i] + t1 + ')';
+            stack.push(newStr);
+        }
+        i++
+    }
+    return stack.top()
+}
+
+function PrefixToInfix(exp){
+    let i = exp.length -1;
+    let stack = new Stack();
+    while(i >=0){
+        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
+        (exp[i] >= '0' && exp[i] <= '9')
+        ){
+            stack.push(s[i])
+        }else{
+            let t1 = stack.top();
+            stack.pop();
+            let t2 = stack.top();
+            stack.pop();
+            let newStr = '(' + t1 + exp[i] + t2 + ')';
+            stack.push(newStr);
+        }
+        i--
+    }
+    return stack.top()
+}
+function PostfixToPrefix(exp){
+    let i = 0;
+    let stack = new Stack();
+    while(i<exp.length){
+        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
+        (exp[i] >= '0' && exp[i] <= '9')
+        ){
+            stack.push(s[i])
+        }else{
+            let t1 = stack.top();
+            stack.pop();
+            let t2 = stack.top();
+            stack.pop();
+            let newStr = exp[i] + t2 + t1;
+            stack.push(newStr);
+        }
+        i++
+    }
+    return stack.top()
+}
+
+function PrefixToPostfix(exp){
+    let i = exp.length-1;
+    let stack = new Stack();
+    while(i>=0){
+        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
+        (exp[i] >= '0' && exp[i] <= '9')
+        ){
+            stack.push(s[i])
+        }else{
+            let t1 = stack.top();
+            stack.pop();
+            let t2 = stack.top();
+            stack.pop();
+            let newStr = t1+t2+exp[i];
+            stack.push(newStr);
+        }
+        i--
+    }
+    return stack.top()
+}
