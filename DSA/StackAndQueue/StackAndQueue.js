@@ -154,137 +154,137 @@ function BalancedParanthesis(string) {
 }
 console.log(BalancedParanthesis('()[{}()'))
 
-class MinStack{
-    constructor(){
+class MinStack {
+    constructor() {
         this.items = [];
         this.min = Infinity;
     }
-    push(element){
-        if(this.isEmpty()){
+    push(element) {
+        if (this.isEmpty()) {
             this.items.push(element)
             this.min = element;
         }
-        if(element<this.min){
-            let calc = 2*element - this.min
+        if (element < this.min) {
+            let calc = 2 * element - this.min
             this.items.push(calc)
             this.min = element
-        }else{
+        } else {
             this.items.push(element)
         }
     };
-    pop(){
-        if(this.isEmpty()) return undefined
+    pop() {
+        if (this.isEmpty()) return undefined
         const ele = this.top()
         this.items.pop()
-        if(ele < this.min){
+        if (ele < this.min) {
             this.min = 2 * this.min - ele
-        }else{
+        } else {
             return ele
         }
     }
-    top(){
-        if(this.isEmpty()) return undefined
+    top() {
+        if (this.isEmpty()) return undefined
         const ele = this.top()
-        if(this.min < ele){
-           return ele
+        if (this.min < ele) {
+            return ele
         }
         return this.min
     }
-    getMin(){
+    getMin() {
         return this.min;
     }
 }
 
-function priority(ch){
-    if(ch == '^'){
+function priority(ch) {
+    if (ch == '^') {
         return 3;
-    }else if(ch == '*' || ch == '/'){
+    } else if (ch == '*' || ch == '/') {
         return 2;
-    }else if(ch == '+' || ch == '-'){
+    } else if (ch == '+' || ch == '-') {
         return 1;
-    }else{
+    } else {
         return -1;
     }
 };
 
-function InfixToPostfix(exp){
+function InfixToPostfix(exp) {
     let i = 0;
     let stack = new Stack();
     let ans = '';
 
-    while(i<exp.length){
-        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
-        (exp[i] >= '0' && exp[i] <= '9')
-        ){
+    while (i < exp.length) {
+        if ((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') ||
+            (exp[i] >= '0' && exp[i] <= '9')
+        ) {
             ans += exp[i]
-        }else if(exp[i] == '('){
+        } else if (exp[i] == '(') {
             stack.push(exp[i]);
-        }else if(exp[i] == ')'){
-            while(!stack.isEmpty() && stack.top() != '('){
+        } else if (exp[i] == ')') {
+            while (!stack.isEmpty() && stack.top() != '(') {
                 ans = ans + stack.top()
                 stack.pop();
             }
-        }else{
-            while(!stack.isEmpty() && priority(s[i]) <= priority(stack.top())){
+        } else {
+            while (!stack.isEmpty() && priority(s[i]) <= priority(stack.top())) {
                 ans = ans + stack.top();
                 stack.pop()
             }
-         stack.push(stack[i])
+            stack.push(stack[i])
         }
         i++
     }
-    while(!stack.isEmpty()){
+    while (!stack.isEmpty()) {
         ans = ans + stack.top()
         stack.pop()
     }
 }
 function reverseAndSwapBrackets(string) {
     let reversed = '';
-    
+
     for (let i = string.length - 1; i >= 0; i--) {
         let char = string[i];
-        
+
         // Swap brackets
         if (char == '(') {
             reversed += ')';
         } else if (char == ')') {
             reversed += '(';
-        }else{
+        } else {
             reversed += char
         }
     }
     return reversed;
 }
-function InfixToPrefix(exp){
+function InfixToPrefix(exp) {
     // step1: Reverse the string 
     let reversed = reverseAndSwapBrackets(exp);
     // Step 2: Only diff from InfixTOpostfilx is handling operand. Instead of 1 check we will have 2 checks
-    else if(s[i] == '^'){
-            while(!stack.isEmpty() && priority(s[i]) <= priority(stack.top())){
-                ans = ans + stack.top();
-                stack.pop()
-            }
+    else if (s[i] == '^') {
+        while (!stack.isEmpty() && priority(s[i]) <= priority(stack.top())) {
+            ans = ans + stack.top();
+            stack.pop()
         }
-    else{
-            while(!stack.isEmpty() && priority(s[i]) < priority(stack.top())){
-                ans = ans + stack.top();
-                stack.pop()
-            }
-         stack.push(stack[i])
+    }
+    else {
+        while (!stack.isEmpty() && priority(s[i]) < priority(stack.top())) {
+            ans = ans + stack.top();
+            stack.pop()
         }
+        stack.push(stack[i])
+    }
 
-//Step 3 reverse ans
+    //Step 3 reverse ans
 }
 
-function PostfixToInfix(exp){
+function PostfixToInfix(exp) {
     let i = 0;
     let stack = new Stack();
-    while(i<exp.length){
-        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
-        (exp[i] >= '0' && exp[i] <= '9')
-        ){
+    while (i < exp.length) {
+        if ((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') ||
+            (exp[i] >= '0' && exp[i] <= '9')
+        ) {
             stack.push(s[i])
-        }else{
+        } else {
             let t1 = stack.top();
             stack.pop();
             let t2 = stack.top();
@@ -297,15 +297,15 @@ function PostfixToInfix(exp){
     return stack.top()
 }
 
-function PrefixToInfix(exp){
-    let i = exp.length -1;
+function PrefixToInfix(exp) {
+    let i = exp.length - 1;
     let stack = new Stack();
-    while(i >=0){
-        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
-        (exp[i] >= '0' && exp[i] <= '9')
-        ){
+    while (i >= 0) {
+        if ((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') ||
+            (exp[i] >= '0' && exp[i] <= '9')
+        ) {
             stack.push(s[i])
-        }else{
+        } else {
             let t1 = stack.top();
             stack.pop();
             let t2 = stack.top();
@@ -317,15 +317,15 @@ function PrefixToInfix(exp){
     }
     return stack.top()
 }
-function PostfixToPrefix(exp){
+function PostfixToPrefix(exp) {
     let i = 0;
     let stack = new Stack();
-    while(i<exp.length){
-        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
-        (exp[i] >= '0' && exp[i] <= '9')
-        ){
+    while (i < exp.length) {
+        if ((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') ||
+            (exp[i] >= '0' && exp[i] <= '9')
+        ) {
             stack.push(s[i])
-        }else{
+        } else {
             let t1 = stack.top();
             stack.pop();
             let t2 = stack.top();
@@ -338,23 +338,61 @@ function PostfixToPrefix(exp){
     return stack.top()
 }
 
-function PrefixToPostfix(exp){
-    let i = exp.length-1;
+function PrefixToPostfix(exp) {
+    let i = exp.length - 1;
     let stack = new Stack();
-    while(i>=0){
-        if((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') || 
-        (exp[i] >= '0' && exp[i] <= '9')
-        ){
+    while (i >= 0) {
+        if ((exp[i] >= 'a' && exp[i] <= 'z') || (exp[i] >= 'A' && exp[i] <= 'Z') ||
+            (exp[i] >= '0' && exp[i] <= '9')
+        ) {
             stack.push(s[i])
-        }else{
+        } else {
             let t1 = stack.top();
             stack.pop();
             let t2 = stack.top();
             stack.pop();
-            let newStr = t1+t2+exp[i];
+            let newStr = t1 + t2 + exp[i];
             stack.push(newStr);
         }
         i--
     }
     return stack.top()
+}
+
+function NextGreaterElement(arr) {
+    let ans = [];
+    let stack = new Stack();
+
+    for (let i = arr.length - 1; i >= 0; i--) {
+        while (!stack.isEmpty() && stack.top() <= arr[i]) {
+            stack.pop()
+        }
+        if (stack.isEmpty()) {
+            ans[i] = -1
+        } else {
+            ans[i] = stack.top()
+        }
+        stack.push(arr[i])
+    }
+    return ans
+}
+
+function NextGreaterElement2(arr) {
+    let ans = [];
+    let stack = new Stack();
+
+    for (let i = 2 * arr.length - 1; i >= 0; i--) {
+        while (!stack.isEmpty() && stack.top() <= arr[i % arr.length]) {
+            stack.pop()
+        }
+        if (i < arr.length) {
+            if (stack.isEmpty()) {
+                ans[i] = -1
+            } else {
+                ans[i] = stack.top()
+            }
+        }
+        stack.push(arr[i%arr.length])
+    }
+    return ans
 }
