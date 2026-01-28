@@ -396,3 +396,43 @@ function NextGreaterElement2(arr) {
     }
     return ans
 }
+
+function CountGreaterElement(arr, indices) {
+    let ans = [];
+    let stack = new Stack();
+    let array = Array(arr.length).fill(0)
+
+    for (let i = arr.length - 1; i >= 0; i--) {
+        while (!stack.isEmpty() && stack.top() <= arr[i]) {
+            stack.pop()
+        }
+        array[i] = stack.size()
+        stack.push(arr[i])
+    }
+    return indices.map(i=> array[i])
+}
+function TappingRainwater(arr){
+    let n = arr.length
+    let lmax = 0; let rmax = 0;
+    let total = 0;
+    let left =0; let right = n-1;
+
+    while(left< right){
+        if(arr[left] <=arr[right]){
+            if(lmax > arr[left]){
+                total += lmax-arr[left]
+            }else{
+                lmax = arr[left]
+            }
+            letf++
+        }else{
+             if(rmax > arr[right]){
+                total += rmax-arr[right]
+            }else{
+                rmax = arr[right]
+            }
+            right--
+        }
+    }
+    return total
+}
