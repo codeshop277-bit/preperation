@@ -378,6 +378,7 @@ function NextGreaterElement(arr) {
 }
 
 function NextGreaterElement2(arr) {
+    //Circular array
     let ans = [];
     let stack = new Stack();
 
@@ -435,4 +436,85 @@ function TappingRainwater(arr){
         }
     }
     return total
+}
+
+function NextSmallerElement(arr) {
+    let ans = [];
+    let stack = new Stack();
+
+    for (let i = arr.length - 1; i >= 0; i--) {
+        while (!stack.isEmpty() && arr[stack.top()] >= arr[i]) {
+            stack.pop()
+        }
+        if (stack.isEmpty()) {
+            ans[i] = arr.length
+        } else {
+            ans[i] = stack.top()
+        }
+        stack.push(i)
+    }
+    return ans
+}
+
+function PreviousSmallerElement(arr) {
+    let ans = [];
+    let stack = new Stack();
+
+    for (let i = 0; i <arr.length; i++) {
+        while (!stack.isEmpty() && arr[stack.top()] >= arr[i]) {
+            stack.pop()
+        }
+        if (stack.isEmpty()) {
+            ans[i] = -1
+        } else {
+            ans[i] = stack.top()
+        }
+        stack.push(i)
+    }
+    return ans
+}
+function SumOFSubarrayMinimums(arr) {
+    let nse = NextSmallerElement(arr);
+    let pse = PreviousSmallerElement(arr);
+    let total = 0;
+    for(let i=0;i<arr.length;i++){
+        let left = i-pse[i];
+        let right = nse[i]-i;
+        total += arr[i]*left*right
+    }
+    return total;
+}
+
+function SumOFSubarrayMax(arr) {
+    let nse = NextGreaterElement(arr);
+    let pse = PreviousGreaterElement(arr);
+    let total = 0;
+    for(let i=0;i<arr.length;i++){
+        let left = i-pse[i];
+        let right = nse[i]-i;
+        total += arr[i]*left*right
+    }
+    return total;
+}
+function PreviousGreaterElement(arr) {
+    let ans = [];
+    let stack = new Stack();            
+    for (let i = 0; i <arr.length; i++) {
+        while (!stack.isEmpty() && arr[stack.top()] <= arr[i]) {
+            stack.pop()
+        }           
+        if (stack.isEmpty()) {
+            ans[i] = -1
+        }           
+        else {
+            ans[i] = stack.top()
+        }
+        stack.push(i)
+    }           
+    return ans
+}
+function SumOfRanges(arr){
+    let sumMax = SumOFSubarrayMax(arr);
+    let sumMin = SumOFSubarrayMinimums(arr);
+    return sumMax - sumMin;
 }
