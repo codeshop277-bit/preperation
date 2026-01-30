@@ -393,7 +393,7 @@ function NextGreaterElement2(arr) {
                 ans[i] = stack.top()
             }
         }
-        stack.push(arr[i%arr.length])
+        stack.push(arr[i % arr.length])
     }
     return ans
 }
@@ -410,26 +410,26 @@ function CountGreaterElement(arr, indices) {
         array[i] = stack.size()
         stack.push(arr[i])
     }
-    return indices.map(i=> array[i])
+    return indices.map(i => array[i])
 }
-function TappingRainwater(arr){
+function TappingRainwater(arr) {
     let n = arr.length
     let lmax = 0; let rmax = 0;
     let total = 0;
-    let left =0; let right = n-1;
+    let left = 0; let right = n - 1;
 
-    while(left< right){
-        if(arr[left] <=arr[right]){
-            if(lmax > arr[left]){
-                total += lmax-arr[left]
-            }else{
+    while (left < right) {
+        if (arr[left] <= arr[right]) {
+            if (lmax > arr[left]) {
+                total += lmax - arr[left]
+            } else {
                 lmax = arr[left]
             }
             letf++
-        }else{
-             if(rmax > arr[right]){
-                total += rmax-arr[right]
-            }else{
+        } else {
+            if (rmax > arr[right]) {
+                total += rmax - arr[right]
+            } else {
                 rmax = arr[right]
             }
             right--
@@ -460,7 +460,7 @@ function PreviousSmallerElement(arr) {
     let ans = [];
     let stack = new Stack();
 
-    for (let i = 0; i <arr.length; i++) {
+    for (let i = 0; i < arr.length; i++) {
         while (!stack.isEmpty() && arr[stack.top()] >= arr[i]) {
             stack.pop()
         }
@@ -477,44 +477,62 @@ function SumOFSubarrayMinimums(arr) {
     let nse = NextSmallerElement(arr);
     let pse = PreviousSmallerElement(arr);
     let total = 0;
-    for(let i=0;i<arr.length;i++){
-        let left = i-pse[i];
-        let right = nse[i]-i;
-        total += arr[i]*left*right
+    for (let i = 0; i < arr.length; i++) {
+        let left = i - pse[i];
+        let right = nse[i] - i;
+        total += arr[i] * left * right
     }
     return total;
 }
 
 function SumOFSubarrayMax(arr) {
-    let nse = NextGreaterElement(arr);
+    let nse = NextGreaterElement(arr);//Modify for storing index
     let pse = PreviousGreaterElement(arr);
     let total = 0;
-    for(let i=0;i<arr.length;i++){
-        let left = i-pse[i];
-        let right = nse[i]-i;
-        total += arr[i]*left*right
+    for (let i = 0; i < arr.length; i++) {
+        let left = i - pse[i];
+        let right = nse[i] - i;
+        total += arr[i] * left * right
     }
     return total;
 }
 function PreviousGreaterElement(arr) {
     let ans = [];
-    let stack = new Stack();            
-    for (let i = 0; i <arr.length; i++) {
+    let stack = new Stack();
+    for (let i = 0; i < arr.length; i++) {
         while (!stack.isEmpty() && arr[stack.top()] <= arr[i]) {
             stack.pop()
-        }           
+        }
         if (stack.isEmpty()) {
             ans[i] = -1
-        }           
+        }
         else {
             ans[i] = stack.top()
         }
         stack.push(i)
-    }           
+    }
     return ans
 }
-function SumOfRanges(arr){
+function SumOfRanges(arr) {
     let sumMax = SumOFSubarrayMax(arr);
     let sumMin = SumOFSubarrayMinimums(arr);
     return sumMax - sumMin;
+}
+function AesteroidCollision(arr) {
+    let stack = new Stack();
+    for (let i = 0; i < arr.length; i++) {
+        if(arr[i] > 0){
+            stack.push(arr[i])
+        }else{
+            while(!stack.isEmpty() && stack.top() > 0 && stack.top() < Math.abs(arr[i])){
+                stack.pop()
+            };
+            if(!stack.isEmpty() && stack.top() == Math.abs(arr[i])){
+                stack.pop()
+            }else if(stack.isEmpty() || stack.top() <0){
+                stack.push(arr[i])
+            }
+        }
+    }
+    return stack.items;
 }
