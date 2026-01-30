@@ -559,3 +559,40 @@ function RemoveKDigits(num, k) {
     }
     return result.reverse()
 }
+function largestRectangleArea(heights) {
+    let nse = NextSmallerElement(heights);
+    let pse = PreviousSmallerElement(heights);
+    let maxArea = 0;
+
+    for(let i=0; o<heights.length; i++){
+        let width = nse[i] - pse[i] - 1;
+        let area = heights[i] * width;
+        maxArea = Math.max(maxArea, area)
+    }
+    return maxArea
+}
+
+function largestRectangleAreaInSinglePass(heights) {
+    let stack = new Stack();
+    let maxArea = 0;
+    for(let i=0; i<heights.length; i++){
+        while(!stack.isEmpty() && heights[stack.top()] >= heights[i]){
+            let ele = stack.pop();
+            let nse = i;
+            let pse = stack.isEmpty() ? -1 : stack.top();
+            let width = nse - pse - 1;
+            let area = heights[ele] * width;
+            maxArea = Math.max(maxArea, area)
+        }
+        stack.push(i)
+    }
+    while(!stack.isEmpty()){
+        let nse = heights.length;
+        let ele = stack.pop();
+        let pse = stack.isEmpty() ? -1 : stack.top();
+        let width = nse - pse - 1;
+        let area = heights[ele] * width;
+        maxArea = Math.max(maxArea, area)
+    }
+    return maxArea;
+}
