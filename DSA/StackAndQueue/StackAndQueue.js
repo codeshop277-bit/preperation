@@ -536,3 +536,26 @@ function AesteroidCollision(arr) {
     }
     return stack.items;
 }
+function RemoveKDigits(num, k) {
+    let stack = new Stack();
+    for(let i=0; i<num.length; i++){
+        while(!stack.isEmpty() && k>0 &&  stack.top()-'0' > num[i]-'0'){
+            stack.pop();
+            k--;
+        }
+        stack.push(num[i])
+    }
+    while(k>0){
+        stack.pop();
+        k--;
+    }
+    if(stack.isEmpty()) return "0";
+    let result = "";
+    while(!stack.isEmpty()){
+        result = stack.pop() + result;
+    }
+    while(result.top()){
+        result = result.slice(1);
+    }
+    return result.reverse()
+}
