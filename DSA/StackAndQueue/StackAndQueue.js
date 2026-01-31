@@ -596,3 +596,44 @@ function largestRectangleAreaInSinglePass(heights) {
     }
     return maxArea;
 }
+
+function MaximalRectangle(matrix) {
+    let n = matrix.length;
+    let m = matrix[0].length;
+    let maxArea = 0;
+    let prefixSum = Array(m).fill(0);
+
+    for(let i=0; i<m; i++){
+        let sum = 0;
+        for(let j=0; j<n; j++){
+            if(matrix[i][j] == '1'){
+              sum+=1;
+            }else{
+                sum = 0;
+            }
+            prefixSum[i][j] = sum;
+        }
+    }
+    for(let i=0; i<n; i++){
+        let area = largestRectangleAreaInSinglePass(prefixSum[i]);
+        maxArea = Math.max(maxArea, area)
+    }
+    return maxArea;
+}
+function MaxSliding(nums, k){
+    const dq = [];
+    const results = []
+    for(let i=0; i<nums.length; i++){
+        if(dq.length && dq[0] <= i-k){
+            dq.shift();
+        }
+        while(dq.length && nums[dq[dq.length -1]] < nums[i]){
+            dq.pop();
+        }
+        dq.push(i)
+        if(i>=k-1){
+            results.push(nums[dq[0]]);  
+        }
+    }
+    return results;
+}
