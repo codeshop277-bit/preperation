@@ -521,15 +521,15 @@ function SumOfRanges(arr) {
 function AesteroidCollision(arr) {
     let stack = new Stack();
     for (let i = 0; i < arr.length; i++) {
-        if(arr[i] > 0){
+        if (arr[i] > 0) {
             stack.push(arr[i])
-        }else{
-            while(!stack.isEmpty() && stack.top() > 0 && stack.top() < Math.abs(arr[i])){
+        } else {
+            while (!stack.isEmpty() && stack.top() > 0 && stack.top() < Math.abs(arr[i])) {
                 stack.pop()
             };
-            if(!stack.isEmpty() && stack.top() == Math.abs(arr[i])){
+            if (!stack.isEmpty() && stack.top() == Math.abs(arr[i])) {
                 stack.pop()
-            }else if(stack.isEmpty() || stack.top() <0){
+            } else if (stack.isEmpty() || stack.top() < 0) {
                 stack.push(arr[i])
             }
         }
@@ -538,23 +538,23 @@ function AesteroidCollision(arr) {
 }
 function RemoveKDigits(num, k) {
     let stack = new Stack();
-    for(let i=0; i<num.length; i++){
-        while(!stack.isEmpty() && k>0 &&  stack.top()-'0' > num[i]-'0'){
+    for (let i = 0; i < num.length; i++) {
+        while (!stack.isEmpty() && k > 0 && stack.top() - '0' > num[i] - '0') {
             stack.pop();
             k--;
         }
         stack.push(num[i])
     }
-    while(k>0){
+    while (k > 0) {
         stack.pop();
         k--;
     }
-    if(stack.isEmpty()) return "0";
+    if (stack.isEmpty()) return "0";
     let result = "";
-    while(!stack.isEmpty()){
+    while (!stack.isEmpty()) {
         result = stack.pop() + result;
     }
-    while(result.top()){
+    while (result.top()) {
         result = result.slice(1);
     }
     return result.reverse()
@@ -564,7 +564,7 @@ function largestRectangleArea(heights) {
     let pse = PreviousSmallerElement(heights);
     let maxArea = 0;
 
-    for(let i=0; o<heights.length; i++){
+    for (let i = 0; o < heights.length; i++) {
         let width = nse[i] - pse[i] - 1;
         let area = heights[i] * width;
         maxArea = Math.max(maxArea, area)
@@ -575,8 +575,8 @@ function largestRectangleArea(heights) {
 function largestRectangleAreaInSinglePass(heights) {
     let stack = new Stack();
     let maxArea = 0;
-    for(let i=0; i<heights.length; i++){
-        while(!stack.isEmpty() && heights[stack.top()] >= heights[i]){
+    for (let i = 0; i < heights.length; i++) {
+        while (!stack.isEmpty() && heights[stack.top()] >= heights[i]) {
             let ele = stack.pop();
             let nse = i;
             let pse = stack.isEmpty() ? -1 : stack.top();
@@ -586,7 +586,7 @@ function largestRectangleAreaInSinglePass(heights) {
         }
         stack.push(i)
     }
-    while(!stack.isEmpty()){
+    while (!stack.isEmpty()) {
         let nse = heights.length;
         let ele = stack.pop();
         let pse = stack.isEmpty() ? -1 : stack.top();
@@ -603,37 +603,126 @@ function MaximalRectangle(matrix) {
     let maxArea = 0;
     let prefixSum = Array(m).fill(0);
 
-    for(let i=0; i<m; i++){
+    for (let i = 0; i < m; i++) {
         let sum = 0;
-        for(let j=0; j<n; j++){
-            if(matrix[i][j] == '1'){
-              sum+=1;
-            }else{
+        for (let j = 0; j < n; j++) {
+            if (matrix[i][j] == '1') {
+                sum += 1;
+            } else {
                 sum = 0;
             }
             prefixSum[i][j] = sum;
         }
     }
-    for(let i=0; i<n; i++){
+    for (let i = 0; i < n; i++) {
         let area = largestRectangleAreaInSinglePass(prefixSum[i]);
         maxArea = Math.max(maxArea, area)
     }
     return maxArea;
 }
-function MaxSliding(nums, k){
+function MaxSliding(nums, k) {
     const dq = [];
     const results = []
-    for(let i=0; i<nums.length; i++){
-        if(dq.length && dq[0] <= i-k){
+    for (let i = 0; i < nums.length; i++) {
+        if (dq.length && dq[0] <= i - k) {
             dq.shift();
         }
-        while(dq.length && nums[dq[dq.length -1]] < nums[i]){
+        while (dq.length && nums[dq[dq.length - 1]] < nums[i]) {
             dq.pop();
         }
         dq.push(i)
-        if(i>=k-1){
-            results.push(nums[dq[0]]);  
+        if (i >= k - 1) {
+            results.push(nums[dq[0]]);
         }
     }
     return results;
+}
+function StockSpan(prices) {
+    const stack = new Stack();
+    const spans = Array(prices.length).fill(0);
+    const pge = PreviousGreaterElement(prices);
+    for (let i = 0; i < prices.length; i++) {
+        spans[i] = i - pge[i]
+    }
+    return spans;
+}
+function CelebrityProblem(matrix) {
+    const n = matrix.length;
+    const knowMe = Array(n).fill(0);
+    const KnownByMe = Array(n).fill(0);
+
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            if (matrix[i][j] == 1) {
+                knowMe[i]++;
+                KnownByMe[j]++;
+            }
+        }
+    }
+
+    for (let i = 0; i < n; i++) {
+        if (knowMe[i] == n - 1 && KnownByMe[i] == 0) {
+            return i
+        }
+    }
+}
+
+class LRUCache{
+    constructor(capacity){
+        this.Node = function(key, value){
+            return {
+                key: key,
+                value: value,
+                prev: null,
+                next: null
+            }
+        }
+        this.head = this.Node(-1,-1);
+        this.tail = this.Node(-1,-1);
+        this.head.next = this.tail;
+        this.tail.prev = this.head;
+        this.capacity = capacity;
+        this.map = new Map();
+    }
+
+    deleteNode(node){
+        let prevNode = node.prev;
+        let nextNode = node.next;
+        prevNode.next = nextNode;
+        nextNode.prev = prevNode;
+    }
+    addToHead(node){
+        let temp = this.head.next;
+        node.next = temp;
+        node.prev = this.head;
+        this.head.next = node;
+        temp.prev = node;
+    }
+    get(key){
+        if(this.map.has(key)){
+            let node = this.map.get(key);
+            let res = node.value;
+            this.map.delete(key);
+            this.deleteNode(node);
+            this.addToHead(node);
+            return res;
+        }
+        return -1;
+    };
+    put(key, value){
+        if(this.map.has(key)){
+            let existingNode = this.map.get(key);
+            existingNode.value = value;
+            this.deleteNode(existingNode);
+            this.addToHead(existingNode);
+        }
+        if(this.map.size == this.capacity){
+            let deleteNode = this.tail.prev;
+            this.map.delete(deleteNode.key);
+            this.deleteNode(deleteNode);
+        }
+        let newNode = this.Node(key, value);
+        this.map.set(key, newNode);
+        this.addToHead(newNode);
+    }
 }
