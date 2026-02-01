@@ -667,7 +667,7 @@ function CelebrityProblem(matrix) {
     }
 }
 
-class LRUCache{
+class LRUCache{//Least frequently used
     constructor(capacity){
         this.Node = function(key, value){
             return {
