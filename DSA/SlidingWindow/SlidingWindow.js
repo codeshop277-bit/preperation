@@ -120,3 +120,43 @@ function CountNiceSubarrays(arr, k) {
     return BinarySUm(arr.map(x => x % 2), k) - BinarySUm(arr.map(x => x % 2), k - 1);
 }
 // console.log(CountNiceSubarrays([2,2,2,1,2,2,1,2,2,2], 2)); //16
+
+function NoOfStringsContainingAllThreeChars(s) {
+    let n = s.length;
+    let map = new Map();
+    let count = 0;
+    map.set('a', -1);
+    map.set('b', -1);
+    map.set('c', -1);
+
+    for(let i=0; i<n; i++){
+        map.set(s[i], i);
+        if(map.get('a') != -1 && map.get('b') != -1 && map.get('c') != -1){
+        let minIndex = Math.min(...map.values());
+        count += minIndex + 1;
+        }
+    }
+    return count;
+}
+// console.log(NoOfStringsContainingAllThreeChars("abcabc")); //10
+
+function MaximumPointsYouCanObtainFromCards(arr, k) {
+    let n = arr.length;
+    let lsum = 0;
+    let rsum = 0;
+    let maxSum = 0;
+
+    for(let i=0; i<=k-1; i++){
+        lsum += arr[i];
+    }
+    maxSum = lsum;
+    let rightIndex = n-1;
+    for(let i=k-1; i>=0; i--){
+        lsum = lsum - arr[i];
+        rsum += arr[rightIndex];
+        rightIndex--;
+        maxSum = Math.max(maxSum, lsum + rsum);
+    }
+    return maxSum;
+}
+// console.log(MaximumPointsYouCanObtainFromCards([1,2,3,4,5,6,1], 3)); //12
