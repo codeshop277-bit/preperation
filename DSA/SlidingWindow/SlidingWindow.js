@@ -51,8 +51,8 @@ function FruitsIntoBaskets(arr, k) {
 
     while (r < arr.length) {
         map.set(arr[r], map.get(arr[r]) + 1 || 1);
-        
-        if(map.size > k) {
+
+        if (map.size > k) {
             map.set(arr[l], map.get(arr[l]) - 1);
             if (map.get(arr[l]) == 0) {
                 map.delete(arr[l]);
@@ -70,21 +70,21 @@ function FruitsIntoBaskets(arr, k) {
 
 function LongestSubstingWithKReplacement(s, k) {
     let n = s.length;
-    let l=0;
+    let l = 0;
     let r = 0;
     let maxLen = 0;
     let map = new Map();
     let maxFreq = 0;
 
-    while(r<n){
+    while (r < n) {
         map.set(s[r], map.get(s[r]) + 1 || 1);
         maxFreq = Math.max(maxFreq, map.get(s[r]));
 
-        if(r-l+1 - maxFreq > k){
+        if (r - l + 1 - maxFreq > k) {
             map.set(s[l], map.get(s[l]) - 1);
             l++;
         }
-        if(r - l + 1 - maxFreq <= k){
+        if (r - l + 1 - maxFreq <= k) {
             maxLen = Math.max(maxLen, r - l + 1);
         }
         r++;
@@ -96,15 +96,15 @@ function LongestSubstingWithKReplacement(s, k) {
 function BinarySUm(arr, target) {
     let l = 0;
     let r = 0;
-    let sum =0;
+    let sum = 0;
     let count = 0;
-    while(r<arr.length){
-        sum+=arr[r];
-        while(sum > target){
-            sum = sum -arr[l];
+    while (r < arr.length) {
+        sum += arr[r];
+        while (sum > target) {
+            sum = sum - arr[l];
             l++;
         }
-        count += r-l+1;
+        count += r - l + 1;
         r++
     }
     return count;
@@ -129,11 +129,11 @@ function NoOfStringsContainingAllThreeChars(s) {
     map.set('b', -1);
     map.set('c', -1);
 
-    for(let i=0; i<n; i++){
+    for (let i = 0; i < n; i++) {
         map.set(s[i], i);
-        if(map.get('a') != -1 && map.get('b') != -1 && map.get('c') != -1){
-        let minIndex = Math.min(...map.values());
-        count += minIndex + 1;
+        if (map.get('a') != -1 && map.get('b') != -1 && map.get('c') != -1) {
+            let minIndex = Math.min(...map.values());
+            count += minIndex + 1;
         }
     }
     return count;
@@ -146,12 +146,12 @@ function MaximumPointsYouCanObtainFromCards(arr, k) {
     let rsum = 0;
     let maxSum = 0;
 
-    for(let i=0; i<=k-1; i++){
+    for (let i = 0; i <= k - 1; i++) {
         lsum += arr[i];
     }
     maxSum = lsum;
-    let rightIndex = n-1;
-    for(let i=k-1; i>=0; i--){
+    let rightIndex = n - 1;
+    for (let i = k - 1; i >= 0; i--) {
         lsum = lsum - arr[i];
         rsum += arr[rightIndex];
         rightIndex--;
@@ -163,26 +163,53 @@ function MaximumPointsYouCanObtainFromCards(arr, k) {
 
 function LongestSubstingWithAtmostKDistinctChars(s, k) {
     const n = s.length;
-    let l=0;
-    let r =0;
+    let l = 0;
+    let r = 0;
     let map = new Map();
-    let maxLn =0;
+    let maxLn = 0;
 
-    while(r<n){
+    while (r < n) {
         map.set(s[r], map.get(s[r]) + 1 || 1);
-        if(map.size > k){
-            map.set(s[l], map.get(s[l])-1);
-            if(map.get(s[l]) ==0){
+        if (map.size > k) {
+            map.set(s[l], map.get(s[l]) - 1);
+            if (map.get(s[l]) == 0) {
                 map.delete(s[l]);
             }
             l++
         }
 
-        if(map.size <=k){
-            maxLn = Math.max(maxLn, r-l+1);
+        if (map.size <= k) {
+            maxLn = Math.max(maxLn, r - l + 1);
         }
         r++;
     }
     return maxLn;
 }
-console.log(LongestSubstingWithAtmostKDistinctChars("aaabbccd", 2)); //3
+// console.log(LongestSubstingWithAtmostKDistinctChars("aaabbccd", 2)); //3
+
+function MinimumWindowSubsequence(s1, s2) {
+    let minStart = 0;
+    let minLen = Infinity;
+    let i = 0;
+
+    while (i < s1.length) {
+        let j=0;
+        let start =i;
+        while(j<s2.length && i<s1.length){
+            if(s1[i] == s2[j]){
+                j++
+            }
+            i++
+        }
+        if(j==s2.length){
+            let len = i-start;
+            if(len < minLen){
+                minLen = len
+                minStart = start
+            }
+            i=start +1
+        }
+    }
+    return minLen == Infinity ? "" : s1.substring(minStart, minLen+minStart);
+}
+// console.log(MinimumWindowSubsequence("abcdebdde", "bde")); //"bcde"
