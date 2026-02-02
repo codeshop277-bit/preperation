@@ -91,4 +91,32 @@ function LongestSubstingWithKReplacement(s, k) {
     }
     return maxLen;
 }
-console.log(LongestSubstingWithKReplacement("AABABBA", 1)); //4
+// console.log(LongestSubstingWithKReplacement("AABABBA", 1)); //4
+
+function BinarySUm(arr, target) {
+    let l = 0;
+    let r = 0;
+    let sum =0;
+    let count = 0;
+    while(r<arr.length){
+        sum+=arr[r];
+        while(sum > target){
+            sum = sum -arr[l];
+            l++;
+        }
+        count += r-l+1;
+        r++
+    }
+    return count;
+}
+
+function BinarySubarraysWithSum(arr, target) {
+    return BinarySUm(arr, target) - BinarySUm(arr, target - 1);
+}
+// console.log(BinarySubarraysWithSum([1,0,1,0,1], 1)); //4
+
+function CountNiceSubarrays(arr, k) {
+    //Convert odd to 1 and even to 0
+    return BinarySUm(arr.map(x => x % 2), k) - BinarySUm(arr.map(x => x % 2), k - 1);
+}
+// console.log(CountNiceSubarrays([2,2,2,1,2,2,1,2,2,2], 2)); //16
