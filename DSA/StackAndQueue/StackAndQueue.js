@@ -259,6 +259,9 @@ function InfixToPrefix(exp) {
     // step1: Reverse the string 
     let reversed = reverseAndSwapBrackets(exp);
     // Step 2: Only diff from InfixTOpostfilx is handling operand. Instead of 1 check we will have 2 checks
+    if(!reversed){
+        return '';//just for error
+    }
     else if (s[i] == '^') {
         while (!stack.isEmpty() && priority(s[i]) <= priority(stack.top())) {
             ans = ans + stack.top();
