@@ -160,3 +160,29 @@ function MaximumPointsYouCanObtainFromCards(arr, k) {
     return maxSum;
 }
 // console.log(MaximumPointsYouCanObtainFromCards([1,2,3,4,5,6,1], 3)); //12
+
+function LongestSubstingWithAtmostKDistinctChars(s, k) {
+    const n = s.length;
+    let l=0;
+    let r =0;
+    let map = new Map();
+    let maxLn =0;
+
+    while(r<n){
+        map.set(s[r], map.get(s[r]) + 1 || 1);
+        if(map.size > k){
+            map.set(s[l], map.get(s[l])-1);
+            if(map.get(s[l]) ==0){
+                map.delete(s[l]);
+            }
+            l++
+        }
+
+        if(map.size <=k){
+            maxLn = Math.max(maxLn, r-l+1);
+        }
+        r++;
+    }
+    return maxLn;
+}
+console.log(LongestSubstingWithAtmostKDistinctChars("aaabbccd", 2)); //3
