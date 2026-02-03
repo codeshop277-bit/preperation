@@ -161,7 +161,11 @@ let b = 4;
 //     }
 //     console.log()
 // }
-
+// 1
+// 23
+// 456
+// 78910
+// 1112131415
 // let start = 1;
 // for(let i =1; i<=a; i++){
 //     for (let j = 1; j<=i; j++){
@@ -170,7 +174,12 @@ let b = 4;
 //     }
 //     console.log()
 // }
-
+// A 
+// A B
+// A B C
+// A B C D
+// A B C D E
+// A B C D E F
 // for(let i =0; i<=a; i++){
 //     for (let j = 0; j<=i; j++){
 //         process.stdout.write(String.fromCharCode(65 + j) + " ")
