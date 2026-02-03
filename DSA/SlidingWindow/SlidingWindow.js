@@ -239,4 +239,51 @@ function SubArray(arr, k) {
 function SubarrayWithKDifferentIntegers(arr, k) {
     return SubArray(arr, k) - SubArray(arr, k - 1);
 }
-console.log(SubarrayWithKDifferentIntegers([1, 2, 1, 2, 3], 2)); //7
+// console.log(SubarrayWithKDifferentIntegers([1, 2, 1, 2, 3], 2)); //7
+function minWindow(s1, s2) {
+    let n = s1.length;
+    let m = s2.length;
+    if (m > n) return "";
+    // Create hash map for s2 with frequency count
+    let hash = new Map();
+    for (let char of s2) {
+        hash.set(char, (hash.get(char) || 0) + 1);
+    }
+    let minLen = Infinity;
+    let startIndex = -1;
+    let l = 0; // left pointer
+    let cnt = 0; // count of matched characters
+    // Iterate through s1 with right pointer
+    for (let r = 0; r < n; r++) {
+        // If current character is in s2
+        if (hash.has(s1[r])) {
+            hash.set(s1[r], hash.get(s1[r]) - 1);
+            
+            // If this character is still needed (count was positive)
+            if (hash.get(s1[r]) >= 0) {
+                cnt++;
+            }
+        }
+        // When we have all characters of s2
+        while (cnt === m) {
+            // Update minimum window
+            if (r - l + 1 < minLen) {
+                minLen = r - l + 1;
+                startIndex = l;
+            }
+            
+            // Try to shrink window from left
+            if (hash.has(s1[l])) {
+                hash.set(s1[l], hash.get(s1[l]) + 1);
+                
+                // If removing this character breaks the window
+                if (hash.get(s1[l]) > 0) {
+                    cnt--;
+                }
+            }
+            l++;
+        }
+    }
+    return startIndex === -1 ? "" : s1.substring(startIndex, startIndex + minLen);
+}
+console.log(minWindow("abcdebdde", "bde")); // "bcde"
