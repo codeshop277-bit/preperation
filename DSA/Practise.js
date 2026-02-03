@@ -1,10 +1,20 @@
-function Pascals(n){
-    let ans  = 1;
-    let triangle = [1]
-    for(let i=1; i<n; i++){
-        ans =  Math.floor(ans * (n-i)/i)
-        triangle.push(ans)
+function EucledianGCD(n1, n2) {
+    let count = 0;
+
+    while(n1>0 & n2>0){
+        count++
+        console.log('n1', n1, 'n2', n2)
+        console.log('count', count)
+        if(n1> n2){
+            n1= n1 % n2
+        }else{
+            n2= n2 % n1
+        }
+        if(n1==0){
+            return n2
+        }else if(n2==0){
+            return n1
+        }
     }
-    return triangle
 }
-console.log(Pascals(6))
+console.log(EucledianGCD(90,180)) //6

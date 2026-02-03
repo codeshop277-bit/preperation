@@ -213,3 +213,30 @@ function MinimumWindowSubsequence(s1, s2) {
     return minLen == Infinity ? "" : s1.substring(minStart, minLen+minStart);
 }
 // console.log(MinimumWindowSubsequence("abcdebdde", "bde")); //"bcde"
+
+function SubArray(arr, k) {
+    let l =0;
+    let r=0;
+    let map = new Map();
+    let count =0;
+
+    while(r<arr.length){
+        map.set(arr[r], map.get(arr[r]) +1 || 1);
+        while(map.size > k){
+            map.set(arr[l], map.get(arr[l]) -1);
+            if(map.get(arr[l]) ==0){
+                map.delete(arr[l]);
+            }   
+            l++;
+        }
+        if(map.size <= k){
+            count += r - l +1;
+        }   
+        r++;
+    }
+    return count;
+}
+function SubarrayWithKDifferentIntegers(arr, k) {
+    return SubArray(arr, k) - SubArray(arr, k - 1);
+}
+console.log(SubarrayWithKDifferentIntegers([1, 2, 1, 2, 3], 2)); //7
