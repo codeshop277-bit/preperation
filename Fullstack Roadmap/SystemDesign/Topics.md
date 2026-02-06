@@ -789,3 +789,40 @@ API service
 Backend service
 This is the most common approach.
 No extra infrastructure needed
+
+# Caching
+Caching means storing frequently accessed or expensive-to-compute data in fast-access memory (closer to the application) instead of always hitting a slower backend (usually a database).
+Instagram news feed example (main analogy throughout):
+User requests their feed → server queries DB for followed users + their posts.
+Typical latency breakdown (rough numbers used):
+Client ↔ server: ~100 ms each way
+Server ↔ DB: ~10 ms each way
+Total round-trip: ~220 ms
+Goal: Reduce the server-to-DB part dramatically (from 20 ms to ~1–2 ms).
+By caching the computed feed (or parts of it):
+First request: Compute from DB → store result in cache → return to user.
+Next similar requests: Serve directly from cache (1 ms instead of 20 ms).
+Result: Much lower latency, huge savings when hit rate is high.
+Key Benefits Demonstrated
+Reduces latency dramatically for repeated/similar queries.
+Saves computation — avoid re-doing expensive work (joins, aggregations, ranking).
+Improves scalability — database gets far fewer requests.
+Can apply at multiple levels:
+Backend services (in-memory like Redis, Memcached)
+Even client-side (mobile app caches feed locally → instant reload when reopening app)
+Limitations & Trade-offs
+You can't cache everything — large databases (TB/PB scale) won't fit in memory.
+→ You cache only the "hot" / frequently accessed subset.
+→ Effectiveness depends on access pattern (power-law / Zipf distribution: small % of data is requested most of the time).
+If cache miss rate is high → you pay extra overhead (check cache + then DB).
+Two big policy questions every cache must solve:
+Write / Update policy (Cache-Aside, Write-Through, Write-Behind, etc. — how/when to update or invalidate cache when source data changes).
+Eviction policy (when cache is full, what to remove?):
+LRU (Least Recently Used) — most common
+LFU (Least Frequently Used)
+Others (ARC, ML-based, etc.)
+Takeaways
+Caching trades storage (extra memory) for speed and reduced load.
+It's simple in concept but powerful — tiny changes (1 ms vs 10 ms) compound massively at scale.
+Real-world systems use multi-level caching (CDN edge, app server local cache, distributed cache like Redis, database query cache).
+The video teases deeper follow-ups on specific write policies, eviction strategies, consistency issues (stale data), cache stampedes/thundering herd, etc.
