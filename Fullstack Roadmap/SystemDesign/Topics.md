@@ -667,3 +667,125 @@ Microservices (Prefer When)
 ✔ Want fault isolation
 ✔ Domain complexity demands modularization
 Microservices win for scale and team autonomy.
+
+# Database Sharding
+What Is Database Sharding?
+Database sharding is the process of splitting a large database into smaller, more manageable pieces called shards. Each shard holds only a portion of the total dataset, and usually sits on a separate database server instance.
+It’s a form of horizontal partitioning — data is split by rows, not columns — so each shard handles a subset of the entire table(s).
+Why Sharding Is Needed
+When your app scales:
+One database becomes too large
+Table scan and index operations slow down
+Queries take longer
+The database becomes a bottleneck
+Even with indexing and optimization, a single database eventually fails to handle huge traffic and massive data growth.
+Sharding solves this by distributing load and data across multiple servers, improving scalability and performance.
+Tinder Example (Common Real-World Case)
+Let’s imagine how Tinder might store user profiles and match data before sharding.
+🧱 Original (Pre-Sharding) Database
+Users Table
+-----------------
+user_id
+name
+age
+location
+preferences
+photo_urls
+last_active
+...
+Matches Table
+-----------------
+match_id
+user_id_1
+user_id_2
+timestamp
+All millions of users and matches are stored in one large database.
+📉 Query Example Before Sharding
+Suppose:
+SELECT * FROM Users
+WHERE location = "New York";
+If Users table has 100M rows:
+The DB searches through millions of rows
+Even with indexing, it’s large data
+Query time could be tens to hundreds of milliseconds, or slower
+For large joins (e.g., users + matches), time grows significantly
+This leads to:
+Slow response times
+Heavy load on DB
+Poor user experience
+🆕 After Sharding
+Instead of one massive DB, you split into shards.
+A shard might be based on a logical shard key such as:
+✔ location
+✔ user_id % N
+So Tinder might shard by location:
+Shard1 → Users from US & Canada
+Shard2 → Users from Europe
+Shard3 → Users from Asia
+...
+Or by user_id % 4, where each user_id maps to one of 4 shards.
+Each shard holds a subset of the data.
+How Query Changes After Sharding
+Now if you run:
+SELECT * FROM Users
+WHERE location = "New York";
+Instead of scanning the entire database, the system:
+Determines which shard uses that location
+Routes the query only to that shard
+Only that shard scans its smaller dataset
+This drastically reduces the query time because:
+A shard might have only 10 million users instead of 100 million
+Search and indexing are faster
+Index smaller size → faster lookup
+⚙️ How Sharding Works Mechanically
+You need:
+➤ Shard Key
+A field that determines which shard a row belongs to. Examples:
+user_id % N
+geographic region
+hashed value
+The key must distribute data evenly to avoid hot spots.
+➤ Shard Manager / Metadata
+A component that maps shard keys to shard servers.
+Example:
+Location → Shard ID
+Shard ID → DB server endpoint
+When an app queries, it checks the shard manager first to know where to send the request.
+➤ Router Logic
+At runtime, application logic:
+shard_id = shard_key % N
+send query to Shard[shard_id]
+This ensures queries go only to the relevant shard, not all of them.
+⚠️ Trade-offs and Challenges
+While sharding improves scalability, it adds complexity:
+❌ Cross-Shard Joins
+If your query needs data from multiple shards, you may have to query all shards and aggregate results. This is slow and complex.
+❌ Resharding Difficulty
+Adding new shards requires redistributing data. Unless you plan ahead with techniques like consistent hashing, resharding can be expensive.
+❌ Hot Spots
+If your shard key doesn’t distribute evenly (e.g., most users in New York), some shards get overloaded.
+❌ Operational Overhead
+You now have multiple databases to maintain, backup, monitor, and replicate.
+Final Thought
+Sharding is a horizontal scaling technique that trades added system complexity for major improvements in performance and scalability. For apps with huge datasets (like social apps, dating apps, globally distributed user bases), it turns an unscalable monolith into a scalable, distributed system.
+Increases INfra cost
+1 RDS + 1 standby
+Shard1 → Primary + Standby
+Shard2 → Primary + Standby
+Shard3 → Primary + Standby
+Shard4 → Primary + Standby
+So yes — cost multiplies.
+Sharding increases:
+Infra cost
+Operational complexity
+Monitoring overhead
+Shard Manager can Live in my backedn service itself
+Your application itself contains shard logic:
+shardId = userId % 4
+connectTo(shardId)
+No separate server required.
+Shard logic lives inside:
+API service
+Backend service
+This is the most common approach.
+No extra infrastructure needed
