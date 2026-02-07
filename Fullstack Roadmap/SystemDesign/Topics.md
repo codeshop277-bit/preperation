@@ -826,3 +826,66 @@ Caching trades storage (extra memory) for speed and reduced load.
 It's simple in concept but powerful — tiny changes (1 ms vs 10 ms) compound massively at scale.
 Real-world systems use multi-level caching (CDN edge, app server local cache, distributed cache like Redis, database query cache).
 The video teases deeper follow-ups on specific write policies, eviction strategies, consistency issues (stale data), cache stampedes/thundering herd, etc.
+# What is a Single Point of Failure? (0:00–1:30)
+SPOF = One component fails → whole system dies.
+Real-world analogy: Earth is a SPOF for humanity; a key character in a story whose death ends everything.
+In tech: A single database server, load balancer, or coordinator that everything depends on.
+Common SPOFs in Real Systems (1:30–3:00)
+Databases — If your only DB crashes, everything stops.
+Load Balancers / Gateways — Single entry point for traffic.
+Coordinators/Proxies — Services handling discovery, routing, or orchestration.
+Centralized Services — Like a single profile server or cache.
+How to Eliminate SPOFs – Step-by-Step Strategies (3:00–5:30)
+Add Redundancy — Run multiple copies of the same service (e.g., 2+ profile servers).
+Stateless services → Active-active (all handle traffic).
+Stateful services (like databases) → Master-slave replication.
+Master handles writes → slaves replicate data.
+If master dies, promote a slave (failover).
+Failure probability drops dramatically (from P to ~P² with 2 replicas).
+Load Balancer Redundancy
+Don't rely on one LB → Use multiple load balancers (or gateways).
+Put them behind DNS → DNS returns multiple IPs for the same domain (e.g., facebook.com → IP1, IP2, IP3).
+Clients connect to any IP; if one LB fails, others take over.
+Multi-Region Deployment (Ultimate Resilience)
+Spread across geographic regions (e.g., AWS us-east-1 + us-west-2).
+Survives regional disasters (earthquake, power outage, DDoS).
+Requires solving node-level + replication + load-balancing SPOFs first.
+Advanced / Bonus Insights (5:30–end)
+CAP Theorem Trade-offs → Removing SPOFs often means trading perfect consistency for availability/partition tolerance.
+Chaos Engineering → Netflix's Chaos Monkey randomly kills instances in production to test resilience.
+Fail Gracefully → Design so partial failures don't cascade.
+
+# Content Delivery Network
+The Problem CDNs Solve (Early part)
+Centralized servers create high latency for distant users (e.g., a server in India serving users in the US or Japan → slow page loads).
+Geographic distance = physics problem (speed of light limits).
+Local regulations (e.g., geo-restricted content like region-specific movies) can't be handled by one central server.
+Even with caching on the origin server, it doesn't help global users.
+What is a CDN?
+A distributed network of servers (often called "edge servers" or "PoPs" – Points of Presence) spread across the globe.
+Acts like a geographically distributed cache.
+Companies like Akamai, Cloudflare, AWS CloudFront, Fastly run these massive networks.
+You "rent" their infrastructure instead of building your own global data centers.
+How CDNs Work (High-Level Flow)
+User requests content (e.g., via domain like interviewready.io).
+DNS resolves to the nearest CDN edge server (not your origin).
+If the content is cached at that edge → serve instantly (low latency).
+Cache miss → edge fetches from origin server, caches it, then serves to user.
+Future requests hit the cache → super fast.
+Supports cache invalidation/purging when origin content changes.
+Major Benefits
+Latency reduction — Users get content from nearby servers (often <50-100ms).
+Studies cited: Amazon/Google show even 100-500ms delays hurt conversion rates and perceived professionalism.
+Origin server offload — Static content served by CDN → your backend handles only dynamic requests.
+Geo-compliance — Region-specific caching (e.g., India-only content stays in Indian edges).
+High availability & DDoS protection (many CDNs include this).
+Cost-effective — Cheap to use compared to building your own global infra.
+Real-World Example: AWS CloudFront
+Gaurav personally uses it for InterviewReady.io.
+Integrates seamlessly with S3 (upload file to S3 → CloudFront auto-caches/distributes).
+No manual work needed for caching.
+Reliable, inexpensive, and easy setup.
+Quick TL;DR from the Video
+"A CDN is a black box which stores static content close to all of your clients. It's usually very cheap and very very efficient for fast static access."
+Relevance to System Design & Modern Apps (2026 Context)
+Almost every production web/app (including GenAI frontends, Next.js apps, streaming, e-commerce) uses a CDN.
