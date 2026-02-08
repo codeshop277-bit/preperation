@@ -1,0 +1,11 @@
+It explains APIs as a software contract or documented interface defining how external users interact with your code — focusing on the function name, input parameters, response structure, and possible errors — without revealing internal implementation details. The speaker compares an API to a function signature (e.g., a hypothetical getAdmins(groupID) that returns a list of admins or errors like group not found/deleted).
+Key best practices and design principles covered include:
+
+Naming: Choose clear, precise names that accurately reflect the action (e.g., getAdmins should return only admins, not extra unrelated data). Avoid misleading or overly broad names.
+Parameters: Define only what's strictly necessary. Extra parameters might be acceptable for optimization (reducing internal calls in microservices), but change the name if they alter the core intent.
+Response objects: Return only what's needed — avoid stuffing extra data for future-proofing, as it increases network usage and causes confusion.
+Errors: Strike a balance — define expected/common errors your service is responsible for (e.g., group doesn't exist), but don't over-engineer every possible edge case (e.g., invalid string length if the database handles it).
+HTTP-specific design: Discusses mapping APIs to endpoints (e.g., /v1/admins with query params or body). Prefers GET for pure reads (idempotent, no payload needed) over POST when appropriate. Avoids mixing routing with actions and redundant wording (e.g., use /admins?groupId=123 instead of forcing "get" into the path).
+GET vs POST: GET suits read-only operations without side effects; POST for actions that modify state.
+Side effects: APIs should do one thing well without hidden/unexpected behavior (e.g., a setAdmins shouldn't implicitly create groups or add members). Avoid flags/config objects that change behavior drastically. For atomicity needs, prefer separate clear calls over overloaded single APIs.
+Other topics: Brief mentions of pagination for large lists and ensuring data consistency.
