@@ -331,3 +331,233 @@ docker run -p 3000:3000 myapp
 Meaning:
 Host:3000 → Container:3000
 Without -p, container is internal only.
+
+# Docker Compose
+Docker Compose is a tool that lets you define and run multiple containers together using a single configuration file.
+Instead of running 5 long docker commands, you write:
+docker-compose up
+And everything starts together.
+🧠 Mental Model
+If Docker runs one container,
+Docker Compose runs an entire application stack.
+📄 It Uses a File Called
+docker-compose.yml
+This file describes:
+Services (containers)
+Networks
+Volumes
+Environment variables
+Dependencies
+All in one place.
+🔥 Example: React + Node + MySQL
+version: "3.9"
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+Now just run:
+docker-compose up
+Boom 💥
+3 containers
+1 network
+1 volume
+Everything connected automatically
+🌐 Networking in Compose
+All services in a compose file automatically:
+Share the same network
+Can talk to each other using service name
+So backend connects to DB using:
+db:3306
+Not localhost.
+This is huge.
+📦 Volumes in Compose
+We defined:
+volumes:
+  db_data:
+This makes DB data persistent.
+If you delete containers:
+Data stays.
+⚙️ Why Docker Compose is Important
+1️⃣ Local Development
+Perfect for:
+Full stack apps
+Microservices
+Teams
+Everyone runs:
+docker-compose up
+No setup mess.
+2️⃣ Environment Parity
+Dev environment = Staging environment = Production (if designed well)
+3️⃣ Cleaner Infrastructure Definition
+Instead of documentation like:
+“First run DB, then backend…”
+It’s all declared in YAML.
+Infrastructure as code.
+🚀 Compose vs Kubernetes
+Compose:
+Great for local
+Simple production setups
+Small teams
+Kubernetes:
+Large scale
+Auto-scaling
+Cloud orchestration
+Compose is like:
+Single-machine orchestration
+🎯 One-Line Interview Answer
+Docker Compose is a tool used to define and run multi-container Docker applications using a single YAML configuration file.
+🧠 Real World Insight
+In serious production systems:
+Compose → Local development
+ECS / Kubernetes → Production
+But for small apps?
+Compose + EC2 works perfectly fine.
+
+# Image Size
+Why Image Size Matters
+Large images cause:
+🐢 Slow docker pull
+🐢 Slow CI/CD pipelines
+💸 Higher bandwidth costs
+🔓 Larger attack surface
+📦 Wasted storage in registry
+Goal: Small, deterministic, production-only image
+1️⃣ Use Minimal Base Images
+2️⃣ Use Multi-Stage Builds (Most Important)
+3️⃣ Use .dockerignore
+4️⃣ Combine RUN Commands
+5️⃣ Use npm ci + Production Only
+6️⃣ Clean Package Manager Cache
+7️⃣ Avoid Installing Unnecessary Tools
+Don’t install:
+curl
+git
+vim
+bash
+Unless absolutely required.
+Every installed tool increases size.
+🚀 9️⃣ Analyze Image Size
+Use:
+docker history <image>
+Shows layer sizes.
+Or use tools like:
+dive (image analyzer)
+This helps identify bloated layers.
+🚀 🔥 Example: Size Comparison
+Typical Node app:
+Without optimization → 900MB
+With Alpine + multi-stage → 150MB
+With distroless → 80–120MB
+Huge difference.
+🧠 Advanced: Distroless Images
+Instead of:
+FROM node:alpine
+Use:
+gcr.io/distroless/nodejs
+No shell, no package manager.
+Extremely minimal.
+More secure.
+Smaller.
+🎯 Interview One-Liner
+Image size can be optimized using minimal base images, multi-stage builds, proper layer ordering, .dockerignore, removing dev dependencies, and cleaning package manager caches.
+
+# Security best practices
+Secure Production Container Checklist
+✔ Minimal base image
+✔ Multi-stage build
+✔ Non-root user
+By default, containers run as root.
+That’s dangerous.
+If attacker compromises container:
+Root inside container can sometimes escalate to host.
+Use:
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+Now container runs with limited permissions.
+✔ No secrets in image
+Instead:
+Use environment variables at runtime
+Use AWS Secrets Manager
+Use Docker secrets
+Use Kubernetes secrets
+Images should be generic, secrets injected at runtime.
+✔ Image scanning enabled
+✔ Limited resources
+✔ Only required ports exposed
+Database containers should NOT be publicly exposed.
+Keep them internal network only.
+✔ Regular updates
+Use Read-Only Filesystem (Advanced)
+You can run container as:
+docker run --read-only
+Prevents file system tampering.
+Good for stateless apps.
+# ENV vs ARG in Docker
+Both define variables.
+But they live in different lifecycles.
+🟢 ARG (Build-Time Variable)
+Available only during image build
+Not available in running container (unless passed to ENV)
+Used mainly for:
+Versioning
+Conditional builds
+Customizing base image
+Example:
+ARG NODE_VERSION=20
+FROM node:${NODE_VERSION}-alpine
+Build with:
+docker build --build-arg NODE_VERSION=18 .
+After build finishes?
+👉 ARG disappears.
+Container cannot access it.
+🟢 ENV (Runtime Variable)
+Available during build
+Also available in running container
+Persists in final image
+Used for:
+Config values
+App environment
+Production flags
+Example:
+ENV NODE_ENV=production
+Now inside container:
+echo $NODE_ENV
+You’ll see:
+production
+| Feature                | ARG | ENV               |
+| ---------------------- | --- | ----------------- |
+| Available during build | ✅   | ✅                 |
+| Available at runtime   | ❌   | ✅                 |
+| Stored in final image  | ❌   | ✅                 |
+| Override at build time | ✅   | ❌                 |
+| Override at runtime    | ❌   | ✅ (docker run -e) |
+Good Use Case for ARG
+ARG APP_VERSION
+LABEL version=$APP_VERSION
+You pass version during build.
+Good Use Case for ENV
+ENV PORT=3000
+ENV NODE_ENV=production
+Your app reads these at runtime.
+Interview One-Liner
+ARG is used for build-time variables and does not persist in the final container, whereas ENV defines environment variables that are available both during build and at runtime.
