@@ -155,3 +155,203 @@ Versioned migrations
 🚨 Important Rule
 Always deploy in a way that rollback is possible.
 If rollback is hard → deployment strategy is bad.
+
+# What is Secrets Management?
+A secret is anything sensitive:
+API keys
+DB passwords
+JWT secrets
+OAuth client secrets
+AWS credentials
+Secrets management =
+Storing and injecting sensitive data securely without hardcoding it.
+If secrets are inside your repo → you’ve already lost.
+🌍 ENV Injection (Environment Variables)
+This is the most common method.
+Instead of:
+const password = "superSecret123";
+You do:
+const password = process.env.DB_PASSWORD;
+Then the value is injected at runtime.
+🧠 How ENV Injection Works
+Flow:
+Secret stored in secure place
+CI/CD injects it as environment variable
+App reads it using process.env
+Secret never lives in code
+Where ENV Injection Happens
+Local machine
+Docker container
+CI pipeline
+Kubernetes pod
+Cloud provider
+Example in Docker:
+docker run -e DB_PASSWORD=mysecret app
+Or in Dockerfile:
+ENV NODE_ENV=production
+Important difference:
+ENV → runtime variable
+ARG → build-time variable
+Never pass real secrets as Docker ARG — they get baked into image layers.
+🟣 GitHub Secrets
+If you’re using GitHub Actions, secrets live here:
+Repo → Settings → Secrets and variables
+They are:
+Encrypted at rest
+Masked in logs
+Only accessible inside workflow
+Example usage:
+env:
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+Then your app can read:
+process.env.DB_PASSWORD
+🔐 GitHub Secrets Levels
+Repository secrets
+Environment secrets (staging/prod separation)
+Organization secrets
+Best practice:
+Use environment-specific secrets.
+Prod should not share staging credentials.
+🧨 .env Pitfalls
+Now we get spicy 😬
+.env files are convenient but dangerous if misused.
+🚨 Pitfall 1: Accidentally Committing .env
+You MUST add:
+.env
+to .gitignore.
+If you push secrets once:
+They are permanently in Git history.
+Even if deleted later.
+🚨 Pitfall 2: Frontend Exposure
+In React / Next.js:
+Only variables prefixed with:
+NEXT_PUBLIC_
+are exposed to browser.
+But anything in frontend build:
+IS visible to users.
+You cannot hide secrets in frontend code.
+If it’s in browser → it’s public.
+Period.
+🚨 Pitfall 3: Using .env in Production
+.env is fine for local dev.
+In production:
+Secrets should come from:
+CI/CD
+Cloud secret manager
+Container runtime injection
+Not from a static file on server.
+🚨 Pitfall 4: Reusing Same Secrets Everywhere
+Bad:
+Same DB password for dev, staging, prod
+Good:
+Different secrets per environment
+Least privilege access
+
+Fetching secret from AWS Secretmanager
+import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
+
+const client = new SecretsManagerClient({ region: "ap-south-1" });
+
+async function loadSecrets() {
+  const response = await client.send(
+    new GetSecretValueCommand({
+      SecretId: "my-app-secrets"
+    })
+  );
+
+  const secrets = JSON.parse(response.SecretString);
+
+  process.env.DB_PASSWORD = secrets.DB_PASSWORD;
+  process.env.JWT_SECRET = secrets.JWT_SECRET;
+}
+
+await loadSecrets();
+
+# Method 2 CI/CD fetches secret
+Step 2: IAM Role for GitHub (Important)
+
+Instead of storing AWS keys in GitHub (bad practice), use OIDC.
+
+You create:
+
+IAM Role
+
+Trust policy for GitHub OIDC
+
+Permission policy allowing:
+
+secretsmanager:GetSecretValue
+
+Now GitHub can securely assume role.
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/github-actions-role
+          aws-region: ap-south-1
+
+      - name: Fetch Secrets
+        id: secrets
+        run: |
+          SECRET=$(aws secretsmanager get-secret-value \
+            --secret-id my-prod-app-secrets \
+            --query SecretString \
+            --output text)
+
+          echo "DB_PASSWORD=$(echo $SECRET | jq -r .DB_PASSWORD)" >> $GITHUB_ENV
+          echo "JWT_SECRET=$(echo $SECRET | jq -r .JWT_SECRET)" >> $GITHUB_ENV
+          echo "PORT=$(echo $SECRET | jq -r .PORT)" >> $GITHUB_ENV
+
+      - name: Build Docker Image
+        run: docker build -t myapp:latest .
+
+      - name: Deploy to EC2
+        run: |
+          ssh ec2-user@your-ec2-ip "
+            docker stop myapp || true &&
+            docker rm myapp || true &&
+            docker run -d \
+              -e DB_PASSWORD=$DB_PASSWORD \
+              -e JWT_SECRET=$JWT_SECRET \
+              -e PORT=$PORT \
+              -p 80:5000 \
+              --name myapp \
+              myapp:latest
+          "
+
+Step A
+
+GitHub assumed AWS role securely.
+
+Step B
+
+CLI fetched secret from AWS.
+
+Step C
+
+We extracted JSON values using jq.
+
+Step D
+
+We added them to $GITHUB_ENV.
+
+Step E
+
+Docker container started with -e flags.
