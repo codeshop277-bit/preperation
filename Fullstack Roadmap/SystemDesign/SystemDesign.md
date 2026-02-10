@@ -174,3 +174,32 @@ Bandwidth
 Example prompts:
 10M users, 20% active daily — estimate infra.
 Each user uploads 2MB daily — storage for 1 year?
+
+ # Do's And Don'ts
+ The 5 Tips Summarized
+
+Don’t get into details prematurely
+Avoid jumping straight into low-level implementation (e.g., specific protocols, database schemas, gateways, or heartbeat mechanisms) without confirming with the interviewer.
+State high-level ideas first (e.g., "I'll use a load balancer with HTTP"), then pause for feedback. Diving deep too early wastes time, forces backtracking, and signals poor prioritization — mirroring real-world inefficiency.
+Avoid fitting requirements to a fixed architecture (no "silver bullets")
+Don't force every problem into a preconceived pattern like MVC, pub-sub, microservices, or event-driven just because it's trendy.
+Let the requirements drive the design. Interviewers often add conflicting constraints to test adaptability — rigidly sticking to one style hurts your score.
+Example: WhatsApp and Uber need very different architectures; no single one fits all.
+Keep it simple (apply KISS principle)
+Resist over-engineering any single component while ignoring the rest of the system.
+If one part of your diagram gets bloated (e.g., excessive features in one service), step back, simplify, and extract reusable patterns (e.g., apply logging/health checks globally instead of per-service).
+Over-complication in one area shows tunnel vision.
+Have justifications for every decision
+Never pick a technology or approach without explaining why (trade-offs, use-case fit, scalability needs, etc.).
+Buzzword-dropping (e.g., "Let's use Cassandra because it's cool/NoSQL") without reasoning is a red flag.
+Good answers reference real constraints: consistency vs. availability, read-heavy vs. write-heavy, etc.
+Be aware of current solutions and tech practices
+Know popular off-the-shelf tools and when to "buy vs. build":
+Databases: MySQL/Postgres (relational), Cassandra/DynamoDB (NoSQL/scalable).
+Messaging: RabbitMQ, Kafka/ZooKeeper patterns.
+Others: Elastic Load Balancer, etc.
+Naming real products shows efficiency and awareness of industry standards (e.g., widespread NoSQL shift for scale). But only mention them if you can discuss their pros/cons.
+
+
+Overall Message
+Interviews evaluate how you think and communicate under ambiguity, not just memorized architectures. Stay collaborative, adapt to feedback, justify choices clearly, and balance depth with breadth/simplicity
