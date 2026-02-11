@@ -242,3 +242,255 @@ Adds HTTPS + security
 | Bucket Policy  | Access control          |
 | Signed URL     | Temporary secure access |
 | CloudFront     | CDN for global delivery |
+
+# Amazon Web Services provides IAM (Identity and Access Management).
+IAM controls:
+Who can access AWS and what they can do.
+It answers 2 questions:
+Who are you?
+What are you allowed to do?
+Without IAM, AWS would be chaos.
+👤 IAM Users vs 👥 IAM Roles
+This is where most people get confused.
+👤 IAM User
+An IAM User is:
+A permanent identity for a human or system.
+Example:
+You (developer)
+DevOps engineer
+CI/CD bot
+They have:
+Username
+Password (for console login)
+Access keys (for CLI / API)
+Example
+You create:
+User: balaji-dev
+Attach policies:
+EC2 access
+S3 read access
+Now that user can log in and perform those actions.
+When to Use IAM Users?
+Small teams
+Direct console access
+Personal developer accounts
+But…
+In production companies, IAM users are minimized.
+👥 IAM Roles (Very Important)
+IAM Role is:
+A temporary identity that AWS services or users can assume.
+Roles DO NOT have:
+Passwords
+Permanent access keys
+Instead:
+They are assumed temporarily
+AWS provides temporary credentials
+Example 1: EC2 accessing S3
+You have:
+EC2 instance
+Private S3 bucket
+You attach an IAM Role to EC2:
+Role: S3ReadOnlyRole
+Now EC2 can access S3 securely.
+No hardcoded keys.
+No storing secrets in code.
+🔥 This is best practice.
+Example 2: Cross-account access
+Account A wants to access Account B.
+Instead of sharing credentials:
+Account A assumes a role in Account B.
+Secure + clean.
+
+| IAM User                        | IAM Role                        |
+| ------------------------------- | ------------------------------- |
+| Permanent identity              | Temporary identity              |
+| For humans or long-term systems | For services & temporary access |
+| Has credentials                 | No long-term credentials        |
+| Manual login                    | Assumed dynamically             |
+📜 IAM Policies
+Now the real power.
+A Policy defines:
+What actions are allowed or denied.
+Policies are written in JSON.
+Basic Policy Structure
+{
+  "Effect": "Allow",
+  "Action": "s3:GetObject",
+  "Resource": "arn:aws:s3:::my-bucket/*"
+}
+It says:
+Allow
+Download files
+From this bucket
+Policy Types
+1️⃣ Managed Policies
+Created by AWS or you.
+Example:
+AmazonS3FullAccess
+AmazonEC2ReadOnlyAccess
+Reusable across users/roles.
+2️⃣ Inline Policies
+Attached directly to one user or role.
+Not reusable.
+| Service | Action                  |
+| ------- | ----------------------- |
+| S3      | s3:GetObject            |
+| EC2     | ec2:StartInstances      |
+| RDS     | rds:DescribeDBInstances |
+# Principle of Least Privilege (Super Important)
+This is a security mindset.
+It means:
+Give only the permissions required. Nothing extra.
+❌ Bad Example
+You give:
+AdministratorAccess
+To:
+Backend server
+Now if hacked → attacker controls entire AWS account.
+Disaster.
+✅ Good Example
+Backend server only needs:
+Read from S3
+Write logs to CloudWatch
+So policy should allow:
+s3:GetObject
+logs:PutLogEvents
+Nothing more.
+Real-World Scenario
+Let’s say you deploy a Node.js app on EC2.
+What it needs:
+Read images from S3
+Access RDS
+It DOES NOT need:
+Delete buckets
+Create IAM users
+Modify VPC
+So don’t allow those.
+
+# Lamda
+Lambda (Serverless)
+AWS Lambda is completely different.
+Lambda =
+Run code without managing servers.
+You just upload a function:
+exports.handler = async (event) => {
+  return "Hello world";
+};
+AWS:
+Runs it when triggered
+Scales automatically
+Stops it after execution
+Charges only for execution time
+No server to manage.
+🧠 Core Difference
+| EC2               | Lambda                   |
+| ----------------- | ------------------------ |
+| Server-based      | Serverless               |
+| Runs continuously | Runs only when triggered |
+| You manage infra  | AWS manages infra        |
+| Pay for uptime    | Pay per execution        |
+| Full control      | Limited environment      |
+💰 Cost Model
+EC2
+You pay:
+Even if no one uses your app
+Example:
+t3.micro → pay 24/7
+Lambda
+You pay:
+Only when function runs
+Based on execution time + memory
+If no traffic → almost ₹0 cost.
+🧪 Example: Simple API
+EC2 Flow
+User → Load Balancer → EC2 → Express server → Response
+Lambda Flow
+User → API Gateway → Lambda → Response
+Much simpler infra.
+
+# S3 steps
+🪣 STEP 1 — Create S3 Bucket
+Go to AWS → S3 → Create bucket
+Important Settings:
+Bucket name: your-domain.com
+Region: same as most of your infra
+Uncheck “Block all public access”
+Acknowledge warning
+After creation:
+Enable Static Hosting
+Bucket → Properties → Static website hosting → Enable
+Index document: index.html
+Error document: index.html (important for SPA routing)
+🔓 STEP 2 — Add Bucket Policy
+Go to Bucket → Permissions → Bucket Policy
+Add:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-domain.com/*"
+    }
+  ]
+}
+This allows public reads.
+📤 STEP 3 — Upload Your Build
+Upload all files inside /out, not the folder itself.
+Now your app is technically live via S3 URL
+(but don’t use this in production — no HTTPS, no CDN).
+🚀 STEP 4 — Create CloudFront Distribution
+Go to CloudFront → Create Distribution
+Origin Settings
+Origin domain → Select your S3 bucket
+Origin access → Use Origin Access Control (OAC) (recommended)
+Default Behavior
+Viewer protocol policy → Redirect HTTP to HTTPS
+Allowed methods → GET, HEAD
+Default root object
+Set:
+index.html
+Create distribution.
+Wait 5–10 minutes.
+🔐 STEP 5 — Add HTTPS (ACM Certificate)
+Go to:
+AWS Certificate Manager
+IMPORTANT:
+Certificate must be created in us-east-1 region (for CloudFront).
+Request certificate
+Add your domain (e.g. app.yoursite.com)
+Validate via DNS
+Once issued:
+CloudFront → Edit distribution →
+Attach ACM certificate.
+🌍 STEP 6 — Connect Custom Domain
+If using:
+Amazon Route 53
+Create:
+Record type: A
+Alias → CloudFront distribution
+Now:
+https://yourdomain.com works.
+🧠 IMPORTANT: SPA Routing Fix (Very Important)
+Without this, refreshing /dashboard gives 404.
+In CloudFront:
+Go to → Error Pages → Create custom error response:
+HTTP error code: 403
+Customize response: Yes
+Response page path: /index.html
+HTTP response code: 200
+Repeat for:
+404
+This makes SPA routing work properly.
+⚡ STEP 7 — Caching Optimization (Pro Tip)
+Create 2 cache behaviors:
+For static assets:
+_next/static/*
+Cache TTL: 1 year
+For index.html:
+Cache TTL: 0 or very low
+This ensures:
+JS/CSS cached heavily
+App updates reflect quickly
