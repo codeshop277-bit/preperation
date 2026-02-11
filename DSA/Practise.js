@@ -1,18 +1,22 @@
-function Kadene(nums){
-    let sum = 0;
-    let max = -Infinity
-    let start = 0;
-    let end = 0;
-
-    for(let i=0; i<nums.length; i++){
-        sum+=nums[i]
-        if(sum > max){
-            max = sum
-            end = i
-        }else if(sum <=0){
-            start = i
-        }
+class ServerConfig{
+    constructor(port, host){
+        this.port = port
     }
-    return nums.slice(start, end+1);
 }
-console.log(Kadene([2, 3, 5, -2, 7, -4]))
+
+class ServerConfigBuilder{
+    constructor(host, port){
+        this.host = host
+    }
+    enableSSl(){
+        this.ssl = true
+        return this
+    }
+    build(){
+        return new ServerConfig(this)
+    }
+}
+
+const server = new ServerConfigBuilder(2000, 2525)
+.enableSSl()
+.build();
