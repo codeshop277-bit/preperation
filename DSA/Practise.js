@@ -1,44 +1,12 @@
 function SetMatrixZeroesOptimal(matrix) {
-    let rows = matrix.length
-    let cols = matrix[0].length
-    let firstRowHasZero = false
-    let firstColHasZero = false
+    let m = matrix.length
+    for(let i=0; i<m-1; i++){
+        for(let j= i+1; j<m; j++){
+            [matrix[i][j], matrix[j][i]] =  [matrix[j][i], matrix[i][j]]
 
-    for (let i = 0; i < rows; i++) {
-        if (matrix[i][0] == 0) {
-            firstColHasZero = true
         }
     }
-    for (let i = 0; i < cols; i++) {
-        if (matrix[0][i] == 0) {
-            firstRowHasZero = true
-        }
-    }
-    for(let i=1; i< rows; i++){
-        for(let j=1; j<cols; j++){
-            if(matrix[i][j] == 0){
-                matrix[i][0] = 0
-                matrix[0][j] = 0
-            }
-        }
-    }
-     for(let i=1; i< rows; i++){
-        for(let j=1; j<cols; j++){
-            if(matrix[i][0] == 0 || matrix[0][j] == 0){
-                matrix[i][j] = 0
-            }
-        }
-    }
-    if(firstColHasZero){
-        for(let i=0; i<rows; i++){
-            matrix[i][0] = 0
-        }
-    }
-    if(firstRowHasZero){
-        for(let i=0; i<cols; i++){
-            matrix[0][i] = 0
-        }
-    }
-return matrix
+
+return matrix.map(m => m.reverse())
 }
 console.log(SetMatrixZeroesOptimal([[0, 1, 2, 0], [3, 4, 5, 2], [1, 3, 1, 5]]))
