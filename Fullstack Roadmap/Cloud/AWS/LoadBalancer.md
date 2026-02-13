@@ -327,3 +327,95 @@ CloudWatch = AWS monitoring tool
 Metrics = Numeric performance data
 Logs = Detailed event records
 Alerts = Notifications when threshold crossed
+
+# 🧾 Structured Logging
+🔎 What is it?
+Structured logging means writing logs in a consistent, machine-readable format (usually JSON) instead of plain text.
+❌ Unstructured Log
+Error occurred while processing order 123
+Hard to search, filter, or analyze at scale.
+✅ Structured Log (JSON)
+{
+  "level": "error",
+  "service": "order-service",
+  "orderId": 123,
+  "userId": 45,
+  "message": "Payment failed",
+  "timestamp": "2026-02-13T10:00:00Z"
+}
+🎯 Why Structured Logging?
+Easy to search (orderId=123)
+Easy to filter (level=error)
+Better dashboards
+Better alerting
+Works well with log tools
+🧠 Benefits in Production
+If you're using:
+Amazon CloudWatch
+ELK Stack
+Datadog
+Structured logs allow:
+Fast debugging
+Aggregations
+Query-based alerts
+🔥 Best Practices
+Always log:
+requestId
+userId
+service name
+timestamp
+log level
+Avoid logging sensitive data
+Keep consistent field names across services
+🔍 Distributed Tracing (Conceptual)
+🔎 What is it?
+Distributed tracing tracks a single request as it flows through multiple services.
+Example (Microservices)
+User Request
+   ↓
+API Gateway
+   ↓
+Auth Service
+   ↓
+Order Service
+   ↓
+Payment Service
+   ↓
+Database
+If something is slow:
+👉 Which service caused it?
+👉 Where did it fail?
+That’s where tracing helps.
+🧠 How It Works (Concept)
+A request gets a Trace ID
+Each service adds a Span
+All spans are connected
+You can see:
+Total request time
+Time per service
+Failure point
+Visual Idea
+Trace ID: abc123
+API Gateway (20ms)
+   ├── Auth Service (50ms)
+   ├── Order Service (120ms)
+   │      └── DB (100ms)
+   └── Payment Service (300ms) ❌ Slow
+Now you know exactly where the bottleneck is.
+Tools for Tracing
+AWS X-Ray
+Jaeger
+Zipkin
+Datadog APM
+📊 Logging vs Tracing (Crisp Comparison)
+Feature	Structured Logging	Distributed Tracing
+Focus	Events	Request lifecycle
+Scope	Single service	Multiple services
+Debugging	What happened	Where it slowed/failed
+Format	JSON logs	Trace + spans
+🎯 Interview Summary
+Structured logging = JSON-based consistent logs
+Helps with filtering & alerting
+Distributed tracing = Track one request across services
+Uses Trace ID + spans
+Helps find bottlenecks in microservices
