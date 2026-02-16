@@ -351,3 +351,213 @@ In large frontend apps, fragments often mirror UI components.
 | Arguments    | Dynamic inputs          |
 | Variables    | Runtime-safe parameters |
 | Fragments    | Reusable field sets     |
+
+2️⃣ Overfetching / Underfetching
+🔹 Overfetching
+Client receives more data than needed.
+REST example:
+GET /users/101
+
+Returns:
+{
+  "id": 101,
+  "name": "Balaji",
+  "email": "...",
+  "address": "...",
+  "createdAt": "..."
+}
+
+If UI only needs name, bandwidth is wasted.
+🔹 Underfetching
+Client does not receive enough data and must make multiple calls.
+
+Example:
+GET /users/101
+GET /users/101/posts
+GET /posts/1/comments
+
+Multiple round trips → latency increases.
+🔹 GraphQL Fix
+Client specifies exactly what it needs:
+query {
+  user(id: 101) {
+    name
+    posts {
+      title
+    }
+  }
+}
+
+✔ No overfetching
+✔ No underfetching
+✔ One round-trip
+
+3️⃣ N+1 Problem
+This is a backend execution issue, not a query issue.
+Example query:
+
+query {
+  users {
+    id
+    posts {
+      title
+    }
+  }
+}
+
+Naive resolver implementation:
+1 query → get all users
+Then for each user → query posts
+If 100 users:
+1 query for users
+100 queries for posts
+Total = 101 DB queries
+This is the N+1 problem.
+
+🔹 Why It Happens
+Each field resolver executes independently.
+GraphQL resolver model is:
+Field-level execution, not query-level optimization.
+
+🔹 Solution
+Use batching tools like:
+DataLoader (Facebook pattern)
+Query-level joins
+ORM eager loading
+With batching:
+1 query for users
+1 query for posts
+Total = 2 queries
+
+4️⃣ Versioning vs Schema Evolution
+🔵 REST Versioning
+Typical pattern:
+/api/v1/users
+/api/v2/users
+
+Why?
+Response shape changes break clients
+Removing fields causes breaking changes
+
+Problems:
+Duplicate endpoints
+Maintenance overhead
+Client migration complexity
+
+🟣 GraphQL Schema Evolution
+GraphQL prefers additive changes.
+Rules:
+Never remove fields immediately
+Mark fields as deprecated
+Add new fields safely
+
+Example:
+type User {
+  id: ID!
+  name: String!
+  fullName: String @deprecated(reason: "Use name instead")
+}
+Clients choose what fields to request.
+No forced versioning.
+
+1️⃣ When NOT to Use GraphQL
+GraphQL is powerful — but not universal.
+❌ 1. Simple CRUD APIs
+REST is simpler and operationally cheaper.
+GraphQL introduces unnecessary schema + resolver complexity.
+
+❌ 2. Heavy CDN Caching Requirements
+REST:
+GET /products/101
+→ Cacheable at CDN (URL-based)
+GraphQL:
+POST /graphql
+→ Harder to cache at CDN level
+→ Requires persisted queries or custom caching layer
+
+If edge caching is critical → REST wins.
+
+❌ 3. Strict Backend-Controlled APIs
+If backend must:
+Control response shape strictly
+Limit data exposure tightly
+GraphQL’s client-driven nature may be risky.
+
+❌ 4. Low Team Maturity
+GraphQL requires:
+Schema governance
+Query complexity limits
+N+1 prevention strategy
+Observability tooling
+Without discipline → performance & security risks.
+
+❌ 5. Very High-Throughput Systems
+If your API:
+Serves millions of identical simple requests
+Needs maximum HTTP caching efficiency
+REST with CDN is often more performant operationally.
+
+🎯 Senior Rule
+
+Use GraphQL when UI complexity is high.
+Avoid it when system complexity is low.
+
+2️⃣ GraphQL in Microservices
+
+GraphQL works best as a BFF (Backend For Frontend) or API Gateway layer.
+Typical Microservice Architecture
+Frontend
+    ↓
+GraphQL Gateway
+    ↓
+User Service
+Order Service
+Payment Service
+Inventory Service
+GraphQL:
+Aggregates multiple services
+Shields frontend from service fragmentation
+Reduces multiple network calls
+Example
+
+Frontend wants:
+query {
+  user(id: 1) {
+    name
+    orders {
+      total
+      paymentStatus
+    }
+  }
+}
+
+GraphQL Gateway:
+Calls User Service
+Calls Order Service
+Calls Payment Service
+Merges response
+Frontend sees a unified contract.
+Why It Works Well
+
+✔ Reduces frontend orchestration
+✔ Prevents service coupling to UI
+✔ Centralized schema contract
+✔ Enables team autonomy per domain
+
+Risks in Microservices
+N+1 across services
+Increased latency aggregation
+Gateway becoming bottleneck
+Requires batching & caching strategies
+Senior Pattern
+Large orgs often use:
+GraphQL Gateway layer
+Domain-owned subgraphs
+GraphQL becomes the experience layer, not the data layer.
+
+| Scenario                  | Prefer       |
+| ------------------------- | ------------ |
+| Large enterprise          | Schema-first |
+| Strong governance needed  | Schema-first |
+| Startup / rapid iteration | Code-first   |
+| Heavy TypeScript usage    | Code-first   |
