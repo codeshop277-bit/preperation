@@ -561,3 +561,321 @@ GraphQL becomes the experience layer, not the data layer.
 | Strong governance needed  | Schema-first |
 | Startup / rapid iteration | Code-first   |
 | Heavy TypeScript usage    | Code-first   |
+
+# N+1 using data loader
+```js
+const DataLoader = require("dataloader");
+
+// Batch function
+const postLoader = new DataLoader(async (userIds) => {
+  const posts = await db.getPostsByUserIds(userIds);
+  
+  return userIds.map(id =>
+    posts.filter(post => post.userId === id)
+  );
+});
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: () => ({
+    postLoader
+  })
+});
+// Updated Resolver
+User: {
+  posts: (user, _, context) => {
+    return context.postLoader.load(user.id);
+  }
+}
+```
+✅ Now What Happens?
+If 100 users:
+1 query → users
+1 query → posts (batched with WHERE userId IN (...))
+Total = 2 queries
+🔥 Massive performance improvement.
+
+# Batching
+Combine multiple resolver calls into one DB query.
+Example batched DB query:
+```js
+db.getPostsByUserIds = async (userIds) => {
+  return db.query(
+    `SELECT * FROM posts WHERE user_id IN (?)`,
+    [userIds]
+  );
+};
+```
+SQL becomes
+SELECT * FROM posts WHERE user_id IN (1,2,3)
+
+#  Caching Strategies
+GraphQL caching has multiple layers.
+1️⃣ Request-Level Caching (DataLoader Default)
+DataLoader caches within a single request.
+If same user requested twice:
+{
+  user(id: 1) { name }
+  anotherUser: user(id: 1) { email }
+}
+DB hit happens once.
+
+2️⃣ Resolver-Level Caching
+You can manually cache expensive calls.
+Example with Redis:
+```js
+const resolvers = {
+  Query: {
+    user: async (_, { id }) => {
+      const cached = await redis.get(`user:${id}`);
+      if (cached) return JSON.parse(cached);
+
+      const user = await db.getUser(id);
+      await redis.set(`user:${id}`, JSON.stringify(user), "EX", 60);
+
+      return user;
+    }
+  }
+};
+```
+3️⃣ Apollo Response Caching
+Apollo provides cache control:
+const resolvers = {
+  Query: {
+    users: async (_, __, { cacheControl }) => {
+      cacheControl.setCacheHint({ maxAge: 60 });
+      return db.getAllUsers();
+    }
+  }
+};
+This enables HTTP-level caching strategies.
+
+4️⃣ Client-Side Caching (Apollo Client)
+Apollo Client automatically caches query results:
+const { data } = useQuery(GET_USERS);
+If query is repeated → no network call.
+Cache key is based on:
+Query shape
+Variables
+Object IDs
+
+# Security
+1️⃣ Depth Limiting
+✅ What It Is
+Limits how deeply nested a GraphQL query can go.
+Example of a dangerous query:
+
+query {
+  users {
+    posts {
+      comments {
+        author {
+          posts {
+            comments {
+              ...
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+This can:
+Blow up DB calls
+Consume huge CPU
+Crash your server
+
+❓ Why It Matters
+GraphQL allows recursive relationships.
+Without depth limits:
+Attackers can craft deeply nested queries
+Your API can get DOS’ed
+🛠 How to Implement (Apollo Example)
+Use graphql-depth-limit:
+import depthLimit from 'graphql-depth-limit';
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  validationRules: [depthLimit(5)]
+});
+This caps nesting at depth 5.
+🎯 Interview Insight
+They want to see if you understand:
+GraphQL gives flexibility — but flexibility must be controlled.
+
+#  Query Complexity Analysis
+✅ What It Is
+Limits total “cost” of a query.
+Instead of just depth, it calculates:
+Number of fields requested
+Estimated execution cost
+Example:
+
+query {
+  users(limit: 10000) {
+    posts {
+      comments {
+        id
+      }
+    }
+  }
+}
+
+Even if depth is small, cost is massive.
+❓ Why It Matters
+Depth ≠ complexity.
+You need to protect against:
+Large list queries
+Expensive aggregations
+Massive nested requests
+🛠 How to Implement
+Use graphql-query-complexity:
+import { createComplexityRule } from 'graphql-query-complexity';
+validationRules: [
+  createComplexityRule({
+    maximumComplexity: 1000
+  })
+]
+You can assign cost per field.
+Total cost is calculated before execution.
+If cost > threshold → reject query.
+
+# 3️⃣ Rate Limiting
+✅ What It Is
+Limits how many requests a user can make in a time window.
+Example:
+100 requests per minute per user/IP
+❓ Why It Matters
+GraphQL:
+Has single endpoint
+Allows complex queries
+Easier to abuse than REST
+Without rate limiting:
+Brute force attacks
+Token abuse
+API scraping
+🛠 How to Implement
+Using Express:
+
+import rateLimit from 'express-rate-limit';
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+}));
+Or Redis-based rate limiting for distributed systems.
+
+# 4️⃣ Auth in Resolvers
+✅ What It Is
+Authorization checks inside GraphQL resolvers.
+GraphQL does NOT have built-in auth.
+
+Example:
+const resolvers = {
+  Query: {
+    users: (parent, args, context) => {
+      if (!context.user) {
+        throw new Error("Unauthorized");
+      }
+      return getUsers();
+    }
+  }
+};
+❓ Why It Matters
+Even if route is protected:
+Clients can query any allowed field
+You must check permissions per resolver
+Example:
+User should see only their posts
+Admin can see all users
+🛠 Best Practice
+Use:
+Context-based auth
+Role-based checks (RBAC)
+Field-level authorization
+Better pattern:
+if (!context.user || context.user.role !== "ADMIN") {
+  throw new ForbiddenError("Access denied");
+}
+
+# Error Handling
+1️⃣ Error Handling in GraphQL
+Unlike REST:
+REST → HTTP status codes define failure.
+GraphQL → Always returns 200 OK (in most cases).
+Errors are part of the response body.
+Why?
+Because GraphQL can return partial success.
+Example Query
+query {
+  user(id: 1) {
+    name
+    posts {
+      title
+    }
+  }
+}
+
+If user loads but posts fails → GraphQL still returns what it can.
+2️⃣ GraphQL Error Format
+Standard GraphQL response:
+```js
+{
+  "data": {
+    "user": {
+      "name": "Balaji",
+      "posts": null
+    }
+  },
+  "errors": [
+    {
+      "message": "Failed to fetch posts",
+      "path": ["user", "posts"],
+      "extensions": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ]
+}
+```
+| Field        | Meaning                            |
+| ------------ | ---------------------------------- |
+| `message`    | Error description                  |
+| `path`       | Field that failed                  |
+| `extensions` | Custom metadata (error code, etc.) |
+
+3️⃣ Partial Responses
+This is one of GraphQL’s biggest differences from REST.
+REST:
+If one part fails → entire request fails.
+GraphQL:
+If one field fails → other fields can still succeed.
+query {
+  user(id: 1) {
+    name
+    salary   # restricted field
+  }
+}
+If user has no permission for salary:
+Response:
+
+{
+  "data": {
+    "user": {
+      "name": "Balaji",
+      "salary": null
+    }
+  },
+  "errors": [...]
+}
+✔ Frontend still receives usable data
+✔ Fine-grained field-level errors
+🎯 Senior Insight
+Partial responses:
+Improve resilience
+Reduce UI breakage
+Enable field-level authorization
+But:
+Require frontend error-awareness
+
