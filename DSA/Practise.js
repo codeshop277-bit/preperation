@@ -1,153 +1,34 @@
-const vehicleTypeEnum = {
-    CAR: "CAR",
-    BIKE: "BIKE"
+function MaxiMumElement(nums){
+    let max = -Infinity
+    for(let i=0; i<nums.length; i++){
+        if(nums[i] > max){
+            max = nums[i]
+        }
+    }
+    return max
 }
-class ParkingFeeStrategy{
-    calculateFee(duration){
-        throw new Error("must ")
+function HourlyTime(nums, mid){
+    let avg = 0;
+    for(let i=0; i<nums.length; i++){
+        avg += Math.ceil(nums[i] / mid)
     }
+    return avg
 }
-class BasicHourlyRate extends ParkingFeeStrategy{
-    constructor(rate = 5){
-        super();
-        this.rate = rate;
+function Koko(nums, k){
+    let low = 0;
+    let high = MaxiMumElement(nums)
+
+    while(low <= high){
+        let mid = Math.floor((low+high)/2);
+        let totalTime = HourlyTime(nums, mid);
+        if(totalTime == k) return mid
+        if(totalTime > k){
+            low = mid +1
+        }else{
+            high = mid -1
+        }
     }
-    calculateFee(duration){
-        return this.rate * duration
-    }
-}
-class PremiumHourlyRate extends ParkingFeeStrategy{
-    constructor(rate = 10){
-        super();
-        this.rate = rate;
-    }
-    calculateFee(duration){
-        return this.rate * duration
-    }
+    return -1
 }
 
-class PaymentStrategy{
-    processPayment(amount){
-        throw new Error("must")
-    }
-}
-class CreditCardPayment extends PaymentStrategy{
-    processPayment(amount){
-        console.log(`processed amount ${amount}`)
-        return true;
-    }
-}
-class Vehicle{
-    constructor(licensePlate, feeStartegy){
-        this.licensePlate = licensePlate;
-        this.feeStartegy = feeStartegy;
-        this.vehicleType = null;
-        this.entryTime = null
-    }
-    getType(){
-        return this.vehicleType;
-    }
-}
-class Bike extends Vehicle{
-    constructor(licensePlate, feeStartegy){
-        super(licensePlate, feeStartegy);
-        this.vehicleType = vehicleTypeEnum.BIKE;
-    }
-}
-class VehicleFactory{
-    static createVehicle(licensePlate, type, feeStartegy){
-        switch(type){
-            case vehicleTypeEnum.BIKE:
-                return new Bike(licensePlate, feeStartegy)
-            default:
-                throw new Error('unknown')
-        }
-    }
-}
-
-class ParkingSpot{
-    constructor(spotNo){
-        this.spotNo = spotNo;
-        this.occupied = false;
-        this.vehicle = null;
-    }
-    canPark(vehicle){
-
-    }
-    vacate(){
-        this.occupied = false
-        this.vehicle = null
-    }
-    parkVehicle(vehicle){
-        if(this.occupied){
-            return 'cant'
-        }
-        this.occupied = true
-        this.vehicle = vehicle
-        vehicle.entryTime = new Date()
-    }
-    getVehicle(){
-        return this.vehicle
-    }
-}
-class BikeParkingSpot extends ParkingFeeStrategy{
-    canPark(vehicle){
-        return vehicle.getType() == vehicleTypeEnum.BIKE
-    }
-}
-
-class ParkingFloor{
-    constructor(floorNo, cars=0, bike=0){
-        this.floorNo = floorNo
-        this.spots = [];
-        for(let i=0; i<bike; i++){
-            this.spots.push(new BikeParkingSpot(`${floorNo}-B${i}`))
-        }
-    }
-    findSpot(type){
-        return this.spots.find(spot => !spot.occupied && spot.canPark({getType() => type}))
-    }
-}
-class ParkingLotBuilder{
-    constructor(){
-        this.floors = []
-    }
-    addFloor(floorNo, cars, bike){
-        this.floors.push(new ParkingFloor(floorNo, cars, bike))
-        return this
-    }
-    build(){
-        return new ParkingLot(this.floors)
-    }
-}
-class ParkingLot{
-    constructor(floors){
-        this.floors = floors
-        this.tickets = new Map()
-    }
-    findAvailableSpot(type){
-        for(let floor of this.floors){
-            const spot = floor.findSpot(type);
-            if(spot) return spot
-        }
-        return null
-    }
-    parkVehicle(vehicle){
-        const spot = this.findAvailableSpot(vehicle.getType())
-        if(!spot){
-            return 'no spot'
-        }
-        spot.parkVehicle(vehicle);
-        this.tickets.set(vehicle.licensePlate, {spot, entryTime: vehicle.emtryTime})
-        return spot.spotNo
-    }
-    vacateSpot(licensePlate, paymentStrategy){
-        const ticket = this.tickets.get(licensePlate);
-        const now = new Date();
-        const duration = (now - ticket.entryTime)/(1000*60*60);
-        const fee = ticket.spot.getVehicle().feeStartegy.calculateFee(duration)
-        const paid = paymentStrategy.processPayment(fee)
-        ticket.spot.vacate()
-        this.tickets.delete(licensePlate);
-    }
-}
+console.log(Koko([25, 12, 8, 14, 19], 5))
