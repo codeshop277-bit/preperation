@@ -970,3 +970,12 @@ Pros
 Cons
 ❌ More complex
 ❌ Risk of inconsistent cache if done wrong
+
+#  errorPolicy: "all"
+Both data and errors available
+You can:
+Render partial data
+Show warning banner
+
+# npm install @graphql-codegen/cli
+GraphQL Code Generator auto-generates types from schema + queries.
