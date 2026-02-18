@@ -879,3 +879,94 @@ Enable field-level authorization
 But:
 Require frontend error-awareness
 
+# Optimistic updates
+Optimistic Updates
+🔎 What is it?
+Optimistic update means:
+Update the UI immediately before the server responds.
+Used for:
+Like buttons
+Add comment
+Delete item
+Example Without Optimistic Update
+User clicks "Like"
+→ Wait for server
+→ UI updates after response
+Feels slow.
+Example With Optimistic Update (Apollo)
+const [likePost] = useMutation(LIKE_POST, {
+  optimisticResponse: {
+    likePost: {
+      id: post.id,
+      likes: post.likes + 1,
+      __typename: "Post"
+    }
+  }
+});
+What happens:
+UI updates instantly
+Apollo stores optimistic value
+Server response arrives
+Cache reconciles
+If Server Fails?
+Apollo automatically rolls back the optimistic change.
+Senior Insight
+Optimistic updates:
+Improve perceived performance
+Require deterministic mutations
+Should not be used for complex transactional logic
+
+#  Cache Normalization
+🔎 What is it?
+Cache normalization means:
+Store API response as individual entities keyed by unique ID instead of storing full nested objects.
+✅ With Normalization (Apollo Behavior)
+Apollo stores like this internally: Instead of nested query
+User:10 → { id: 10, name: "Balaji" }
+Post:1  → { id: 1, title: "Post 1", author: "User:10" }
+One source of truth
+Updating User:10 updates everywhere automatically
+
+# Refetch vs Cache Update
+After a mutation, you have two options.
+Option A: Refetch Queries
+useMutation(DELETE_USER, {
+  refetchQueries: ["GetUsers"]
+});
+What happens:
+Mutation completes
+Apollo re-runs query
+UI updates with fresh server data
+Pros
+✔ Simple
+✔ Safe
+✔ No manual cache logic
+Cons
+❌ Extra network request
+❌ Slower
+❌ Wasteful at scale
+Option B: Manual Cache Update
+useMutation(DELETE_USER, {
+  update(cache, { data }) {
+    cache.modify({
+      fields: {
+        users(existingUsers = [], { readField }) {
+          return existingUsers.filter(
+            user => readField("id", user) !== data.deleteUser.id
+          );
+        }
+      }
+    });
+  }
+});
+What happens:
+Remove deleted user from cache directly
+No refetch
+Instant UI update
+Pros
+✔ No extra request
+✔ Faster
+✔ More scalable
+Cons
+❌ More complex
+❌ Risk of inconsistent cache if done wrong
