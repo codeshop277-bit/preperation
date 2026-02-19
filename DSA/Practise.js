@@ -1,34 +1,49 @@
-function MaxiMumElement(nums){
+function MinAndMax(nums){
+    let min = Infinity;
     let max = -Infinity
     for(let i=0; i<nums.length; i++){
         if(nums[i] > max){
             max = nums[i]
         }
-    }
-    return max
-}
-function HourlyTime(nums, mid){
-    let avg = 0;
-    for(let i=0; i<nums.length; i++){
-        avg += Math.ceil(nums[i] / mid)
-    }
-    return avg
-}
-function Koko(nums, k){
-    let low = 0;
-    let high = MaxiMumElement(nums)
-
-    while(low <= high){
-        let mid = Math.floor((low+high)/2);
-        let totalTime = HourlyTime(nums, mid);
-        if(totalTime == k) return mid
-        if(totalTime > k){
-            low = mid +1
-        }else{
-            high = mid -1
+        if(nums[i]<min){
+            min = nums[i]
         }
     }
-    return -1
+    return {max, min}
 }
 
-console.log(Koko([25, 12, 8, 14, 19], 5))
+function checkPossible(nums, k, days){
+    let count = 0;
+    let noOfBouq = 0;
+
+    for(let i=0; i< nums.length; i++){
+        if(nums[i] <= days){
+            count++
+        }else{
+            noOfBouq += Math.floor(count/k)
+            count = 0;
+        }
+    }
+    noOfBouq += Math.floor(count/k)
+    return noOfBouq
+}
+function Bloom(nums, k, m){
+    const minAndMax = MinAndMax(nums);
+
+    let low = minAndMax.min
+    let high = minAndMax.max
+    let ans = -1
+
+    while(low <=high){
+        let mid = Math.floor((low+high)/2);
+        let noOfBouq = checkPossible(nums, k, mid)
+        if(noOfBouq == m){
+            ans = mid
+            high = mid -1
+        }else{
+            low = mid+1
+        }
+    }
+    return ans
+}
+console.log(Bloom([7, 7, 7, 7, 13, 11, 12, 7], 3, 2))
