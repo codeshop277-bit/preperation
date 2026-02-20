@@ -1,49 +1,129 @@
-function MinAndMax(nums){
-    let min = Infinity;
-    let max = -Infinity
-    for(let i=0; i<nums.length; i++){
-        if(nums[i] > max){
-            max = nums[i]
-        }
-        if(nums[i]<min){
-            min = nums[i]
-        }
-    }
-    return {max, min}
+const Direction = {
+    UP: 'UP',
+    DOWN: 'DOWN',
+    IDLE: 'IDLE'
 }
 
-function checkPossible(nums, k, days){
-    let count = 0;
-    let noOfBouq = 0;
+const State = {
+    IDLE: 'IDLE',
+    MOVING: 'MOVING',
+    DOORS_OPEN: 'DOORS_OPEN'
+}
 
-    for(let i=0; i< nums.length; i++){
-        if(nums[i] <= days){
-            count++
+class ElevatorRequest{
+    constructor(type, floor, direction = null){
+       this.type = type
+       this.direction = direction
+       this. floor = floor
+    }
+
+    execute(){
+        //this.requests.push(request)
+    }
+}
+
+class Observer{
+    update(elevator){
+        //
+    }
+}
+
+class Elevator{
+    constructor(id, startingFloor = 0){
+        this.id = id
+        this.currentFloor = startingFloor
+        this.direction = Direction.IDLE
+        this.state = State.IDLE
+        this.requests = []
+        this.observers = []
+    }
+    addObserver(observer){
+        this.observers.push(observer)
+    }
+    notifyObserver(observer){
+        this.observers.forEach((obs) => obs.update(this))
+    }
+    addRequest(request){
+        this.requests.push(request)
+        this.updateDirection();
+        this.notifyObserver();
+    }
+    updateDirection(){
+        if(this.requests.length == 0){
+            this.direction = Direction.IDLE
+            this.state = State.IDLE
+            return
+        }
+        const firstRequest = this.requests[0];
+        if(firstRequest > this.currentFloor){
+            this.direction = Direction.UP
         }else{
-            noOfBouq += Math.floor(count/k)
-            count = 0;
+            this.direction = Direction.DOWN
         }
+        this.state = State.MOVING
     }
-    noOfBouq += Math.floor(count/k)
-    return noOfBouq
-}
-function Bloom(nums, k, m){
-    const minAndMax = MinAndMax(nums);
-
-    let low = minAndMax.min
-    let high = minAndMax.max
-    let ans = -1
-
-    while(low <=high){
-        let mid = Math.floor((low+high)/2);
-        let noOfBouq = checkPossible(nums, k, mid)
-        if(noOfBouq == m){
-            ans = mid
-            high = mid -1
-        }else{
-            low = mid+1
+    getNextStop(){
+        if(this.requests.length === 0) return null;
+        let candidates = []
+        this.requests.forEach((req) => {
+            const dist = Math.abs(req.floor - this.currentFloor);
+            const isSameDirection = req.direction == this.direction;
+            const sameDir = (this.direction == Direction.UP && req.floor > this.currentFloor) ||
+            (this.direction == Direction.DOWN && req.floor < this.currentFloor)
+            if(isSameDirection && sameDir){
+                candidates.push({floor: req.floor, dist})
+            }
+        })
+        if(candidates.length == 0){
+            this. direction = this.direction == Direction.UP ? Direction.DOWN : Direction.UP
+            return this.getNextStop()
         }
+        candidates.sort((a,b) => a.dist - b.dist)
+        return candidates[0].floor
     }
-    return ans
+
+    processRequest(){
+        this.state = State.DOORS_OPEN
+        this.requests.forEach((req) => {
+            if(req.floor == this.currentFloor){
+                return false
+            }
+            return true
+        })
+        this.state = State.MOVING
+    }
+    move(){
+        const nextStop = this.getNextStop()
+        if(nextStop == null) return
+
+        while(this.currentFloor != nextStop){
+            this.currentFloor += this.direction == Direction.UP ? 1 : -1;
+            this.processRequest()
+        }
+        this.processRequest();
+        this.updateDirection();
+        this.notifyObserver();
+    }
 }
-console.log(Bloom([7, 7, 7, 7, 13, 11, 12, 7], 3, 2))
+class Building{
+    constructor(floors, elevator = 1){
+        this.floors = floors
+        this.elevators = []
+        for(let i =1; elevator.length ; i++){
+            this.elevators.push(new Elevator(i))
+        }
+        this.controller = new ElevatorController(this.elevators)
+    }
+}
+
+class ElevatorController{
+    constructor(elevator){
+        this.elevators = elevator
+    };
+
+    assignRequest(){
+        const elevator = this.elevators[0];
+        elevator.addRequest(elevator);
+        return elevator
+    }
+}
