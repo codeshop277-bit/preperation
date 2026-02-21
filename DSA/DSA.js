@@ -1,37 +1,14 @@
-function Median(nums1, nums2, k){
-    let m = nums1.length
-    let n = nums2.length
-    let sorted = [];
-    let i=0;
-    let j=0;
-
-    while(i<m && j<n){
-        if(nums1[i] < nums2[j]){
-            sorted.push(nums1[i])
-            i++
-        }else{
-            sorted.push(nums2[j])
-            j++
+function PeakRows(matrix){
+    let rows = matrix.length
+    let cols = matrix[0].length
+    let max = -1
+    for(let i=0; i< rows; i++){
+        for(let j=0; j<cols; j++){
+            if(matrix[i][j] > max){
+                max = matrix[i][j]
+            }
         }
     }
-    while(i<m){
-         sorted.push(nums1[i])
-            i++
-    }
-    while(j<n){
-         sorted.push(nums2[j])
-            j++
-    }
-    let low = 0;
-    let high = sorted.length-1;
-    let median = -1;
-    let mid =Math.floor((low+high)/2)
-    if(sorted.length % 2 == 0){
-        median = (sorted[mid] + sorted[mid+1])/2
-    }else{
-        median = sorted[mid]
-    }
-    return sorted[k-1]
-    //return median
+    return max
 }
-console.log(Median( [100, 112, 256, 349, 770],  [72, 86, 113, 119, 265, 445, 892], 7 ))
+console.log(PeakRows([[10, 20, 15], [21, 30, 14], [7, 16, 32]]))
