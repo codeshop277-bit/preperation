@@ -1,129 +1,147 @@
-const Direction = {
-    UP: 'UP',
-    DOWN: 'DOWN',
-    IDLE: 'IDLE'
-}
+const ProductCategory = Object.freeze({
+    ELECTRONICS: 'ELECTRONICS',
+    GROCERY: 'GROCERY',
+    CLOTHING: 'CLOTHING'
+})
 
-const State = {
-    IDLE: 'IDLE',
-    MOVING: 'MOVING',
-    DOORS_OPEN: 'DOORS_OPEN'
-}
-
-class ElevatorRequest{
-    constructor(type, floor, direction = null){
-       this.type = type
-       this.direction = direction
-       this. floor = floor
+class Product {
+    constructot(id, name, price, threshold, quantity, category) {
+        this.id = id
+        this.name = name
+        this.price = price
+        this.threshold = threshold
+        this.quantity = quantity
+        this.category = category
     }
-
-    execute(){
-        //this.requests.push(request)
+    isLowStock() {
+        this.quantity <= this.threshold
     }
 }
+class ElectronicProduct extends Product {
+    constructor(id, name, price, quantity, threshold, brand, warranty, powerConsumption) {
+        super(id, name, price, quantity, threshold, ProductCategory.ELECTRONICS);
+        this.brand = brand;
+        this.warranty = warranty;
+        this.powerConsumption = powerConsumption;
+    }
+}
 
-class Observer{
-    update(elevator){
+class ElectronicProductBuilder extends ElectronicProduct {
+    constructor(id, name, price, quantity, threshold) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.quantity = quantity;
+        this.threshold = threshold;
+        this.brand = 'Generic';
+        this.warranty = 1; // Default 1 year
+        this.powerConsumption = 'N/A';
+    }
+
+    build() {
+        return new ElectronicProduct(
+            this.id,
+            this.name,
+            this.price,
+            this.quantity,
+            this.threshold,
+            this.brand,
+            this.warranty,
+            this.powerConsumption
+        );
+    }
+}
+
+class ProductFactory {
+    static createProduct(type, ...args) {
+        switch (type) {
+            case ProductCategory.ELECTRONICS:
+                return new ElectronicProductBuilder(...args)
+            default:
+                return "Must be implemented"
+        }
+    }
+}
+
+class ReplishmentStrategy {
+    replishment(product, quantity) {
+        product.quantity += quantity
+        //
+    }
+}
+class JustInTimeStrategy extends ReplishmentStrategy {
+    replishment(product, quantity) {
         //
     }
 }
 
-class Elevator{
-    constructor(id, startingFloor = 0){
-        this.id = id
-        this.currentFloor = startingFloor
-        this.direction = Direction.IDLE
-        this.state = State.IDLE
-        this.requests = []
-        this.observers = []
-    }
-    addObserver(observer){
-        this.observers.push(observer)
-    }
-    notifyObserver(observer){
-        this.observers.forEach((obs) => obs.update(this))
-    }
-    addRequest(request){
-        this.requests.push(request)
-        this.updateDirection();
-        this.notifyObserver();
-    }
-    updateDirection(){
-        if(this.requests.length == 0){
-            this.direction = Direction.IDLE
-            this.state = State.IDLE
-            return
-        }
-        const firstRequest = this.requests[0];
-        if(firstRequest > this.currentFloor){
-            this.direction = Direction.UP
-        }else{
-            this.direction = Direction.DOWN
-        }
-        this.state = State.MOVING
-    }
-    getNextStop(){
-        if(this.requests.length === 0) return null;
-        let candidates = []
-        this.requests.forEach((req) => {
-            const dist = Math.abs(req.floor - this.currentFloor);
-            const isSameDirection = req.direction == this.direction;
-            const sameDir = (this.direction == Direction.UP && req.floor > this.currentFloor) ||
-            (this.direction == Direction.DOWN && req.floor < this.currentFloor)
-            if(isSameDirection && sameDir){
-                candidates.push({floor: req.floor, dist})
-            }
-        })
-        if(candidates.length == 0){
-            this. direction = this.direction == Direction.UP ? Direction.DOWN : Direction.UP
-            return this.getNextStop()
-        }
-        candidates.sort((a,b) => a.dist - b.dist)
-        return candidates[0].floor
+class Warehouse {
+    constructor(id,) {
+        this.id = id,
+            this.products = new Map()
     }
 
-    processRequest(){
-        this.state = State.DOORS_OPEN
-        this.requests.forEach((req) => {
-            if(req.floor == this.currentFloor){
-                return false
-            }
+    addProduct(product) {
+        if (this.products.get(product.id)) {
+            this.products.get(product).quantity += product.quantity
+        } else {
+            this.products.set(product.id, product)
+        }
+    }
+    removeProduct(product) {
+        if (this.products.get(product.id)) {
+            this.products.get(product).quantity -= product.quantity
             return true
+        }
+        return false
+    }
+    getProduct() {
+        return this.products.get(product.id)
+    }
+}
+
+class InventoryManager {
+    constructor() {
+        if (InventoryManager.instance) {
+            return InventoryManager.instance
+        }
+        this.strategies = new Map()
+        this.observers = []
+        this.warehouses = new Map()
+    }
+
+    getInstance() {
+        return new InventoryManager()
+    }
+    addWarehouses(warehouse) {
+        this.warehouses.set(warehouse.id, warehouse)
+    }
+    addProductToWarehouse(warehouseId, product, qty) {
+        const warehouse = this.warehouses.get(warehouseId)
+        if (warehouse) {
+            warehouse.addProduct(product, qty)
+        }
+    }
+    removeFromWarehouse(warehouseId, product) {
+        const warehouse = this.warehouses.get(warehouseId)
+        if (warehouse) {
+            warehouse.removeProduct(product, qty)
+        }
+    }
+    setStartegy() {
+        this.strategies.set(category, strategy)
+    }
+    checkAndReplinsh() {
+        this.warehouses.foreEach((warehouse) => {
+            warehouse.foreEach((products) => {
+                if (product.isLowStock()) {
+                    this.notifyObservers(product);
+                    const strategy = this.strategies.get(product.category);
+                    if (strategy) {
+                        strategy.replenish(product, product.threshold * 2); // Replenish double the threshold
+                    }
+                }
+            })
         })
-        this.state = State.MOVING
-    }
-    move(){
-        const nextStop = this.getNextStop()
-        if(nextStop == null) return
-
-        while(this.currentFloor != nextStop){
-            this.currentFloor += this.direction == Direction.UP ? 1 : -1;
-            this.processRequest()
-        }
-        this.processRequest();
-        this.updateDirection();
-        this.notifyObserver();
-    }
-}
-class Building{
-    constructor(floors, elevator = 1){
-        this.floors = floors
-        this.elevators = []
-        for(let i =1; elevator.length ; i++){
-            this.elevators.push(new Elevator(i))
-        }
-        this.controller = new ElevatorController(this.elevators)
-    }
-}
-
-class ElevatorController{
-    constructor(elevator){
-        this.elevators = elevator
-    };
-
-    assignRequest(){
-        const elevator = this.elevators[0];
-        elevator.addRequest(elevator);
-        return elevator
     }
 }
