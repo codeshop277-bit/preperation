@@ -1,147 +1,146 @@
-const ProductCategory = Object.freeze({
-    ELECTRONICS: 'ELECTRONICS',
-    GROCERY: 'GROCERY',
-    CLOTHING: 'CLOTHING'
-})
+const VehicleType = {
+    ECONOMY: 'ECONOMY',
+    SUV: 'SUV',
+    SEDAN: 'SEDAN',
+    BIKE: 'BIKE'
+};
 
-class Product {
-    constructot(id, name, price, threshold, quantity, category) {
-        this.id = id
-        this.name = name
+const ReservationStatus = {
+    PENDING: 'PENDING',
+    COMPLETED: 'COMPLETED',
+    CANCELLED: 'CANCELLED',
+    CONFIRMED: 'CONFIRMED'
+};
+
+class Vehicle {
+    constructor(regNo, model, make, year, price) {
+        this.regNo = regNo
+        this.model = model
+        this.make = make
+        this.year = year
         this.price = price
-        this.threshold = threshold
-        this.quantity = quantity
-        this.category = category
+        this.isAvailable = true
     }
-    isLowStock() {
-        this.quantity <= this.threshold
+    getType() {
+        throw ('new')
     }
-}
-class ElectronicProduct extends Product {
-    constructor(id, name, price, quantity, threshold, brand, warranty, powerConsumption) {
-        super(id, name, price, quantity, threshold, ProductCategory.ELECTRONICS);
-        this.brand = brand;
-        this.warranty = warranty;
-        this.powerConsumption = powerConsumption;
+};
+class EconomyVehicle extends Vehicle {
+    getType() {
+        return VehicleType.ECONOMY
     }
 }
-
-class ElectronicProductBuilder extends ElectronicProduct {
-    constructor(id, name, price, quantity, threshold) {
-        this.id = id;
-        this.name = name;
-        this.price = price;
-        this.quantity = quantity;
-        this.threshold = threshold;
-        this.brand = 'Generic';
-        this.warranty = 1; // Default 1 year
-        this.powerConsumption = 'N/A';
-    }
-
-    build() {
-        return new ElectronicProduct(
-            this.id,
-            this.name,
-            this.price,
-            this.quantity,
-            this.threshold,
-            this.brand,
-            this.warranty,
-            this.powerConsumption
-        );
-    }
-}
-
-class ProductFactory {
-    static createProduct(type, ...args) {
+class VehicleFactory {
+    static createVehicle(type, ...args) {
         switch (type) {
-            case ProductCategory.ELECTRONICS:
-                return new ElectronicProductBuilder(...args)
+            case VehicleType.ECONOMY:
+                return new EconomyVehicle(...args);
             default:
-                return "Must be implemented"
+                return 'Unknown vehicle type'
         }
     }
-}
+};
 
-class ReplishmentStrategy {
-    replishment(product, quantity) {
-        product.quantity += quantity
-        //
-    }
-}
-class JustInTimeStrategy extends ReplishmentStrategy {
-    replishment(product, quantity) {
-        //
+class PaymentStrategy {
+    processPayment() {
+        throw ('new')
     }
 }
+class UPIPayment extends PaymentStrategy {
+    processPayment(amount) {
+        return true
+    }
+};
 
-class Warehouse {
-    constructor(id,) {
-        this.id = id,
-            this.products = new Map()
+class PricingStartegy {
+    calculateCost() {
+        throw ('new')
+    }
+}
+class DailyPricing extends PricingStartegy {
+    calculateCost(basePrice, hours) {
+        return basePrice * (Math.ceil(hours / 24) * 24)
+    }
+}
+class Location {
+    constructor(area, zipcode) {
+        this.area = area
+        this.zipcode = zipcode
+    }
+}
+class Reservation {
+    constructor(startDate, endDate, pickup, drop, pricigStrategy, id, user, vehicle) {
+        this.id = id
+        this.user = user
+        this.startDate = startDate
+        this.endDate = endDate
+        this.vehicle = vehicle
+        this.strategy = pricigStrategy
+        this.pickup = pickup
+        this.drop = drop
+        this.status = ReservationStatus.PENDING
+    }
+    confirm() {
+        this.status = ReservationStatus.CONFIRMED
+        this.vehicle.isAvailable = false
+    }
+    cancel() {
+        this.status = ReservationStatus.CANCELLED
+        this.vehicle.isAvailable = true
+    }
+    calculateCost() {
+        const duration = (this.endDate - this.startDate) / (1000 * 60 * 60);
+        this.strategy = this.strategy.calculateCost(this.vehicle.price, duration)
+    }
+}
+class User {
+    constructor(name, email) {
+        this.id = this.id
+        this.name = name
+        this.email = email
+        this.reservations = []
     }
 
-    addProduct(product) {
-        if (this.products.get(product.id)) {
-            this.products.get(product).quantity += product.quantity
-        } else {
-            this.products.set(product.id, product)
-        }
-    }
-    removeProduct(product) {
-        if (this.products.get(product.id)) {
-            this.products.get(product).quantity -= product.quantity
-            return true
-        }
-        return false
-    }
-    getProduct() {
-        return this.products.get(product.id)
+    addReservation(reservation) {
+        this.reservations.push(reservation)
     }
 }
 
-class InventoryManager {
+class RentalSystem {
+    static instance = null
     constructor() {
-        if (InventoryManager.instance) {
-            return InventoryManager.instance
+        if (RentalSystem.instance) {
+            return RentalSystem.instance
         }
-        this.strategies = new Map()
-        this.observers = []
-        this.warehouses = new Map()
+        this.stores = []
+        this.users = []
+        this.reservations = []
+        this.payment = new PaymentProcessor()
+    }
+    static getInstance() {
+        if (!RentalSystem.instance) {
+            RentalSystem.instance = new RentalSystem()
+        }
+        return RentalSystem.instance
     }
 
-    getInstance() {
-        return new InventoryManager()
+    addStores(store) {
+        this.stores.push(store)
     }
-    addWarehouses(warehouse) {
-        this.warehouses.set(warehouse.id, warehouse)
-    }
-    addProductToWarehouse(warehouseId, product, qty) {
-        const warehouse = this.warehouses.get(warehouseId)
-        if (warehouse) {
-            warehouse.addProduct(product, qty)
+    createReservation(userId, vehicleNo, pickupId, startDate, endDate, pricigStrategy, PaymentStrategy) {
+        const user = this.users.find((u) => u.id == userId);
+        const store = this.users.find((u) => u.id == pickupId);
+        const vehicle = store.vehicles.find((u) => u.regNo == vehicleNo);
+        if(!vehicle || !vehicle.isAvailable){
+            return 'Vehicle not available';
         }
-    }
-    removeFromWarehouse(warehouseId, product) {
-        const warehouse = this.warehouses.get(warehouseId)
-        if (warehouse) {
-            warehouse.removeProduct(product, qty)
+        const reservation = new Reservation(id, vehicle, user, startDate, endDate, pricigStrategy, PaymentStrategy)
+        const cost = reservation.calculateCost()
+        if(this.payment.processPayment(cost, PaymentStrategy)){
+            this.reservations.push(reservation)
+            user.addReservation(reservation)
+            reservation.confirm()
+            return reservation
         }
-    }
-    setStartegy() {
-        this.strategies.set(category, strategy)
-    }
-    checkAndReplinsh() {
-        this.warehouses.foreEach((warehouse) => {
-            warehouse.foreEach((products) => {
-                if (product.isLowStock()) {
-                    this.notifyObservers(product);
-                    const strategy = this.strategies.get(product.category);
-                    if (strategy) {
-                        strategy.replenish(product, product.threshold * 2); // Replenish double the threshold
-                    }
-                }
-            })
-        })
     }
 }
