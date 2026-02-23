@@ -1,146 +1,169 @@
-const VehicleType = {
-    ECONOMY: 'ECONOMY',
-    SUV: 'SUV',
-    SEDAN: 'SEDAN',
-    BIKE: 'BIKE'
-};
-
-const ReservationStatus = {
-    PENDING: 'PENDING',
-    COMPLETED: 'COMPLETED',
-    CANCELLED: 'CANCELLED',
-    CONFIRMED: 'CONFIRMED'
-};
-
-class Vehicle {
-    constructor(regNo, model, make, year, price) {
-        this.regNo = regNo
-        this.model = model
-        this.make = make
-        this.year = year
+class Item {
+    constructor(name, code, price) {
+        this.code = code
         this.price = price
-        this.isAvailable = true
-    }
-    getType() {
-        throw ('new')
-    }
-};
-class EconomyVehicle extends Vehicle {
-    getType() {
-        return VehicleType.ECONOMY
-    }
-}
-class VehicleFactory {
-    static createVehicle(type, ...args) {
-        switch (type) {
-            case VehicleType.ECONOMY:
-                return new EconomyVehicle(...args);
-            default:
-                return 'Unknown vehicle type'
-        }
-    }
-};
-
-class PaymentStrategy {
-    processPayment() {
-        throw ('new')
-    }
-}
-class UPIPayment extends PaymentStrategy {
-    processPayment(amount) {
-        return true
-    }
-};
-
-class PricingStartegy {
-    calculateCost() {
-        throw ('new')
-    }
-}
-class DailyPricing extends PricingStartegy {
-    calculateCost(basePrice, hours) {
-        return basePrice * (Math.ceil(hours / 24) * 24)
-    }
-}
-class Location {
-    constructor(area, zipcode) {
-        this.area = area
-        this.zipcode = zipcode
-    }
-}
-class Reservation {
-    constructor(startDate, endDate, pickup, drop, pricigStrategy, id, user, vehicle) {
-        this.id = id
-        this.user = user
-        this.startDate = startDate
-        this.endDate = endDate
-        this.vehicle = vehicle
-        this.strategy = pricigStrategy
-        this.pickup = pickup
-        this.drop = drop
-        this.status = ReservationStatus.PENDING
-    }
-    confirm() {
-        this.status = ReservationStatus.CONFIRMED
-        this.vehicle.isAvailable = false
-    }
-    cancel() {
-        this.status = ReservationStatus.CANCELLED
-        this.vehicle.isAvailable = true
-    }
-    calculateCost() {
-        const duration = (this.endDate - this.startDate) / (1000 * 60 * 60);
-        this.strategy = this.strategy.calculateCost(this.vehicle.price, duration)
-    }
-}
-class User {
-    constructor(name, email) {
-        this.id = this.id
         this.name = name
-        this.email = email
-        this.reservations = []
-    }
-
-    addReservation(reservation) {
-        this.reservations.push(reservation)
     }
 }
-
-class RentalSystem {
-    static instance = null
+class Inventory {
     constructor() {
-        if (RentalSystem.instance) {
-            return RentalSystem.instance
-        }
-        this.stores = []
-        this.users = []
-        this.reservations = []
-        this.payment = new PaymentProcessor()
+        this.shelves = new Map()
     }
-    static getInstance() {
-        if (!RentalSystem.instance) {
-            RentalSystem.instance = new RentalSystem()
+    addItem(itm, quantity) {
+        if (this.shelves.get(itm.code)) {
+            this.shelves.get(itm.code).quantity += quantity
+        } else {
+            this.shelves.set(itm.code, quantity)
         }
-        return RentalSystem.instance
+    }
+    getItem(itm) {
+        if (this.shelves.get(itm.code)) {
+            return this.shelves.get(itm.code)
+        }
+    }
+    getQuantity(itm) {
+        if (this.shelves.get(itm.code)) {
+            return this.shelves.get(itm.code).quantity
+        } else {
+            return 0
+        }
+    }
+    updateQuantity(itm, quantity) {
+        if (this.shelves.get(itm.code)) {
+            return this.shelves.get(itm.code).quantity += quantity
+        }
+    }
+    dispense(itm) {
+        if (this.shelves.get(itm.code)) {
+            return this.shelves.get(itm.code).quantity -= 1
+        }
     }
 
-    addStores(store) {
-        this.stores.push(store)
+}
+class VendingMachine {
+    constructor() {
+        this.inventory = new Inventory();
+        this.paidAmount = 0;
+        this.state = new IdleState(this);
+        this.selectedCode = null;
     }
-    createReservation(userId, vehicleNo, pickupId, startDate, endDate, pricigStrategy, PaymentStrategy) {
-        const user = this.users.find((u) => u.id == userId);
-        const store = this.users.find((u) => u.id == pickupId);
-        const vehicle = store.vehicles.find((u) => u.regNo == vehicleNo);
-        if(!vehicle || !vehicle.isAvailable){
-            return 'Vehicle not available';
+    setState(state) {
+        this.state = state
+    }
+    insertCoint(amount) {
+        this.state.insertCoin(amount)
+    }
+    selectItem(code) {
+        this.state.selectItem(code)
+    }
+    dispenseItem() {
+        this.state.dispenseItem();
+    }
+    refund() {
+        this.state.refund()
+    }
+}
+class State {
+    constructor(machine) {
+        this.machine = machine
+    }
+    insertCoin() {
+        throw new Error("must be implemented")
+    }
+    selectItem() {
+        throw new Error("must be implemented")
+    }
+    dispenseItem() {
+        throw new Error("must be implemented")
+    }
+    refund() {
+        throw new Error("must be implemented")
+    }
+}
+class IdleState extends State {
+    insertCoin(amount) {
+        if (amount > 0) {
+            this.machine.paidAmount += amount
+            this.machine.setState(new HasMoneyState(this.machine))
         }
-        const reservation = new Reservation(id, vehicle, user, startDate, endDate, pricigStrategy, PaymentStrategy)
-        const cost = reservation.calculateCost()
-        if(this.payment.processPayment(cost, PaymentStrategy)){
-            this.reservations.push(reservation)
-            user.addReservation(reservation)
-            reservation.confirm()
-            return reservation
+    }
+    selectItem() {
+        console.log("Pay the amount")
+    }
+}
+class HasMoneyState extends State {
+    insertCoin(amount) {
+        if (amount > 0) {
+            this.machine.paidAmount += amount
+        }
+    }
+    selectItem(code) {
+        const item = this.machine.inventory.getItem(code)
+        if (item) {
+            this.machine.selectedCode = code
+            this.machine.setState(new SelectionState(this.machine))
+        }
+    }
+    refund() {
+        this.machine.paidAmount = 0;
+        this.machine.setState(new IdleState(this.machine))
+    }
+}
+class SelectionState extends State {
+    insertCoin(amount) {
+        if (amount > 0) {
+            this.machine.paidAmount += amount
+        }
+    }
+    selectItem(code) {
+        const item = this.machine.inventory.getItem(code)
+        if (item) {
+            this.machine.selectedCode = code
+            this.machine.setState(new SelectionState(this.machine))
+        }
+    }
+    dispenseItem() {
+        const code = this.machine.selectedCode
+        const item = this.machine.inventory.get(code);
+        if (item) {
+            if (this.machine.inventory.get(code).quantity == 0) {
+                this.machine.setState(new OutOfStockState(this.machine))
+            }
+            if (this.machine.paidAmount >= item.price) {
+                this.machine.setState(new DispenseState(this.machine))
+            }
+        }
+    }
+    refund() {
+        this.machine.paidAmount = 0;
+        this.machine.selectedCode = null
+        this.machine.setState(new IdleState(this.machine))
+    }
+}
+class DispenseState extends State {
+    constructor(machine) {
+        super(machine)
+    }
+    dispenseItem() {
+        const code = this.machine.selectedCode
+        const item = this.machine.inventory.get(code);
+        if (this.machine.inventory.dispense(code)) {
+            this.machine.paidAmount = 0;
+            this.machine.selectedCode = null
+            this.machine.setState(new IdleState(this.machine))
         }
     }
 }
+class OutOfStockState extends State {
+    constructor() {
+        this.refund()
+    }
+    refund() {
+        this.machine.paidAmount = 0;
+        this.machine.selectedCode = null
+        this.machine.setState(new IdleState(this.machine))
+    }
+}
+const vendingMachine = new VendingMachine();
+vendingMachine.inventory.addItem(new Item('A1', 'Soda', 1.5), 5);
+vendingMachine.inventory.addItem(new Item('B2', 'Chips', 1.0), 3);
