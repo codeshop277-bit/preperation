@@ -332,3 +332,31 @@ Use will-change only when:
 ✔ High-frequency transform updates
 ✔ Complex layered UI
 ✔ Scroll-based motion effects
+
+# Profiling Overhead - Measurement cost
+# DEV VS PROD build differences
+| Category                                  | Development Build               | Production Build         | Impact                                |
+| ----------------------------------------- | ------------------------------- | ------------------------ | ------------------------------------- |
+| **Minification (Terser)**                 | ❌ Disabled                      | ✅ Enabled                | Larger file size in dev               |
+| **Dead Code Elimination**                 | ❌ Minimal / disabled            | ✅ Aggressive             | Unused code remains in dev            |
+| **Tree Shaking**                          | ⚠️ Limited                      | ✅ Fully applied          | Entire modules kept in dev            |
+| **Symbol Mangling**                       | ❌ Disabled                      | ✅ Enabled                | Longer variable names in dev          |
+| **Constant Folding**                      | ❌ Disabled                      | ✅ Enabled                | Extra runtime computation in dev      |
+| **Scope Hoisting (Module Concatenation)** | ❌ Disabled                      | ✅ Enabled                | More wrapper functions in dev         |
+| **React Production Optimizations**        | ❌ Dev warnings + checks enabled | ✅ Warnings stripped      | Dev React is heavier & slower         |
+| **PropTypes Checks**                      | ✅ Executed                      | ❌ Stripped               | Extra runtime cost in dev             |
+| **Strict Mode Double Invocations**        | ✅ Enabled                       | ❌ Disabled               | Extra lifecycle execution in dev      |
+| **Source Maps**                           | ✅ Full / eval-based             | ⚠️ External or minimized | Larger bundle + slower parsing in dev |
+| **HMR Runtime**                           | ✅ Included                      | ❌ Removed                | Extra bootstrap code in dev           |
+| **Error Overlay / Dev Client**            | ✅ Included                      | ❌ Removed                | Extra runtime cost in dev             |
+| **Webpack Debug Runtime**                 | ✅ Verbose                       | ❌ Optimized              | More module tracking in dev           |
+| **Module Federation Debug Wrappers**      | ✅ Verbose runtime               | ✅ Optimized runtime      | Slightly larger dev bootstrap         |
+| **Compression (gzip/brotli)**             | ❌ Usually disabled              | ✅ Enabled at server      | Dev transfer size appears larger      |
+| **Long-Term Caching / Chunk Hashing**     | ❌ Not optimized                 | ✅ Optimized              | Smaller repeat loads in prod          |
+| **Bundle Analyzer Optimizations**         | ❌ Not applied                   | ✅ Applied                | Cleaner output in prod                |
+
+# Paint Flashing (Chrome DevTools)
+Paint flashing is a rendering diagnostic feature that visually highlights areas of the page whenever the browser repaints them.
+When enabled, Chrome flashes regions (typically in green) every time they are repainted.
+It helps you answer:
+“What parts of the UI are being repainted, and how often?”
