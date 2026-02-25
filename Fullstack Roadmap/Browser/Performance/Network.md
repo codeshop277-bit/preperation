@@ -371,3 +371,154 @@ Cache-Control: max-age=60, stale-while-revalidate=300
 5️⃣ Image optimization at edge
 CDN transforms:
 /image.jpg?width=400
+
+# Resource Prioritization
+Resource prioritization is how the browser decides which network requests get bandwidth first.
+The browser does NOT download everything equally — it assigns priorities like:
+Highest   → HTML, critical CSS
+High      → fonts, blocking JS
+Medium    → images in viewport
+Low       → prefetch, async scripts
+Lowest    → lazy content
+
+The scheduler decides:
+What starts first
+What gets bandwidth
+What gets delayed
+
+How prioritization works internally
+Discovery timing
+Earlier discovered → higher chance to load early.
+Example:
+<link rel="stylesheet" href="main.css">
+
+vs
+import("./styles.css")
+Second is discovered late → lower priority.
+
+3️⃣ Render dependency
+If rendering depends on it → priority increases.
+
+Controlling priority (Modern APIs)
+✔️ fetchpriority (VERY IMPORTANT)
+<img src="hero.jpg" fetchpriority="high">
+
+Or lower priority:
+
+<img src="below-fold.jpg" fetchpriority="low">
+✔️ Preload changes priority
+<link rel="preload" href="hero.jpg" as="image">
+
+Tells browser:
+“This is important — start now.”
+
+✔️ Async vs defer
+<script defer src="app.js"></script>
+<script async src="analytics.js"></script>
+
+defer → ordered, higher relevance
+async → lower scheduling certainty
+
+# Critical CSS
+Critical CSS = minimum CSS required to render above-the-fold content immediately.
+Everything else can load later.
+
+CSS is render blocking.
+Browser cannot paint until CSSOM is ready:
+HTML → CSS → Render Tree → Paint
+Large CSS file = delayed first paint.
+
+main.css = 300KB
+↓
+Browser waits
+↓
+White screen
+
+Solution (Critical CSS pattern)
+Step 1 — Inline critical CSS
+Step 2 — Load remaining CSS async
+<link 
+  rel="preload" 
+  href="main.css" 
+  as="style"
+  onload="this.rel='stylesheet'"
+>
+
+# Early Hints
+Early Hints (HTTP 103)
+HTTP 103 Early Hints allows the server to tell the browser:
+“Start downloading these resources BEFORE the final response arrives.”
+
+Traditional flow (without 103)
+Request HTML
+   ↓
+Wait for server response
+   ↓
+Parse HTML
+   ↓
+Discover CSS/JS
+   ↓
+Start downloading
+Lost time = network latency.
+
+With Early Hints
+Request HTML
+   ↓
+Server sends 103 response
+   ↓
+<link rel="preload"...>
+   ↓
+Browser starts downloads EARLY
+   ↓
+Final HTML arrives
+
+Server sends:
+HTTP/1.1 103 Early Hints
+Link: </main.css>; rel=preload; as=style
+Link: </app.js>; rel=preload; as=script
+
+Browser starts downloading immediately.
+Why it exists
+Backend rendering can take time:
+SSR frameworks
+Database calls
+API aggregation
+
+Early hints hide that latency.
+
+“How do you improve LCP?”
+1. Send early hints for CSS + hero image
+2. Inline critical CSS
+3. Use fetchpriority=high for LCP image
+4. Reduce waterfall dependency chain
+
+Early Hints (HTTP 103) is NOT configured inside React — it’s configured at the server / CDN layer that serves your React app.
+
+React controls what assets exist
+Server/CDN controls how early they are announced
+Browser requests /
+      ↓
+Server starts rendering (SSR or static)
+      ↓
+Before HTML is ready
+      ↓
+Server sends 103 Early Hints
+      ↓
+Browser downloads CSS + Hero image
+      ↓
+Final HTML arrives
+
+If you serve React via Express:
+
+app.get("/", (req, res) => {
+  // Send Early Hints FIRST
+  res.writeEarlyHints({
+    link: [
+      '</static/main.css>; rel=preload; as=style',
+      '</hero.webp>; rel=preload; as=image'
+    ]
+  });
+
+  // Then send final HTML
+  res.send(renderReactApp());
+});
