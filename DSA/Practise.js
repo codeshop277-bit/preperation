@@ -1,169 +1,104 @@
-class Item {
-    constructor(name, code, price) {
-        this.code = code
-        this.price = price
+class FileSystemNode{
+    constructor(name, modified, created){
         this.name = name
+        this.modified = modified
+        this.created = created
+        this.children = new Map()
+    }
+    addChildren(child){
+        if(this.children.get(child.name)){
+            throw new Error('alreadt')
+        }
+        this.children.set(child.name, child)
+        this.modified = new Date()
+    }
+    getChild(child){
+        return this.children.get(child.name)
+    }
+    deleteChild(child){
+        this.children.delete(child.name)
+        this.modified = new Date()
+    }
+    display(depth = 0){
+        console.log(this.name)
     }
 }
-class Inventory {
-    constructor() {
-        this.shelves = new Map()
+class File extends FileSystemNode{
+    constructor(name, extension, content){
+        super(name);
+        this.extension = extension
+        this.content = content
     }
-    addItem(itm, quantity) {
-        if (this.shelves.get(itm.code)) {
-            this.shelves.get(itm.code).quantity += quantity
-        } else {
-            this.shelves.set(itm.code, quantity)
-        }
+    setContent(content){
+        this.content = content
+        this.modified = new Date()
     }
-    getItem(itm) {
-        if (this.shelves.get(itm.code)) {
-            return this.shelves.get(itm.code)
-        }
+    getContent(){
+        return this.content
     }
-    getQuantity(itm) {
-        if (this.shelves.get(itm.code)) {
-            return this.shelves.get(itm.code).quantity
-        } else {
-            return 0
-        }
+    display(depth = 0){
+        console.log(`${this.name}_${this.extension}`)
     }
-    updateQuantity(itm, quantity) {
-        if (this.shelves.get(itm.code)) {
-            return this.shelves.get(itm.code).quantity += quantity
-        }
-    }
-    dispense(itm) {
-        if (this.shelves.get(itm.code)) {
-            return this.shelves.get(itm.code).quantity -= 1
-        }
-    }
+}
 
-}
-class VendingMachine {
-    constructor() {
-        this.inventory = new Inventory();
-        this.paidAmount = 0;
-        this.state = new IdleState(this);
-        this.selectedCode = null;
+class Directory extends FileSystemNode{
+    constructor(name){
+        super(name)
     }
-    setState(state) {
-        this.state = state
-    }
-    insertCoint(amount) {
-        this.state.insertCoin(amount)
-    }
-    selectItem(code) {
-        this.state.selectItem(code)
-    }
-    dispenseItem() {
-        this.state.dispenseItem();
-    }
-    refund() {
-        this.state.refund()
-    }
-}
-class State {
-    constructor(machine) {
-        this.machine = machine
-    }
-    insertCoin() {
-        throw new Error("must be implemented")
-    }
-    selectItem() {
-        throw new Error("must be implemented")
-    }
-    dispenseItem() {
-        throw new Error("must be implemented")
-    }
-    refund() {
-        throw new Error("must be implemented")
-    }
-}
-class IdleState extends State {
-    insertCoin(amount) {
-        if (amount > 0) {
-            this.machine.paidAmount += amount
-            this.machine.setState(new HasMoneyState(this.machine))
+    display(depth = 0){
+        for(let child of this.children.values()){
+            child.display(depth)
         }
     }
-    selectItem() {
-        console.log("Pay the amount")
-    }
 }
-class HasMoneyState extends State {
-    insertCoin(amount) {
-        if (amount > 0) {
-            this.machine.paidAmount += amount
-        }
+class FileSystem{
+    constructor(path){
+        this.root = "/"
     }
-    selectItem(code) {
-        const item = this.machine.inventory.getItem(code)
-        if (item) {
-            this.machine.selectedCode = code
-            this.machine.setState(new SelectionState(this.machine))
-        }
+    splitPath(path){
+        return path.replace(/^\/+/, '').split('')
     }
-    refund() {
-        this.machine.paidAmount = 0;
-        this.machine.setState(new IdleState(this.machine))
-    }
-}
-class SelectionState extends State {
-    insertCoin(amount) {
-        if (amount > 0) {
-            this.machine.paidAmount += amount
-        }
-    }
-    selectItem(code) {
-        const item = this.machine.inventory.getItem(code)
-        if (item) {
-            this.machine.selectedCode = code
-            this.machine.setState(new SelectionState(this.machine))
-        }
-    }
-    dispenseItem() {
-        const code = this.machine.selectedCode
-        const item = this.machine.inventory.get(code);
-        if (item) {
-            if (this.machine.inventory.get(code).quantity == 0) {
-                this.machine.setState(new OutOfStockState(this.machine))
+    getNode(path){
+        const components = this.splitPath(path);
+        let current = this.root
+        for(let i=0; i< components.length; i++){
+            const name = components[i];
+            const child = current.getChild(name);
+            if(!child){
+                //Create a node
+                const isFile = name.includes('.');
+                child = isFile? new File(name.split('.')[0], `.${name.split('.').slice(1).join('.')}`) : new Directory(name)
+                current.addChildren(child)
             }
-            if (this.machine.paidAmount >= item.price) {
-                this.machine.setState(new DispenseState(this.machine))
-            }
+            current = child
         }
+        return current
     }
-    refund() {
-        this.machine.paidAmount = 0;
-        this.machine.selectedCode = null
-        this.machine.setState(new IdleState(this.machine))
+    createPath(path){
+        return this.getNode(path)
     }
-}
-class DispenseState extends State {
-    constructor(machine) {
-        super(machine)
-    }
-    dispenseItem() {
-        const code = this.machine.selectedCode
-        const item = this.machine.inventory.get(code);
-        if (this.machine.inventory.dispense(code)) {
-            this.machine.paidAmount = 0;
-            this.machine.selectedCode = null
-            this.machine.setState(new IdleState(this.machine))
+    setFileContent(path, content){
+        const node = this.getNode(path);
+        if(! node instanceof File){
+            throw new Error('not a file')
         }
+        node.setContent(content)
+    }
+    setFileContent(path){
+        const node = this.getNode(path);
+        if(! node instanceof File){
+            throw new Error('not a file')
+        }
+        node.getContent()
+    }
+    deletePath(path){
+        const components = this.splitPath(path);
+        if(components.length ===0 ){
+            throw new Error('Cannot delete root folder')
+        }
+        const parentPath = "/" + components.slice(0, -1).join("/");
+        const name = components[components.length -1];
+        const parent = this.getNode(parentPath)
+        parent.removeChild(name);
     }
 }
-class OutOfStockState extends State {
-    constructor() {
-        this.refund()
-    }
-    refund() {
-        this.machine.paidAmount = 0;
-        this.machine.selectedCode = null
-        this.machine.setState(new IdleState(this.machine))
-    }
-}
-const vendingMachine = new VendingMachine();
-vendingMachine.inventory.addItem(new Item('A1', 'Soda', 1.5), 5);
-vendingMachine.inventory.addItem(new Item('B2', 'Chips', 1.0), 3);
