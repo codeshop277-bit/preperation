@@ -1,104 +1,121 @@
-class FileSystemNode{
-    constructor(name, modified, created){
-        this.name = name
-        this.modified = modified
-        this.created = created
-        this.children = new Map()
-    }
-    addChildren(child){
-        if(this.children.get(child.name)){
-            throw new Error('alreadt')
-        }
-        this.children.set(child.name, child)
-        this.modified = new Date()
-    }
-    getChild(child){
-        return this.children.get(child.name)
-    }
-    deleteChild(child){
-        this.children.delete(child.name)
-        this.modified = new Date()
-    }
-    display(depth = 0){
-        console.log(this.name)
+const fs = require("fs");
+
+const LogLevel = {
+    INFO: { value: 1, name: "INFO" },
+    DEBUG: { value: 2, name: "DEBUG" },
+    WARN: { value: 3, name: "WARN" },
+    ERROR: { value: 4, name: "ERROR" },
+}
+
+class LogMessage {
+    constructor(message, metadata, timestamp, level) {
+        this.level = level
+        this.message = message
+        this.timestamp = new Date().toISOString()
+        this.metadata = metadata
     }
 }
-class File extends FileSystemNode{
-    constructor(name, extension, content){
-        super(name);
-        this.extension = extension
-        this.content = content
+class LogHandler {
+    constructor(nextHandler, appender, formatter) {
+        this.nextHandler = nextHandler
+        this.appender = appender
+        this.formatter = formatter
     }
-    setContent(content){
-        this.content = content
-        this.modified = new Date()
+    logMessage(message) {
+        if (this.canHandle(message)) {
+            const formatted = this.formatter ? this.formatter.format(message) : message
+            if (this.appender) {
+                this.appender.append(formatted)
+            }
+        }
+        if (this.nextHandler) {
+            this.nextHandler.logMessage(message)
+        }
     }
-    getContent(){
-        return this.content
+    canHandle(message) {
+        return false
     }
-    display(depth = 0){
-        console.log(`${this.name}_${this.extension}`)
+}
+class InfoHandler extends LogHandler{
+    canHandle(message){
+        return message.level >= LogLevel.INFO.value
+    }
+}
+class DebugHandler extends LogHandler{
+    canHandle(message){
+        return message.level >= LogLevel.DEBUG.value
+    }
+}
+class WarnHandler extends LogHandler{
+    canHandle(message){
+        return message.level >= LogLevel.WARN.value
     }
 }
 
-class Directory extends FileSystemNode{
-    constructor(name){
-        super(name)
+class Appender {
+    append(message) {
+        //
     }
-    display(depth = 0){
-        for(let child of this.children.values()){
-            child.display(depth)
+}
+class ConsoleAppender extends Appender{
+    append(message){
+        console.log(message)
+    }
+}
+class FileAppender extends Appender{
+    constructor(filePath){
+        super()
+        this.filePath = filePath
+    }
+    append(message){
+        fs.appendFileSync(this.filePath, message+ '\n')
+    }
+}
+class Formatter {
+    format(message) {
+        //
+    }
+}
+class SimpleFormatter extends Formatter {
+    formate(message) {
+        return `[${logMessage.timestamp}] [${logMessage.level.name}] ${logMessage.message} ${JSON.stringify(logMessage.metadata)}`
+    }
+}
+class JSONFormatter extends Formatter {
+    format(message) {
+        return JSON.stringify({
+            timestamp: message.timestamp,
+            level: logMessage.level.name,
+            message: logMessage.message,
+            metadata: logMessage.metadata
+        })
+    }
+}
+class Logger{
+    static getInstance(){
+        if(!Logger.instance){
+            Logger.instance = new Logger()
+        }
+        return Logger.instance
+    }
+    constructor(){
+        this.headHandler = null
+    }
+    setHandlerChain(headHandler){
+        this.headHandler = headHandler
+    }
+    logMessage(level, message, metadata){
+        const newMsg = new LogMessage(level, message, metadata)
+        if(this.headHandler){
+            this.headHandler.logMessage(newMsg)
         }
     }
 }
-class FileSystem{
-    constructor(path){
-        this.root = "/"
-    }
-    splitPath(path){
-        return path.replace(/^\/+/, '').split('')
-    }
-    getNode(path){
-        const components = this.splitPath(path);
-        let current = this.root
-        for(let i=0; i< components.length; i++){
-            const name = components[i];
-            const child = current.getChild(name);
-            if(!child){
-                //Create a node
-                const isFile = name.includes('.');
-                child = isFile? new File(name.split('.')[0], `.${name.split('.').slice(1).join('.')}`) : new Directory(name)
-                current.addChildren(child)
-            }
-            current = child
-        }
-        return current
-    }
-    createPath(path){
-        return this.getNode(path)
-    }
-    setFileContent(path, content){
-        const node = this.getNode(path);
-        if(! node instanceof File){
-            throw new Error('not a file')
-        }
-        node.setContent(content)
-    }
-    setFileContent(path){
-        const node = this.getNode(path);
-        if(! node instanceof File){
-            throw new Error('not a file')
-        }
-        node.getContent()
-    }
-    deletePath(path){
-        const components = this.splitPath(path);
-        if(components.length ===0 ){
-            throw new Error('Cannot delete root folder')
-        }
-        const parentPath = "/" + components.slice(0, -1).join("/");
-        const name = components[components.length -1];
-        const parent = this.getNode(parentPath)
-        parent.removeChild(name);
-    }
-}
+const logger = Logger.getInstance();
+const consoleAppender = new ConsoleAppender();
+const simpleFormatter = new SimpleFormatter();
+
+const debugHandler = new DebugHandler(null, consoleAppender, simpleFormatter)
+logger.setHandlerChain(debugHandler)
+
+logger.logMessage(LogLevel.INFO, 'App Started')
