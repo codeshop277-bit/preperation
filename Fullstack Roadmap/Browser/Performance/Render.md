@@ -325,3 +325,102 @@ Batching reduces:
 Render count
 Reconciliation frequency
 Commit work
+
+# State Normalization
+Organizing state to avoid duplication and deep nesting — similar to database normalization.
+
+Why bad state happens
+Common anti-pattern:
+const [user, setUser] = useState({
+  posts: [{ id:1, author:{...}}]
+});
+
+Problems:
+Deep updates
+Object recreation
+Massive re-renders
+
+❌ Non-normalized state
+{
+  users: [{id:1,name:"A"}],
+  posts: [{id:1,user:{id:1,name:"A"}}]
+}
+
+Duplicate data.
+✅ Normalized state (Senior Standard)
+{
+  usersById: {
+    1: { id:1, name:"A" }
+  },
+  postsById: {
+    10: { id:10, userId:1 }
+  }
+}
+Benefits
+✔ Smaller updates
+✔ Easier caching
+✔ Better memoization
+✔ Predictable rendering
+
+React Example
+const user = usersById[post.userId];
+Senior insight
+
+Normalization minimizes:
+Object identity changes → fewer re-renders.
+
+# Virtualization
+Rendering only visible list items instead of the entire list.
+
+Example:
+10,000 rows total
+Only 20 rendered in DOM
+
+Why it’s needed
+Big lists cause:
+Slow reconciliation
+Layout cost
+Memory pressure
+Scroll jank
+
+❌ Without virtualization
+items.map(item => <Row key={item.id} />)
+10k DOM nodes = performance collapse.
+
+✅ With virtualization (react-window)
+import { FixedSizeList as List } from "react-window";
+<List
+  height={500}
+  itemCount={items.length}
+  itemSize={40}
+>
+  {({ index, style }) => (
+    <div style={style}>
+      {items[index].name}
+    </div>
+  )}
+</List>
+How it works internally
+Tracks scroll position
+Calculates visible range
+Recycles DOM nodes
+
+Senior-level considerations
+Overscan
+overscanCount={5}
+Avoids blank areas during fast scrolling.
+
+Stable heights
+Variable heights = expensive recalculations.
+
+Memoized row
+const Row = React.memo(RowComponent);
+
+Virtualization is often bigger performance win than memoization.
+
+
+Performance priorities:
+1. Render LESS (virtualization)
+2. Update LESS (normalization)
+3. Re-render LESS (memoization)
+4. Compute LESS (useMemo)
