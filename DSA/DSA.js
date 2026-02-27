@@ -1,19 +1,22 @@
-function MinimumReversal(str){
-    let starting = 0;
-    let closing = 0;
+function buildLPS(pattern){
+    let m = pattern.length;
+    let lps = new Array(m).fill(0);
+    let len = 0;
+    let i = 1;
 
-    for(let i=0; i<str.length; i++){
-        if(str[i] == "("){
-            starting++
+    while(i<m){
+        if(pattern[i] === pattern[len]){
+            len++
+            lps[i] = len
+            i++
         }else{
-            if(starting> 0){
-                starting--
+            if(len !=0){
+                len = lps[len-1]
             }else{
-                closing++
+                lps[i] = 0
+                i++
             }
         }
     }
-    return {starting, closing}
-    //Math.floor((starting+1)/ 2) + Math.floor((closing+1)/ 2)
+    return lps
 }
-console.log(MinimumReversal(")(())((("))

@@ -424,3 +424,9 @@ Performance priorities:
 2. Update LESS (normalization)
 3. Re-render LESS (memoization)
 4. Compute LESS (useMemo)
+
+# Profiler
+Components Tab Features (07:02) — View full component tree hierarchy. Inspect/edit props & hooks live (great for testing). See hook values (numbered by default, but shows names if variables used). Jump to source code, search components, select DOM → find React component, log details to console, simulate Suspense loading states or Error Boundaries.
+Components Tab Settings (13:45) — Customize theme/layout, parse hook names (can slow large apps), open in VS Code, filter out HOCs/DOM nodes, etc.
+Profiler Tab Features (15:05) — Record performance over time (start/stop profiling). Shows flame charts, ranked slow components, render durations, commit phases, and exact reasons for re-renders (state/prop/parent/hook changes).
+Profiler Tab Settings (18:06) — Record why components rendered, hide fast commits (<10ms), throttle CPU to simulate low-end devices, restart profiling from initial render.
