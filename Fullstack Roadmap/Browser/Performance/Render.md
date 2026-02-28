@@ -430,3 +430,154 @@ Components Tab Features (07:02) — View full component tree hierarchy. Inspect/
 Components Tab Settings (13:45) — Customize theme/layout, parse hook names (can slow large apps), open in VS Code, filter out HOCs/DOM nodes, etc.
 Profiler Tab Features (15:05) — Record performance over time (start/stop profiling). Shows flame charts, ranked slow components, render durations, commit phases, and exact reasons for re-renders (state/prop/parent/hook changes).
 Profiler Tab Settings (18:06) — Record why components rendered, hide fast commits (<10ms), throttle CPU to simulate low-end devices, restart profiling from initial render.
+
+| Content Type      | Strategy |
+| ----------------- | -------- |
+| Marketing / docs  | SSG      |
+| Product listing   | ISR      |
+| User dashboard    | SSR      |
+| Personalized page | SSR      |
+
+# Streaming
+Streaming sends HTML in chunks instead of waiting for full render.
+
+Without streaming:
+Fetch → Render → Send HTML
+
+With streaming:
+Send shell → stream slow parts later
+
+Improves:
+TTFB
+Perceived performance
+Time to first paint
+
+# Image Optimization
+
+Serving images optimized for:
+size
+format
+viewport
+device resolution
+
+Largest Contentful Paint (LCP) is usually images.
+
+Common causes:
+oversized images
+wrong format
+no lazy loading
+layout shifts
+
+✅ Optimized Example
+import Image from "next/image";
+
+<Image
+  src="/hero.jpg"
+  width={1200}
+  height={600}
+  priority
+  alt="Hero"
+/>
+Performance improvements
+Automatic optimization provides:
+WebP/AVIF conversion
+responsive resizing
+lazy loading
+CDN caching
+
+🚨 Senior mistakes
+❌ Using <img> for large assets
+❌ Unknown dimensions (layout shift)
+❌ Loading huge desktop images on mobile
+
+
+For feeds:
+<Image loading="lazy" />
+
+For hero:
+priority
+Only ONE priority image.
+
+# Edge Rendering
+Rendering happens at edge locations close to user.
+
+Instead of:
+India → US Server → Response
+
+Edge:
+India → Mumbai edge → Response
+Example
+export const runtime = "edge";
+
+export default async function Page() {
+  const data = await fetch(API_URL);
+  return <UI data={await data.json()} />;
+}
+⚠ Why performance improves
+Lower network RTT
+Faster TTFB globally
+
+🚨 Why it can be slower
+
+Edge runtime limitations:
+limited Node APIs
+cold starts
+database distance still exists
+
+Use edge when:
+✔ read-heavy pages
+✔ geo-personalization
+✔ middleware logic
+
+Avoid when:
+❌ heavy server compute
+❌ DB far away from edge
+
+# Server Components Performance (Big One)
+React Server Components render on server and send serialized UI, not JS.
+// Server Component (default)
+export default async function ProductList() {
+  const data = await fetchProducts();
+  return <UI data={data} />;
+}
+🚀 Why performance is massive
+Key reason:
+NO client JS shipped.
+
+Benefits:
+lower bundle size
+faster hydration
+less JS parsing
+lower memory
+
+⚠ Why client components hurt performance
+"use client";
+This forces:
+JS shipping
+hydration
+event wiring
+
+Moving too much into client:
+"use client"; // ❌ at top-level page
+This kills RSC benefits.
+
+Server → Client island architecture
+// Server
+<Page>
+  <ProductList />     // server
+  <FilterPanel />     // client
+</Page>
+Performance Flow
+Server Components:
+Fetch → Render → Stream HTML
+
+Client Components:
+Download JS → Parse → Hydrate
+Move interactivity DOWN the tree.
+| Type              | CPU Cost    | TTFB        | JS Cost | Best For     |
+| ----------------- | ----------- | ----------- | ------- | ------------ |
+| SSR               | High        | Medium      | Medium  | dynamic data |
+| SSG               | Zero        | Fastest     | Low     | static       |
+| ISR               | Low         | Fast        | Low     | semi-dynamic |
+| Edge              | Low latency | Fast global | Same    | geo apps     |
+| Server Components | Very low JS | Fast        | Lowest  | modern React |
