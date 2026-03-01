@@ -220,3 +220,229 @@ Did I create:
 - async work?
 - external instance?
 ➡️ If YES → return cleanup.
+
+# Garbage Collection Behavior
+Garbage Collection (GC) is the JavaScript engine’s process of automatically freeing memory that is no longer reachable.
+
+In browsers (V8 / Chrome):
+Memory = Heap
+Objects live until no reference points to them
+GC removes unreachable objects
+React does NOT manage memory — JavaScript engine does.
+
+How GC works internally (Senior-level mental model)
+V8 uses Generational Garbage Collection.
+Two main areas:
+🔹 Young Generation (New Space)
+Short-lived objects
+React renders create many of these
+Very frequent cleanup (fast)
+
+Examples:
+temporary props
+virtual DOM objects
+render calculations
+
+🔹 Old Generation (Old Space)
+Long-lived objects
+expensive cleanup
+leaks usually end up here
+
+Examples:
+listeners
+closures
+cached data
+refs
+
+Why memory problems happen
+GC only removes objects that are:
+UNREACHABLE from ROOTS
+
+Roots include:
+window
+DOM
+event listeners
+active timers
+closures
+
+If anything is still reachable → no cleanup.
+Example (React leak reality)
+useEffect(() => {
+  window.addEventListener("resize", () => {
+    console.log(state);
+  });
+}, []);
+
+Memory graph:
+window
+ └ listener
+     └ closure
+         └ component state
+
+GC cannot remove component.
+GC Behavior in React Apps
+
+React creates MANY short-lived objects:
+reconciliation trees
+fibers
+props copies
+This is normal.
+Problem = when objects survive multiple GC cycles.
+Common GC Symptoms
+
+You see:
+memory grows slowly over time
+drops occasionally (minor GC)
+never returns fully (objects promoted to old space)
+Chrome Performance panel shows:
+sawtooth pattern ↑ ↓ ↑ ↓
+
+If baseline keeps rising → leak.
+Prevention Strategy (Senior)
+✔ Avoid long-lived references
+
+Bad:
+globalCache.push(state);
+
+Good:
+globalCache.push(state.id);
+✔ Cleanup aggressively inside effects
+
+Every side effect = lifecycle responsibility.
+
+# Heap Snapshots
+A Heap Snapshot is:
+A frozen picture of all memory objects at one moment.
+
+Used to:
+detect leaks
+find large objects
+locate retained components
+Why it exists
+GC runs automatically and invisibly.
+Snapshots let you inspect:
+WHAT is in memory
+WHY it still exists
+
+How seniors actually use it (Real workflow)
+Chrome DevTools:
+Memory → Heap Snapshot
+
+Take:
+Snapshot A (fresh page)
+Perform actions (navigate, open dashboard)
+Snapshot B
+Compare
+
+What you look for
+🔹 Growing object counts
+
+Example:
+Detached HTMLDivElement ↑
+DashboardComponent ↑
+
+Means memory not released.
+🔹 Large retained size
+
+Important columns:
+Column	Meaning
+Shallow Size	memory of object itself
+Retained Size	memory kept alive because of it
+
+⚠️ Retained size matters more.
+
+Example Investigation
+You see:
+Closure → retained size: 45MB
+This means:
+
+One closure holding huge object graph.
+If closure references bigData indirectly → snapshot shows:
+Closure
+ └ Array(500000)
+Senior Tip (VERY IMPORTANT)
+Snapshot shows symptoms, not root cause.
+
+Always inspect:
+Retainers chain
+
+
+# Retainers Graph
+A Retainers Graph shows:
+WHY an object is still in memory.
+It displays the chain of references preventing GC.
+
+Think:
+Who is holding this object alive?
+Why it matters
+
+Finding object ≠ solving leak.
+You must know:
+ROOT → … → problematic object
+Example Retainers Graph
+Imagine leaked component:
+Window
+ └ EventListener
+     └ Closure
+         └ React FiberNode
+             └ Component State
+
+Root cause:
+➡️ event listener not removed.
+
+Real React Example
+Code
+useEffect(() => {
+  const handler = () => console.log(data);
+
+  window.addEventListener("scroll", handler);
+}, []);
+
+Heap snapshot:
+data object
+Retainers graph:
+
+Window
+ └ scroll listener
+     └ handler closure
+         └ data
+Now leak is obvious.
+
+Advanced Example — Detached DOM
+Graph:
+
+Window
+ └ library cache
+     └ DOM node
+
+Root cause:
+library forgot cleanup.
+
+How seniors debug leaks (REAL PROCESS)
+Step 1 — Heap Snapshot
+Find growing objects.
+
+Step 2 — Retained Size
+Identify biggest retainers.
+
+Step 3 — Retainers Graph
+Trace back to root.
+
+Ask:
+listener?
+closure?
+global variable?
+timer?
+
+Step 4 — Fix lifecycle cleanup.
+Senior Insight: React Fiber Appears Often
+
+You may see:
+FiberNode
+
+Don’t blame React immediately.
+Usually retained by:
+closures
+listeners
+async callbacks
+React fiber is just the victim.
