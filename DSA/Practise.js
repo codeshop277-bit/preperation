@@ -1,158 +1,156 @@
-const Denomination = [500, 100];
-const crypto = require("crypto");
-
-class Card {
-    constructor(cardNo, pin, account) {
-        this.cardNo = cardNo
-        this.pin = pin
-        this.account = account
-    }
-    hasPin(pin) {
-        return crypto.createHash('256').update(pin).digest('hex')
-    }
-    authenticatePin(pin) {
-        return this.pin === this.hasPin()
-    }
-}
-class AccountDetails {
-    constructor(accountNo, balance) {
-        this.accountNo = accountNo
-        this.balance = balance
-    }
-    getBalance() {
-        return this.balance
-    }
-    withdraw(amount) {
-        if (amount > this.balance) {
-            throw new Error('Insufficient funds')
-        } else {
-            this.balance -= amount
-        }
-    }
-}
-class ATMInventory {
-    constructor(initial) {
-        this.inventory = new Map()
-        Denomination.map(denom => this.inventory.set(denom, initial[denom] || 0))
-    }
-
-    getTotal() {
-        let count = 0;
-        for (let [denom, value] of this.inventory) {
-            count += denom * value
-        }
-        return count
-    }
-    hasEnough(amount) {
-        return this.getTotal() >= amount
-    }
-    dispenseCash(amount) {
-        if (!this.hasEnough(amount)) {
-            //no suff funds
-        }
-        let dispensed = new Map();
-        let remaining = amount;
-        for (let [denom, value] of this.inventory) {
-            let count = Math.floor(remaining / denom)
-            if (count > this.inventory.get(denom)) {
-                count = this.inventory.get(denom)
-            }
-            if (count > 0) {
-                dispensed.set(denom, count)
-                this.inventory.set(denom, this.inventory.get(denom) - count)
-                remaining -= denom * count
-            }
-        }
-        return dispensed
-    }
-}
-class ATMState {
-    insertCard(context, card) {
-        //
-    }
-    enterPin(context, card) {
-        //
-    }
-    performTransaction(context, card) {
-        //
-    }
-    withdrawCash(context, card) {
-        //
-    }
-}
-class InsertCardState extends ATMState {
-    insertCard(context, card) {
-        context.card = card
-        context.setState(ATMFactory.getState("HasCard"))
-    }
-}
-class HasCardState extends ATMState {
-    enterPin(context, pin) {
-        if (context.card.authenticatePin(pin)) {
-            context.setState(ATMFactory.getState("SelectOperation"))
-        }
-    }
-}
-class SelectedOperationState extends ATMState {
-    selectOperation(context, operation) {
-        context.selectOperation = operation
-        context.setState(ATMFactory.getState("Transaction"))
-    }
-}
-class TransactionState extends ATMState {
-    performTransaction(context, amount) {
-        if(context.selectOperation == "CheckBalance"){
-            context.account.getBalance()
-        }else{
-            context.account.withdraw(amount)
-            const dispense = context.inventory.dispenseCash(amount)
-            context.setState(ATMFactory.getState("SelectOperation"))
-        }
-    }
-    returnCard(){
-        context.card = null
-        context.account = null
-        context.setState(ATMFactory.getState("Idle"))
-    }
-}
-class ATMFactory {
-    static getState(type) {
-        switch (type) {
-            case 'Idle': return new IdleState();
-            case 'HasCard': return new HasCardState();
-            case 'SelectOperation': return new SelectOperationState();
-            case 'Transaction': return new TransactionState();
-            default: throw new Error('Invalid state type');
-        }
-    }
-}
-class ATMCOntext {
+class Mutex {
     constructor() {
-        this.state = ''
-        this.inventory = new ATMInventory({ 100: 10, 500: 30 })
-        this.card = null
-        this.account = null
-        this.selectedOperation = null
+        this.locked = false
+        this.queue = []
     }
-    setState(context) {
-        this.state = context
-    }
-    insertCard(card) {
-        this.state.insertCard(this, card)
-    }
-    enterPin(pin) {
-        this.state.enterPin(this, pin);
-    }
+    async lock() {
+        return new Promise((resolve) => {
+            const unlock = () => {
+                this.locked = false
+                if (this.queue.length > 0) {
+                    const nextUnlock = this.queue.shift();
+                    nextUnlock()
+                }
+            }
 
-    selectOperation(operation) {
-        this.state.selectOperation(this, operation);
-    }
-
-    performTransaction(amount) {
-        this.state.performTransaction(this, amount);
-    }
-
-    returnCard() {
-        this.state.returnCard(this);
+            if (!this.locked) {
+                this.locked = true
+                resolve(unlock)
+            } else {
+                this.queue.push(() => {
+                    this.locked = true
+                    resolve(unlock)
+                })
+            }
+        })
     }
 }
+class Seatlock {
+    constructor(seat, show, timeout, lockedBy, lockedTime) {
+        this.seat = seat
+        this.show = show
+        this.timeout = timeout
+        this.lockedBy = lockedBy
+        this.lockedTime = lockedTime || new Date()
+    }
+
+    isExpired() {
+        const expiredTime = new Date(this.lockedTime.getTime() + this.timeout * 1000);
+        return new Date() > expiredTime;
+    }
+}
+
+class SeatLockProvider {
+    constructor(seatlockprovider) {
+        this.seatlockprovider = seatlockprovider
+        this.locks = new Map()
+        this.mutexes = new Map()
+    }
+    getMutex(showId) {
+        if (!this.mutexes.get(showId)) {
+            this.mutexes.set(showId, new Mutex())
+        }
+    }
+    getShowLocks(showId) {
+        if (!this.locks.get(showId)) {
+            this.locks.set(showId, new Map())
+        }
+        return this.locks.get(showId)
+    }
+    isSeatLocked(showId, seat) {
+        const showlocks = this.getShowLocks(showId);
+        const lock = showlocks.get(seat);
+        if (lock && lock.isExpired()) {
+            showlocks.delete(seat)
+            return false
+        }
+        return true
+    }
+    getLockedSeats(showId) {
+        const showlocks = this.getShowLocks(showId)
+        let locked = []
+        for (let [seat, lock] of showlocks) {
+            if (!lock.isExpired()) {
+                locked.push(seat)
+            } else {
+                showlocks.delete(seat)
+            }
+        }
+        return locked
+    }
+    async lockSeats(showId, seats, user) {
+        const unlock = this.mutexes.get(showId).lock()
+        try {
+            const showlocks = this.getShowLocks(showId)
+            for (const seat of seats) {
+                if (this.isSeatLocked(seat)) {
+                    throw new Error("seat locked")
+                } else {
+                    const seatlock = new Seatlock(seat, user, showId, this.timeout)
+                    showlocks.set(seat, lock)
+                }
+            }
+        } finally {
+            unlock()
+        }
+    }
+    async unlockSeats(showId, seats, user) {
+        const unlock = this.mutexes.get(showId).lock()
+        try {
+            const showlocks = this.getShowLocks(showId)
+            for (const seat of seats) {
+                const lock = showlocks.get(seat)
+                if (lock && lock.lockedBy === user && !lock.isExpired()) {
+                    showlocks.delete(seat)
+                }
+            }
+        } finally {
+            unlock()
+        }
+    }
+    async validateLocks(showId, seats, user) {
+        const unlock = this.mutexes.get(showId).lock()
+        try {
+            const showlocks = this.getShowLocks(showId)
+            for (const seat of seats) {
+                const lock = showlocks.get(seat)
+                if (!lock || lock.lockedBy !== user || lock.isExpired()) {
+                    if (lock && lock.isExpired()) {
+                        showlocks.delete(seat)
+                    }
+                }
+            }
+            return true
+        } finally {
+            unlock()
+        }
+    }
+}
+class BookingService{
+    constructor(seatlockprovider){
+        this.seatlockprovider = seatlockprovider
+        this.bookings = new Map()
+        this.counter = 0
+    }
+    async getBookedSeats(showId){
+        return this.bookings.get(showId) || 0
+    }
+    async createBooking(seats, showId, user){
+        await this.seatlockprovider.lockSeats(showId, seats, user)
+        const valid = this.seatlockprovider.validateLocks(showId, seats, user)
+        if(!valid){
+            //
+            this.seatlockprovider.unlockSeats(showId, seats, user)
+        }
+        if(!this.bookings.get(showId)){
+            this.bookings.set(showId, new Set())
+        }
+        for(const seat of seats){
+            this.bookings.get(showId).add(seat)
+        }
+        await this.seatlockprovider.unlockSeats(showId, seats, user)
+        return this.counter++
+    }
+}
+const lock = new SeatLockProvider(2)
+const bs = new BookingService(lock)
