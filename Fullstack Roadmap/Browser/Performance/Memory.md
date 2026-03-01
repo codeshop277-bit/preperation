@@ -446,3 +446,13 @@ closures
 listeners
 async callbacks
 React fiber is just the victim.
+
+# Profiler
+look for 
+elem
+handler
+listener
+closure
+cache
+queue
+node
