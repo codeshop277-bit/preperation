@@ -581,3 +581,143 @@ Move interactivity DOWN the tree.
 | ISR               | Low         | Fast        | Low     | semi-dynamic |
 | Edge              | Low latency | Fast global | Same    | geo apps     |
 | Server Components | Very low JS | Fast        | Lowest  | modern React |
+
+
+# Hydration
+Hydration = attaching React’s event system to already-rendered HTML sent from the server.
+
+Flow:
+Server:
+React → HTML → Browser
+Client:
+Download JS → Parse → Execute → Attach listeners
+
+Until hydration finishes:
+UI looks interactive
+but JS is NOT active yet
+
+⚠ Why it becomes a bottleneck
+Hydration runs on the main thread.
+Main thread is also responsible for:
+scrolling
+input handling
+paint/layout
+animations
+So hydration competes with user interactions.
+
+Major causes (senior-level)
+1) Too much client JS
+"use client";
+export default function Page() {
+  return <HugeComponentTree />;
+}
+➡ Entire subtree must hydrate.
+
+2) Deep interactive trees
+Each component requires:
+reconciliation
+hook initialization
+event binding
+
+3) Large dependency graphs
+import chartLibrary from "heavy-lib";
+Now hydration waits for:
+Download → Parse → Compile → Execute
+4) Blocking hydration waterfalls
+useEffect(() => {
+  fetch("/api");
+});
+JS executes → network starts → UI delays.
+
+🚨 Symptoms you see in real apps
+UI freezes after load
+scroll jank
+delayed button clicks
+high INP (Interaction to Next Paint)
+long scripting tasks in DevTools
+
+🧠 Prevention / Resolution
+Strategy 1 — Reduce hydration surface
+Bad:
+"use client";
+<Page />
+
+Good:
+<Page>
+  <StaticContent />     {/* server */}
+  <SearchBox />         {/* client */}
+</Page>
+Strategy 2 — Move logic server-side
+Instead of:
+useEffect(() => fetchData());
+
+Do:
+const data = await getData();
+Strategy 3 — Lazy hydrate heavy components
+const Chart = dynamic(() => import("./Chart"), {
+  ssr: false,
+});
+Hydrates only when needed.
+Strategy 4 — Split interactivity islands
+Think:
+Hydrate only what the user touches.
+Hydration cost ≈ Amount of client JS × Component complexity
+
+# Partial Hydration
+Hydrating only specific parts of the page instead of the entire tree.
+HTML rendered for whole page
+↓
+Only interactive islands get JS
+⚠ Why it exists
+Traditional React hydration:
+All-or-nothing hydration
+Even static areas receive JS overhead.
+Partial hydration solves:
+unnecessary parsing
+memory usage
+CPU blocking
+
+🧠 How modern React achieves this
+React itself doesn’t explicitly expose “partial hydration”.
+Instead we achieve it via:
+
+1) Server Components (default server)
+2) Client boundaries
+// Server component
+<ProductPage>
+  <ProductInfo />   {/* no hydration */}
+  <BuyButton />     {/* hydration */}
+</ProductPage>
+
+Only BuyButton hydrates.
+🚨 Bad implementation
+"use client";
+
+export default function Page() {
+  return (
+    <>
+      <StaticHeader />
+      <StaticBody />
+    </>
+  );
+}
+Even static parts hydrate → wasted CPU.
+
+Partial hydration is basically:
+Server Components + Client Islands
+Real-world benefit
+Large e-commerce page:
+Without partial hydration:
+Hydrate 200 components
+With partial hydration:
+Hydrate 12 interactive components
+Massive CPU reduction.
+
+# Server VS Client
+| Factor        | Server | Client |
+| ------------- | ------ | ------ |
+| JS shipped    | ❌      | ✅      |
+| Hydration     | ❌      | ✅      |
+| Interactivity | ❌      | ✅      |
+| Performance   | ⭐⭐⭐⭐⭐  | ⭐⭐     |
+| Browser APIs  | ❌      | ✅      |
