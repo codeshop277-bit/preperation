@@ -274,10 +274,11 @@ function ReverseDoubleLL(arr) {
         current.next = last
 
         current = current.prev
+        console.log(current)
     }
     return last.prev
 }
-// console.log(ReverseDoubleLL([1,2,3,4,5]))
+console.log(ReverseDoubleLL([1,2,3,4,5]))
 
 function FindMiddle(arr) {
     const linkedlist = buildDoubleLinkedList(arr)
