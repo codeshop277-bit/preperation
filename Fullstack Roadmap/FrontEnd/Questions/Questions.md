@@ -182,3 +182,119 @@ compose(
 )(dispatch);
 
 Each middleware wraps the next one.
+
+# Prototype
+In JavaScript, every object has a hidden link to another object called its prototype.
+Objects inherit properties and methods from their prototype. This mechanism is called Prototype Inheritance.
+Prototype is an object that provides shared properties and methods to other objects.
+
+Prototype Chain
+When accessing a property, JavaScript searches:
+object → prototype → parent prototype → null
+
+Prototype Inheritance
+Objects can inherit behavior from another object via the prototype chain.
+
+```js
+function Animal(name) {
+  this.name = name;
+}
+
+Animal.prototype.speak = function () {
+  return `${this.name} makes sound`;
+};
+
+function Dog(name) {
+  Animal.call(this, name);
+}
+
+Dog.prototype = Object.create(Animal.prototype);
+
+Dog.prototype.bark = function () {
+  return "Woof!";
+};
+
+const dog = new Dog("Tommy");
+
+console.log(dog.speak());
+console.log(dog.bark());
+```
+dog
+ ↓
+Dog.prototype
+ ↓
+Animal.prototype
+ ↓
+Object.prototype
+So dog inherits speak() from Animal.
+| Concept               | Meaning                                            |
+| --------------------- | -------------------------------------------------- |
+| Prototype             | Object from which other objects inherit properties |
+| Prototype Chain       | Lookup path for properties                         |
+| Prototype Inheritance | One object inheriting from another                 |
+JavaScript uses prototype-based inheritance, where objects inherit properties and methods from other objects through the prototype chain. When a property is accessed, JavaScript looks for it on the object first, then walks up the prototype chain until it finds it or reaches null.
+
+# call, apply, bind
+call, apply, and bind are used to explicitly control the this context of a function. call and apply execute the function immediately, while bind returns a new function with the bound context.
+
+# call
+Purpose: invokes a function immediately while setting this.
+fn.call(thisArg, arg1, arg2)
+```js
+const user = {
+  name: "Balaji"
+};
+
+function greet(age) {
+  console.log(`Hi I am ${this.name}, age ${age}`);
+}
+
+greet.call(user, 30);
+//Hi I am Balaji, age 30
+```
+
+# apply
+Purpose: same as call, but arguments are passed as an array.
+fn.apply(thisArg, [arg1, arg2])
+```js
+const user = {
+  name: "Balaji"
+};
+
+function greet(age, city) {
+  console.log(`${this.name} ${age} ${city}`);
+}
+greet.apply(user, [30, "Delhi"]);
+//Balaji 30 Delhi
+```
+# bind
+Purpose: returns a new function with this permanently bound.
+It does not execute immediately.
+const newFn = fn.bind(thisArg)
+```js
+const user = {
+  name: "Balaji"
+};
+
+function greet() {
+  console.log(`Hello ${this.name}`);
+}
+
+const greetUser = greet.bind(user);
+
+greetUser();
+// Hello Balaji
+```
+```js
+const button = {
+  label: "Submit",
+  handleClick() {
+    console.log(this.label);
+  }
+};
+
+setTimeout(button.handleClick, 1000);
+//undefined
+setTimeout(button.handleClick.bind(button), 1000);
+//Submit
+```

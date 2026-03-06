@@ -233,3 +233,35 @@ Mutates original: ✅ Yes
 const arr = [1,2,3];
 arr.reverse();
 // [3,2,1]
+
+# flatten objects
+Flattening an object means converting nested objects into a single-level object using keys as paths.
+```js
+const data ={
+  user: {
+    name: "Balaji",
+    address: {
+      city: "Delhi"
+    }
+  }
+}
+//Result
+{
+  "user.name": "Balaji",
+  "user.address.city": "Delhi"
+}
+function flattenObject(obj, parent = "", result = {}) {
+  for (let key in obj) {
+    const newKey = parent ? `${parent}.${key}` : key;
+
+    if (typeof obj[key] === "object" && obj[key] !== null) {
+      flattenObject(obj[key], newKey, result);
+    } else {
+      result[newKey] = obj[key];
+    }
+  }
+
+  return result;
+}
+flattenObject(data);
+```
