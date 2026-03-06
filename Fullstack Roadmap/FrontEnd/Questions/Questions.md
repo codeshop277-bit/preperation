@@ -298,3 +298,203 @@ setTimeout(button.handleClick, 1000);
 setTimeout(button.handleClick.bind(button), 1000);
 //Submit
 ```
+# Event Emitter
+An Event Emitter is a pattern used to enable publish–subscribe communication between components.
+One part of the system emits an event, and other parts listen and react to it.
+
+Used widely in:
+Node.js (EventEmitter)
+frontend event systems
+microfrontend communication
+state management systems
+
+Emitter → emits event
+Listeners → subscribe to event
+
+Flow
+userLoggedIn event
+      ↓
+listener1
+listener2
+listener3
+
+```js
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+
+  on(event, listener) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+
+    this.events[event].push(listener);
+  }
+
+  emit(event, data) {
+    if (this.events[event]) {
+      this.events[event].forEach(listener => listener(data));
+    }
+  }
+}
+
+const emitter = new EventEmitter();
+
+emitter.on("login", (user) => {
+  console.log("User logged in:", user);
+});
+
+emitter.emit("login", { name: "Balaji" });
+const emitter = new EventEmitter();
+
+emitter.on("newNotification", (msg) => {
+  console.log("Show toast:", msg);
+});
+
+emitter.emit("newNotification", "New message received");
+```
+| Method   | Purpose            |
+| -------- | ------------------ |
+| `on()`   | subscribe to event |
+| `emit()` | trigger event      |
+| `off()`  | remove listener    |
+| `once()` | listen only once   |
+Example DOM event system works similarly:
+button.addEventListener("click", handler);
+
+# MapLimit
+mapLimit is used to process a list of asynchronous tasks with a fixed concurrency limit.
+Instead of running all promises at once, it ensures only N tasks run simultaneously.
+
+Used in real systems for:
+API rate limits
+file uploads
+batch processing
+preventing server overload
+
+uppose you have 10 API calls.
+
+urls.map(url => fetch(url));
+
+All 10 requests run at the same time, which can cause:
+API rate limit errors
+server overload
+browser request limits
+Instead we limit concurrency.
+```js
+async function mapLimit(arr, limit, asyncFn) {
+  const results = [];
+  let index = 0;
+
+  async function worker() {
+    while (index < arr.length) {
+      const currentIndex = index++;
+      results[currentIndex] = await asyncFn(arr[currentIndex]);
+    }
+  }
+
+  const workers = Array(limit).fill().map(worker);
+
+  await Promise.all(workers);
+
+  return results;
+}
+```
+Execution flow
+
+Fetching: api1
+Fetching: api2
+(wait)
+
+Fetching: api3
+Fetching: api4
+
+Only 2 requests run simultaneously.
+
+# Cancellable Promise
+JavaScript promises are not inherently cancelable, so cancellation is implemented using mechanisms like AbortController or wrapper logic to stop asynchronous operations such as API requests when they are no longer needed.
+Used in real apps for:
+canceling API requests
+stopping search queries
+aborting long-running tasks
+```js
+let controller;
+
+function search(query) {
+  if (controller) {
+    controller.abort();
+  }
+
+  controller = new AbortController();
+
+  fetch(`/api/search?q=${query}`, {
+    signal: controller.signal
+  })
+    .then(res => res.json())
+    .then(data => console.log(data))
+    .catch(err => console.log("Request cancelled"));
+}
+```
+typing quickly
+↓
+previous API calls canceled
+↓
+only latest request processed
+
+# LRU Cache for Search
+```js
+class LRUCache {
+  constructor(limit) {
+    this.limit = limit;
+    this.cache = new Map();
+  }
+
+  get(key) {
+    if (!this.cache.has(key)) return null;
+
+    const value = this.cache.get(key);
+
+    this.cache.delete(key);
+    this.cache.set(key, value);
+
+    return value;
+  }
+
+  set(key, value) {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+
+    this.cache.set(key, value);
+
+    if (this.cache.size > this.limit) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+  }
+}
+const cache = new LRUCache(5);
+
+async function search(query) {
+  const cached = cache.get(query);
+
+  if (cached) {
+    console.log("From cache:", cached);
+    return cached;
+  }
+
+  const response = await fetch(`/api/search?q=${query}`);
+  const data = await response.json();
+
+  cache.set(query, data);
+
+  return data;
+}
+search("react");
+search("react js");
+search("react"); 
+react → API call
+react js → API call
+react → cache hit ✅
+```

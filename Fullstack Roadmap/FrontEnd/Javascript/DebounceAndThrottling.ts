@@ -56,3 +56,42 @@ const handleScroll = throttle(() => {
 }, 500)
 
 //Key difference: Debounce waits for a pause in activity, while throttling executes at regular intervals during continuous activity.
+
+
+//Debounce with trailing and leading
+// User types → show first result immediately (leading)
+// User stops typing → update results again (trailing)
+function debounce(fn, delay, { leading = false, trailing = true } = {}) {
+  let timer = null;
+
+  return function (...args) {
+    const context = this;
+
+    const callNow = leading && !timer;
+
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      if (trailing) fn.apply(context, args);
+      timer = null;
+    }, delay);
+
+    if (callNow) fn.apply(context, args);
+  };
+}
+
+// Debouncing limits how frequently a function runs by delaying execution until events stop firing. Leading execution runs the function immediately, while trailing execution runs it after the delay.
+
+//Throttle
+function throttle(fn, delay) {
+  let lastCall = 0;
+
+  return function (...args) {
+    const now = Date.now();
+
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn.apply(this, args);
+    }
+  };
+}
