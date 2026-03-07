@@ -498,3 +498,124 @@ react → API call
 react js → API call
 react → cache hit ✅
 ```
+
+# Currying
+Currying is a functional programming technique that transforms a function with multiple parameters into a sequence of functions that take one argument at a time.
+
+```js
+function multiply(a) {
+  return function (b) {
+    return function (c) {
+      return a * b * c;
+    };
+  };
+}
+
+multiply(2)(3)(4); // 24
+
+function handleDelete(id) {
+  return function () {
+    console.log("Deleting item", id);
+  };
+}
+
+<button onClick={handleDelete(10)}>Delete</button>
+```
+Currying is commonly used for:
+Reusable utilities
+Event handlers
+Configuration-based functions
+Functional programming patterns in React
+
+# Deepclone
+Deep cloning creates a completely independent copy of an object, including nested objects and arrays, ensuring no shared references exist between the original and cloned object.
+```js
+//Built in
+const clone = structuredClone(originalObject);
+
+function deepClone(obj) {
+
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+
+  const clone = Array.isArray(obj) ? [] : {};
+
+  for (let key in obj) {
+    clone[key] = deepClone(obj[key]);
+  }
+
+  return clone;
+}
+const copy = { ...user };
+copy.address.city = "Mumbai";
+```
+# Shallow Copy
+A shallow copy creates a new object but copies only the top-level properties.
+Nested objects or arrays still share the same reference.
+```js
+const user = {
+  name: "John",
+  address: {
+    city: "Delhi"
+  }
+};
+
+const copy = { ...user };
+
+copy.address.city = "Mumbai";
+
+console.log(user.address.city);
+//Output -> Mumbai
+```
+copy.address === user.address
+Both objects reference the same nested object.
+
+We can also use Json to create a deep copy of object
+```js
+const obj = {
+  date: new Date(),
+  func: () => {},
+  value: undefined
+};
+
+const clone = JSON.parse(JSON.stringify(obj));
+```
+Issue is It fails or loses data for many JavaScript types.
+| Data Type           | Result              |
+| ------------------- | ------------------- |
+| Function            | Removed             |
+| undefined           | Removed             |
+| Date                | Converted to string |
+| Map / Set           | Lost                |
+| Circular references | Error               |
+
+# Retry Promises
+```js
+async function retryPromise(fn, retries) {
+
+  try {
+    return await fn();
+  } catch (error) {
+
+    if (retries === 0) {
+      throw error;
+    }
+
+    return retryPromise(fn, retries - 1);
+  }
+
+}
+
+function fetchUsers() {
+  return fetch("/api/users")
+    .then(res => {
+      if (!res.ok) throw new Error("Request failed");
+      return res.json();
+    });
+}
+
+retryPromise(fetchUsers, 3)
+  .then(data => console.log(data))
+  .catch(err => console.error("Failed after retries"));
+  ```
