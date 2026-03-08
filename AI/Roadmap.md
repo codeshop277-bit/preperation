@@ -151,6 +151,27 @@ Send prompt to LLM API
 Receive response
 Parse structured JSON output
 ```
+# LLM Basics
+Day 1
+Tokens + context window
+
+Day 2
+System prompts + roles
+
+Day 3
+Temperature + parameters
+
+Day 4
+Structured output
+
+Day 5
+Function calling
+
+Day 6
+Streaming responses
+
+Day 7
+Build simple LLM chat backend
 
 ### Deliverable
 
