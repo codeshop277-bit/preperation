@@ -296,3 +296,5 @@ Detect in Network tab, enable protocol col in dev tools
 | `h3`           | HTTP/3 (QUIC)    |
 | `quic`         | HTTP/3 transport |
 | `(blank)`      | Cached / local   |
+
+# TCP - Transmission comission protocol
