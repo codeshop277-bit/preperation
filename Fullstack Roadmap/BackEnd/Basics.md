@@ -195,3 +195,21 @@ Body size > 1MB
 Missing Content-Type
 SQL injection patterns
 XSS payloads
+
+# Mutler - File upload
+# Crypto - encryption, decryption, hashing
+# Passports - authorisation, signins, authentication
+
+# Piping
+piping refers to the process of passing the output of one stream directly into another stream. It allows data to flow through multiple streams without needing to store it in memory or temporarily write it to disk. This is a common pattern used in file handling, HTTP requests, and other I/O operations in NodeJS.
+
+# Cluster
+cluster modules are created that provide us the way to make child processes that run simultaneously with a single parent process.
+Fork(): It creates a new child process from the master. The isMaster returns true if the current process is master or else false.
+isWorker: It returns true if the current process is a worker or else false.
+process: It returns the child process which is global.
+send(): It sends a message from worker to master or vice versa. 
+kill(): It is used to kill the current worker.
+
+# Event Emitter
+In Node.js, an Event Emitter is a class that allows objects to emit events and register listeners (callbacks) to handle those events. It is part of the events module and is commonly used to handle asynchronous events and to implement an observer pattern, where an object (the emitter) triggers events, and other objects (listeners) respond to those events.
