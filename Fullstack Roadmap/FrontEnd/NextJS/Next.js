@@ -739,3 +739,6 @@ const NextJSFeaturesDemo = () => {
         </div>
     )
 }
+// # getStaticProps  used for static site generation to fetch data at build time. 
+// # getServerSideProps ed for fetching data on each request in Next.js. It runs on the server side during the request and response cycle, allowing you to fetch data from a database or external API each time a page is requested.
+// # getStaticPaths  - with dynamic routes to specify which paths should be pre-rendered at build time.
