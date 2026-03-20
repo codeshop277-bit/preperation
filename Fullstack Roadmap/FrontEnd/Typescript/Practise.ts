@@ -144,7 +144,7 @@ const filterKeys = <T extends object>(obj: T , predicate: (value: T[keyof T]) =>
 // → Post[]
 // ============================================================
 
-const retry = ???async (fn: ???, times: number): ??? => {
+const retry = async <T> (fn: () => Promise<T>, times: number): Promise<T> => {
   let lastError: unknown;
   for (let i = 0; i < times; i++) {
     try {
@@ -177,10 +177,10 @@ const retry = ???async (fn: ???, times: number): ??? => {
 // omit(user, ["ghost"]) → type error
 // ============================================================
 
-const omit = ???(obj: ???, keys: ???): ??? => {
+const omit = <T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
   return Object.fromEntries(
     Object.entries(obj).filter(([key]) => !keys.includes(key as ???))
-  ) as ???;
+  ) as Omit<T, K>;
 };
 
 
@@ -198,7 +198,7 @@ const omit = ???(obj: ???, keys: ???): ??? => {
 // intersect([1, 2, 3], ["a", "b"]) → type error — different types
 // ============================================================
 
-const intersect = ???(a: ???, b: ???): ??? => {
+const intersect = <T>(a: T[], b: T[]): T[] => {
   return a.filter(item => b.includes(item));
 };
 
@@ -225,6 +225,6 @@ const intersect = ???(a: ???, b: ???): ??? => {
 // through each transformer step.
 // ============================================================
 
-const pipe = ???(value: ???, ...fns: ???): ??? => {
-  return fns.reduce((acc, fn) => fn(acc), value as ???);
+const pipe = <T, R>(value: T, ...fns: Array<(arg: any) => any> ): R =>{
+  return fns.reduce((acc, fn) => fn(acc), value as Array<R(arg: any) => any> ));
 };
