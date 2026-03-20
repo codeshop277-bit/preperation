@@ -68,3 +68,59 @@ Can Grid replace Flexbox?
 → Yes, but Flexbox is simpler for 1D alignment.
 Best answer:
 “Grid handles layout structure, Flexbox handles component alignment.”
+
+CSS Combinators – Quick Guide
+
+CSS combinators define relationships between selectors.
+
+1. Descendant Combinator ( )
+
+Selects all matching elements inside a parent (any depth).
+
+div p {
+  color: blue;
+}
+<div>
+  <section>
+    <p>Selected</p>
+  </section>
+</div>
+2. Child Combinator (>)
+
+Selects only direct children.
+
+div > p {
+  color: red;
+}
+<div>
+  <p>Selected</p>
+  <section>
+    <p>Not selected</p>
+  </section>
+</div>
+3. Adjacent Sibling (+)
+
+Selects the next immediate sibling.
+
+h1 + p {
+  color: green;
+}
+<h1>Title</h1>
+<p>Selected</p>
+<p>Not selected</p>
+4. General Sibling (~)
+
+Selects all following siblings.
+
+h1 ~ p {
+  color: purple;
+}
+<h1>Title</h1>
+<p>Selected</p>
+<p>Selected</p>
+Summary Table
+Combinator	Symbol	Description
+Descendant	(space)	Any level inside
+Child	>	Direct children only
+Adjacent sibling	+	Next sibling only
+General sibling	~	All following siblings
