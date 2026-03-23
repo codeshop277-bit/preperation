@@ -21,17 +21,6 @@ let price: number = 99.99;
 let hex: number = 0xf00d;
 let binary: number = 0b1010;
 
-interface roleEnum{
-    admin: "admin",
-    editor: "editor",
-    viewer: "viewer"
-}
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: roleEnum;
-}
 
 // Boolean
 let isActive: boolean = true;

@@ -494,3 +494,14 @@ Cache TTL: 0 or very low
 This ensures:
 JS/CSS cached heavily
 App updates reflect quickly
+
+AWS Identity and Access Management (IAM) allows you to manage access to AWS services securely. It lets you create and manage AWS users, groups, and roles, and use permissions to allow or deny access.
+IAM roles allow AWS resources to act on behalf of users or services. Roles have specific permissions and can be assumed by trusted entities.
+IAM policies are JSON documents that define permissions. They can be attached to users, groups, or roles to grant or deny actions on resources.
+
+Enable CloudTrail for API logs, use CloudWatch Logs for application/system logs, and set alarms or dashboards.
+AWS CodeDeploy automates code deployments to any instance, including EC2, Lambda, or on-premise servers.
+
+AWS CodeBuild is a fully managed continuous integration service that compiles source code, runs tests, and produces packages ready for deployment.
+
+AWS CodePipeline is a fully managed continuous integration and continuous delivery (CI/CD) service for fast and reliable application and infrastructure updates.
