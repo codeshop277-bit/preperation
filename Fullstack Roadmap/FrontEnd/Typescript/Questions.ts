@@ -41,10 +41,11 @@ type Manager = {
 };
 
 // YOUR SOLUTION — Q1
-type EmployeeOrManager = // ...
-type EmployeeManager = // ...
+type EmployeeOrManager = Employee | Manager
+type EmployeeManager = Employee & Manager
 function isManager(person: EmployeeOrManager): person is Manager {
   // ...
+  return "reports" in person
 }
 
 
@@ -62,10 +63,25 @@ function isManager(person: EmployeeOrManager): person is Manager {
  */
 
 // YOUR SOLUTION — Q2
-type ApiResponse<T> = // ...
+type SuccessResponse<T> = { status: "success"; data: T };
+type ErrorResponse   = { status: "error"; message: string; code: number };
+type LoadingResponse = { status: "loading" };
+type ApiResponse<T> = SuccessResponse<T> | ErrorResponse | LoadingResponse
 
 function handleResponse<T>(response: ApiResponse<T>): string {
-  // ...
+  switch (response.status) {
+    case "success":
+      return "success"
+    case "error":
+      // ✅ TypeScript knows response.message and response.code exist here
+      return `Error ${response.code}: ${response.message}`;
+
+    case "loading":
+      return "Loading...";
+    default:
+      const _exhaustive: never = response;
+      return _exhaustive
+  }
 }
 
 
@@ -84,10 +100,17 @@ type UserPayload = { id: number; email: string };
 // YOUR SOLUTION — Q3
 function isUserPayload(value: unknown): value is UserPayload {
   // ...
+  return (
+    typeof value == "object" && value != null && "id" in value && "email" in value
+  )
 }
 
 function parseUser(raw: unknown): UserPayload {
   // ...
+  if(isUserPayload(raw)){
+    return raw
+  }
+  throw new Error('')
 }
 
 
@@ -102,13 +125,12 @@ function parseUser(raw: unknown): UserPayload {
  */
 
 // YOUR SOLUTION — Q4
-const HTTP_METHODS = // ...
-
-type HttpMethod = // ...
+const HTTP_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH"] as const
+type HttpMethod = typeof HTTP_METHODS[number]
 
 function makeRequest(url: string, method: HttpMethod): void {
   console.log(`${method} ${url}`);
-}
+} 
 
 
 /**
@@ -125,11 +147,23 @@ type Shape = "circle" | "square" | "triangle";
 
 // YOUR SOLUTION — Q5
 function assertNever(x: never): never {
-  // ...
+  throw new Error('x')
 }
 
 function describeShape(s: Shape): string {
   // ...
+  switch (s){
+    case 'circle':
+      return 'circle'
+    case 'square':
+      return 'square'
+    case 'triangle':
+      return 'triangle'
+    default:
+      
+      return assertNever(s)
+      
+  }
 }
 
 
@@ -146,10 +180,10 @@ function describeShape(s: Shape): string {
  */
 
 // YOUR SOLUTION — Q6
-type Pair<A, B> = // ...
-type Triplet<A, B, C> = // ...
+type Pair<A, B> = [A, B]
+type Triplet<A, B, C> = [A, B, C]
 declare function zip<A, B>(as: A[], bs: B[]): Pair<A, B>[];
-type Concat<T extends unknown[], U extends unknown[]> = // ...
+type Concat<T extends unknown[], U extends unknown[]> = [...T, ...U]
 
 // Test:
 type C1 = Concat<[1, 2], [3, 4]>; // should be [1, 2, 3, 4]
@@ -170,14 +204,14 @@ type C1 = Concat<[1, 2], [3, 4]>; // should be [1, 2, 3, 4]
 type Config = { host: string; port: number; ssl: boolean };
 
 // YOUR SOLUTION — Q7
-type ConfigKey = // ...
-type ConfigValue = // ...
+type ConfigKey = keyof Config
+type ConfigValue = Config[ConfigKey]
 
 function getConfig<K extends keyof Config>(cfg: Config, key: K): Config[K] {
-  // ...
+  return cfg[key]
 }
 
-type ReadonlyConfig = // ...
+type ReadonlyConfig = {readonly [K in keyof Config]: Config[K]}
 
 
 /**
@@ -201,7 +235,7 @@ function createTheme() {
   };
 }
 
-type Theme = // ...
+type Theme = ReturnType<typeof createTheme>
 
 function applyTheme(theme: Theme): void {
   console.log(theme.primaryColor);
@@ -222,9 +256,13 @@ function applyTheme(theme: Theme): void {
  */
 
 // YOUR SOLUTION — Q9
-type FnVoid = // ...
-type FnUndefined = // ...
-type FnNever = // ...
+type FnVoid = () => void
+type FnUndefined = () => undefined
+type FnNever = () => never
+
+const a: FnVoid =      () => { console.log("hi"); };  // no return needed
+const b: FnUndefined = () => undefined;               // must return undefined
+const c: FnNever =     () => { throw new Error(); };  
 
 function processAll<T>(items: T[], fn: (item: T) => void): void {
   // ...
@@ -245,8 +283,8 @@ function processAll<T>(items: T[], fn: (item: T) => void): void {
 type EventName = "click" | "focus" | "blur";
 
 // YOUR SOLUTION — Q10
-type EventHandlerName = // ...
-type RemoveOn<T extends string> = // ...
+type EventHandlerName = `on${EventName}`
+type RemoveOn<T extends string> = T extends `on${infer Rest}` ?Uncapitalize<Rest> : never
 
 // Test:
 type E1 = RemoveOn<"onClick">; // "click"
