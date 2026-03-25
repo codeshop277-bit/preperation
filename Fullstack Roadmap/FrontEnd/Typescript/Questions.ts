@@ -308,6 +308,7 @@ type E1 = RemoveOn<"onClick">; // "click"
 // YOUR SOLUTION — Q11
 function pluck<T, K extends keyof T>(arr: T[], key: K): T[K][] {
   // ...
+  return arr.map(item => item[key])
 }
 
 
@@ -325,7 +326,19 @@ function pluck<T, K extends keyof T>(arr: T[], key: K): T[K][] {
 
 // YOUR SOLUTION — Q12
 class Stack<T = string> {
-  // ...
+  private readonly items: T[] = []
+  push(item: T): void{
+    this.items.push(item)
+  }
+  pop():T | undefined{
+    return this.items.pop()
+  }
+  peek(): T | undefined{
+    return this.items[this.items.length -1]
+  }
+  getSize(): number{
+    return this.items.length
+  }
 }
 
 
@@ -341,11 +354,11 @@ class Stack<T = string> {
  */
 
 // YOUR SOLUTION — Q13
-type IdentityFn = // ...  (generic function type)
-type Box<T> = // ...      (generic type alias)
+type IdentityFn = <T>(arg: T) => T
+type Box<T> = { value: T }//    (generic type alias)
 
-const myIdentity: IdentityFn = // ...
-const strBox: Box<string> = // ...
+const myIdentity: IdentityFn
+const strBox: Box
 
 
 /**
@@ -360,10 +373,12 @@ const strBox: Box<string> = // ...
 // YOUR SOLUTION — Q14
 function merge<T extends object, U extends object>(a: T, b: U): T & U {
   // ...
+  return {...a, ...b} as T & U
 }
 
 function mergeWithTimestamp<T extends object>(obj: T): T & { createdAt: Date } {
   // ...
+  return {...obj, createdAt: new Date()} as T & {createdAt: Date}
 }
 
 
@@ -381,15 +396,37 @@ function mergeWithTimestamp<T extends object>(obj: T): T & { createdAt: Date } {
  */
 
 // YOUR SOLUTION — Q15
+
 interface Repository<T extends { id: number }> {
-  // ...
+  findById(id: number): Promise<T | null>;
+  findAll(): Promise<T[]>;
+  save(entity: Omit<T, "id">): Promise<T>;
+  delete(id: number): Promise<void>;
 }
 
+// Class — owns the private state and implements the contract
 class MockRepository<T extends { id: number }> implements Repository<T> {
-  // ...
+  private items: T[] = [];
+  private nextId = 1;
+
+  async findById(id: number): Promise<T | null> {
+    return this.items.find(item => item.id === id) ?? null;
+  }
+
+  async findAll(): Promise<T[]> {
+    return [...this.items]; // return a copy to prevent external mutation
+  }
+
+  async save(entity: Omit<T, "id">): Promise<T> {
+    const newEntity = { ...entity, id: this.nextId++ } as T;
+    this.items.push(newEntity);
+    return newEntity;
+  }
+
+  async delete(id: number): Promise<void> {
+    this.items = this.items.filter(item => item.id !== id);
+  }
 }
-
-
 /**
  * Q16 — Inferring Function Parameter Types
  *
