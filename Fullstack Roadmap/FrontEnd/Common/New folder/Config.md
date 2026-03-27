@@ -908,3 +908,26 @@ All security headers are configured in `next.config.js` — see the [next.config
 ---
 
 *Generated for Next.js 14+ / React 18+ production projects.*
+
+# Publish config - nexus registry
+Nexus Repository Manager is a private artifact/package registry that companies run internally. Instead of your developers and CI servers pulling packages directly from the public registry.npmjs.org, they pull from your company's own Nexus server
+
+** package.json — declares where to publish
+The publishConfig.registry field tells npm publish where to push your package. It answers: "When I run npm publish, where does this package go?"
+It has no effect on npm install. It is purely a publish-time instruction.
+
+.npmrc — declares how to authenticate and where to fetch from
+The .npmrc answers: "When I run npm install, where do I fetch packages from, and how do I authenticate?"    
+
+Nexus typically serves three repository types, often grouped behind one URL:
+npm-internal — your company's own private packages (@mycompany/design-system, @mycompany/auth-utils). Published via publishConfig, consumed via .npmrc.
+npm-proxy — a transparent cache of registry.npmjs.org. The first time someone installs react, Nexus fetches it from public npm and caches it. Every install after that is served from Nexus. This means your builds never depend on public npm availability.
+npm-group — a virtual URL that merges both of the above. This is usually what you point .npmrc at — one URL that serves both internal packages and cached public ones.
+
+Without Nexus, every npm install in CI reaches out to the public internet. That creates several risks:
+
+A malicious package with a name similar to your internal package can be published to public npm and get installed instead (dependency confusion attack)
+A popular package getting unpublished from npm breaks your builds (the left-pad incident)
+Builds are slower because packages are fetched from across the internet on every CI run
+
+With Nexus as your registry, Nexus controls what packages are allowed into your builds, everything is cached locally on your network, and you can audit every package that enters your supply chain.
