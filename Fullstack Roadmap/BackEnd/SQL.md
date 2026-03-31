@@ -233,3 +233,15 @@ Key Components:
 Anchor Member: The initial query that starts the recursion.
 Recursive Member: A query that references the CTE to continue building the result set.
 Termination Condition: Ensures that recursion stops after a certain depth or condition is met.
+
+# Consistency
+ Use Distributed Transactions: Implement two-phase commit (2PC) to ensure all participating databases commit changes simultaneously or roll back if any part fails.
+
+2. Implement Eventual Consistency: If strong consistency isn’t required, allow data to become consistent over time. This approach is common in distributed systems where high availability is a priority.
+
+3. Conflict Resolution Mechanisms: Use versioning, timestamps, or conflict detection rules to resolve inconsistencies.
+
+4. Data Replication and Synchronization: Use reliable replication strategies to ensure that changes made in one database are propagated to others.
+
+# Pivot
+The PIVOT operator transforms rows into columns, making it easier to summarize or rearrange data for reporting
