@@ -200,6 +200,7 @@ WHERE dept_id = (
 
 Update the `orders` table to set status = 'Reviewed' for all orders placed by employees in the 'Marketing' department.
 
+
 ```sql
 UPDATE orders o
 JOIN employees e ON o.emp_id = e.emp_id
